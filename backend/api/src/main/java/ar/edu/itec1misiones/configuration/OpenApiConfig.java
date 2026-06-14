@@ -16,7 +16,14 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title(OpenApiConstants.OPEN_API_TITTLE)
                         .version(OpenApiConstants.OPEN_API_VERSION)
-                        .description(OpenApiConstants.OPEN_API_DESCRIPTION));
+                        .description(OpenApiConstants.OPEN_API_DESCRIPTION))
+                .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement().addList("bearerAuth"))
+                .components(new io.swagger.v3.oas.models.Components()
+                        .addSecuritySchemes("bearerAuth", new io.swagger.v3.oas.models.security.SecurityScheme()
+                                .name("bearerAuth")
+                                .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
     }
     @Bean
     public GroupedOpenApi publicApi() {
