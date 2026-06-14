@@ -1,0 +1,15 @@
+# === Archivos de contexto y configuración para Agentes IA ===
+# Al no tener una barra (/) adelante, se ignoran en cualquier subcarpeta del proyecto.
+
+# Archivos específicos de instrucciones para IAs
+CLAUDE.md
+GEMINI.md
+CURSOR.md
+.cursorrules
+
+# Carpetas destinadas a guardar prompts o historiales de agentes
+agentes/
+.agents/
+.ai/
+prompts/
+.gemini/

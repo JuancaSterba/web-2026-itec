@@ -1,0 +1,33 @@
+app:
+  name: "@project.name@"
+  version: "@project.version@"
+
+spring:
+  application:
+    name: backoffice-itec
+  output:
+    ansi:
+      enabled: always
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  config:
+    import:
+      - classpath:application-security.yml
+      - classpath:application-core.yml
+      - classpath:application-commons.yml
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: info
+    org.springframework.web: debug
+

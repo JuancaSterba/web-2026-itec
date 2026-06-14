@@ -1,0 +1,9 @@
+package ar.edu.itec1misiones.repository;
+
+import ar.edu.itec1misiones.model.AlumnoInscripto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.*;
+
+@Repository
+public interface AlumnoInscriptoRepository extends JpaRepository<AlumnoInscripto, Long> {
+}

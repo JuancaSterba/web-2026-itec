@@ -1,0 +1,87 @@
+# === Java ===
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# === Maven ===
+target/
+dependency-reduced-pom.xml
+release.properties
+buildNumber.properties
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+.mvn/timing.properties
+
+# === Gradle (por si accidentalmente está) ===
+.gradle/
+build/
+
+# === Logs ===
+*.log
+logs/
+*.out
+*.pid
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === IntelliJ IDEA ===
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+workspace.xml
+shelf/
+
+# === Eclipse ===
+.project
+.classpath
+.settings/
+.springBeans
+bin/
+
+# === NetBeans ===
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# === VS Code ===
+.vscode/
+
+# === Test reports ===
+test-output/
+surefire-reports/
+jacoco.exec
+
+# === Misc ===
+*.swp
+*~
+*.tmp
+*.bak
+*.orig
+*.rej
+*.sublime-workspace
+*.sublime-project
+hs_err_pid*
+replay_pid*
+dump.rdb
+node_modules/
+
+# === Spring Boot Dev Tools ===
+.spring-boot-devtools.properties
+
+# === Coverage tools ===
+.coverage/
+coverage/
+.coverage.*
+*.lcov
+*.exec

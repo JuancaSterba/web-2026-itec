@@ -1,0 +1,18 @@
+spring:
+  application:
+    profiles:
+      active: local
+logging:
+  level:
+    root: info
+
+server:
+  port: 8082
+
+admin:
+  username: testadmin
+  password: test123
+  nombre: Admin
+  apellido: Test
+  email: admin.test@itec.edu.ar
+  telefono: 222222222

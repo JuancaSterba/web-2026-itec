@@ -1,0 +1,58 @@
+{
+  "name": "backoffice-itec-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-popover": "^1.1.14",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.0",
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.292.0",
+    "next": "^16.2.7",
+    "next-themes": "^0.4.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-use": "^13.14.3",
+    "sonner": "^2.0.6",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.20",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.4.5"
+  },
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/damianbetancur/backoffice-itec-frontend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/damianbetancur/backoffice-itec-frontend/issues"
+  },
+  "homepage": "https://github.com/damianbetancur/backoffice-itec-frontend#readme",
+  "description": ""
+}
