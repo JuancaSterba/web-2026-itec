@@ -1,5 +1,7 @@
 # Backoffice ITEC — Frontend
 
+> **Nota importante:** Este proyecto forma parte de un **repositorio modular (monorepo)**. El código y documentación que ves aquí corresponden exclusivamente al **Frontend**. Para ver el backend o la vista general del proyecto, por favor dirígete a la [raíz del repositorio](../README.md).
+
 Panel de administración académica para el Instituto ITEC. Permite gestionar alumnos, profesores, materias, comisiones, asistencia, calificaciones, reportes y certificados.
 
 ## Tech Stack
@@ -19,8 +21,10 @@ Panel de administración académica para el Instituto ITEC. Permite gestionar al
 ## Instalación
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
+
+> **Nota:** Se requiere usar `--legacy-peer-deps` debido a conflictos de dependencias (peer dependencies) con algunas librerías como `react-use` al utilizar React 18.
 
 ## Variables de entorno
 

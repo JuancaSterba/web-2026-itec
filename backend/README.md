@@ -1,4 +1,6 @@
-# 🎓 Backoffice Académico ITEC
+# 🎓 Backoffice Académico ITEC - Backend
+
+> **Nota importante:** Este proyecto forma parte de un **repositorio modular (monorepo)**. El código y documentación que ves aquí corresponden exclusivamente al **Backend**. Para ver el frontend o la vista general del proyecto, por favor dirígete a la [raíz del repositorio](../README.md).
 
 ## 📌 Descripción
 spring.profiles.active=dev
