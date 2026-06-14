@@ -13,3 +13,5 @@ agentes/
 .ai/
 prompts/
 .gemini/
+backend/skills-lock.json
+backend/AGENT.md
