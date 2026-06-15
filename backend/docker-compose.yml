@@ -47,6 +47,7 @@ services:
       - ADMIN_DNI=${ADMIN_LOCAL_DNI}
       - ADMIN_EMAIL=${ADMIN_LOCAL_EMAIL}
       - ADMIN_TELEFONO=${ADMIN_LOCAL_TELEFONO}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     ports:
       # Mapeamos el puerto de nuestra máquina al puerto del contenedor de forma dinámica
       - "${APP_PORT:-8080}:${APP_PORT:-8080}"
