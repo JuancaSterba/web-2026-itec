@@ -10,6 +10,14 @@ La arquitectura general orquestada por Docker Compose estará compuesta por:
 - **Microservicio Calificaciones:** Servicio transaccional, enfocado en la gestión de instancias evaluativas y notas.
 - **Frontend (Next.js):** Aplicación cliente (Puerto 3000).
 
+### 1.1 Estrategia de Base de Datos (Aislamiento Lógico)
+Para evitar la sobrecarga operativa y mantener la separación arquitectónica, se utilizará un enfoque de **Aislamiento Lógico**:
+- Habrá **un único contenedor de servidor de Base de Datos** (`itec-mysql`).
+- Dentro de este servidor, se crearán esquemas (bases de datos lógicas) separados para garantizar que no existan dependencias directas ni JOINs entre servicios:
+  - `db_core`: Administra datos maestros (Alumnos, Profesores, Materias, Inscripciones).
+  - `db_asistencias`: Guarda solo los IDs del alumno y comisión para registrar el presentismo.
+  - `db_calificaciones`: Guarda solo los IDs del alumno y comisión para registrar las notas.
+- **Comunicación de datos**: Si un microservicio necesita el "Nombre" de un alumno, deberá consultar su ID mediante una llamada de API al Core (o el Frontend orquestará ambas llamadas).
 ---
 
 ## 2. Fase 1: Desarrollo del Backend Core (En progreso)
