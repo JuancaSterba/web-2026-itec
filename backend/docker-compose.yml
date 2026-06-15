@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Servicio de Base de Datos (MySQL)
+  mysql-db:
+    image: mysql:8.0 # Usamos la imagen oficial de MySQL versión 8.0
+    container_name: itec-mysql # Nombre amigable para el contenedor
+    environment:
+      # Inyectamos credenciales usando las variables definidas en nuestro archivo .env
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      # Mapeamos el puerto 3306 de nuestra máquina local al 3306 del contenedor
+      - "3306:3306"
+    volumes:
+      # Persistencia de datos: Guardamos la información de MySQL en un volumen de Docker
+      # para no perder la base de datos si el contenedor se destruye.
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      # Comprobación de salud: Le dice a Docker cómo saber si MySQL ya está listo para recibir conexiones.
+      # Intenta hacer un ping a la base de datos usando la contraseña del root.
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      timeout: 10s # Tiempo máximo a esperar por respuesta
+      retries: 10  # Número de intentos antes de dar el servicio por "fallido"
+
+  # Servicio de nuestra aplicación Backend (Spring Boot)
+  backend-app:
+    build: 
+      # Le indicamos a Docker Compose que debe construir la imagen usando nuestro Dockerfile
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Le pasamos el puerto al Dockerfile dinámicamente
+        APP_PORT: ${APP_PORT:-8080}
+    container_name: itec-backend # Nombre amigable para el contenedor
+    environment:
+      # Inyectamos el perfil activo de Spring (ej. local o prod) desde el .env
+      - SPRING_PROFILES_ACTIVE=${APP_PROFILE}
+      # Inyectamos todas las variables de conexión a la BD y datos del administrador
+      - SPRING_DATASOURCE_URL=${DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - ADMIN_USERNAME=${ADMIN_LOCAL_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_LOCAL_PASSWORD}
+      - ADMIN_NOMBRE=${ADMIN_LOCAL_NOMBRE}
+      - ADMIN_APELLIDO=${ADMIN_LOCAL_APELLIDO}
+      - ADMIN_DNI=${ADMIN_LOCAL_DNI}
+      - ADMIN_EMAIL=${ADMIN_LOCAL_EMAIL}
+      - ADMIN_TELEFONO=${ADMIN_LOCAL_TELEFONO}
+    ports:
+      # Mapeamos el puerto de nuestra máquina al puerto del contenedor de forma dinámica
+      - "${APP_PORT:-8080}:${APP_PORT:-8080}"
+    depends_on:
+      # Dependencia estricta: El backend NO arrancará hasta que el contenedor mysql-db
+      # reporte estar "saludable" (gracias al healthcheck configurado arriba).
+      mysql-db:
+        condition: service_healthy
+
+# Declaración de volúmenes manejados por Docker
+volumes:
+  mysql-data:
