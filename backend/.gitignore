@@ -85,3 +85,4 @@ coverage/
 .coverage.*
 *.lcov
 *.exec
+.env

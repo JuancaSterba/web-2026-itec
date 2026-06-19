@@ -1,0 +1,22 @@
+include:
+  - backend/docker-compose.yml
+
+services:
+  frontend-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: itec-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # Apunta a la URL donde se expone el backend.
+      # Nota: al estar expuesto en el localhost del host, el navegador accederá a http://localhost:8082
+      - NEXT_PUBLIC_API_URL=http://localhost:8082
+    volumes:
+      # Montamos el código fuente para tener Hot Reload en modo desarrollo
+      - ./frontend:/app
+      # Protegemos la carpeta node_modules del contenedor para que no se sobreescriba con la local
+      - /app/node_modules
+    depends_on:
+      - backend-app
