@@ -56,6 +56,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(CuatrimestreNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCuatrimestreNotFound(
+            CuatrimestreNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("CUATRIMESTRE_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(ProfesorNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleProfesorNotFound(
             ProfesorNotFoundException ex,
