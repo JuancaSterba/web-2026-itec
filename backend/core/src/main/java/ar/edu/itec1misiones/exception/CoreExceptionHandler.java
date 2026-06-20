@@ -56,6 +56,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ProfesorNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleProfesorNotFound(
+            ProfesorNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("PROFESOR_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(AlumnoNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleAlumnoNotFound(
             AlumnoNotFoundException ex,
