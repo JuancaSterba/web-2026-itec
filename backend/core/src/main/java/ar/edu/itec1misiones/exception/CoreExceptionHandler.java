@@ -27,4 +27,18 @@ public class CoreExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(PlanEstudioNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handlePlanEstudioNotFound(
+            PlanEstudioNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("PLAN_ESTUDIO_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
 }

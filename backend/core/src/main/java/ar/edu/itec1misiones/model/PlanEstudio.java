@@ -13,9 +13,11 @@ public class PlanEstudio {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
+    private String validez;
+    private String resolucion;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+    private boolean activo = true;
 
     @ManyToOne
     private Carrera carrera;
