@@ -41,4 +41,32 @@ public class CoreExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(MateriaNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMateriaNotFound(
+            MateriaNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("MATERIA_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("INVALID_ARGUMENT", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
 }
