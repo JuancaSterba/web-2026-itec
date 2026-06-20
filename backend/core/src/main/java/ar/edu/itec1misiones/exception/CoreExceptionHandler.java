@@ -56,6 +56,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ComisionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleComisionNotFound(
+            ComisionNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("COMISION_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(CuatrimestreNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleCuatrimestreNotFound(
             CuatrimestreNotFoundException ex,

@@ -12,6 +12,10 @@ public class ComisionMateria {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nombre;
+    private Integer cupo;
+    private boolean activa = true;
+
     @ManyToOne
     private Materia materia;
 
