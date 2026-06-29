@@ -15,6 +15,11 @@ public class Alumno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String legajo;
+
+    private boolean activo = true;
+
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AlumnoCarrera> carreras = new ArrayList<>();
 

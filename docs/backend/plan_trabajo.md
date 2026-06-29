@@ -38,21 +38,25 @@ El Core centraliza la gestión académica y la seguridad. Todo el trabajo de est
 *Estos CRUDs conforman la base de datos que consumirán los demás microservicios. Deben implementarse en el siguiente orden sugerido dentro del proyecto `backend/`:*
 
 - **Estructura Académica Base**:
-  - [ ] Carreras
-  - [ ] Planes de Estudio
-  - [ ] Materias
+  - [x] Carreras
+  - [x] Planes de Estudio
+  - [x] Materias
 - **Actores**: 
-  - [ ] Alumnos
-  - [ ] Profesores
+  - [x] Alumnos
+  - [x] Profesores
 - **Estructura Dinámica**:
-  - [ ] Cuatrimestres
-  - [ ] Comisiones
-  - [ ] Horarios y Módulos
+  - [x] Cuatrimestres
+  - [x] Comisiones
+  - [x] Horarios y Módulos
 - **Procesos (Transacciones Core)**:
-  - [ ] Inscripciones a Carreras
-  - [ ] Inscripciones a Cursadas (Comisiones)
+  - [x] Inscripciones a Carreras
+  - [ ] Inscripciones a Materias
 
 > **Regla de oro:** *Solo cuando el Alumno pueda estar inscripto a una Comisión, el Core se considerará estable para pasar a la Fase 2.*
+
+> 📝 **Memo de Avance:**
+> Hoy completamos la parte de **Horarios y Módulos**, además del hito de **Inscripciones a Carreras** (creando los Repositorios, Servicios con lógica de negocio y Controladores REST correspondientes, apoyándonos en Claude). 
+> El próximo y gran último paso del Core es encarar **Inscripciones a Materias (`AlumnoInscripto`)**.
 
 ---
 

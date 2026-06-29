@@ -13,6 +13,9 @@ public class Carrera {
     private Long id;
 
     private String nombre;
+    private String descripcion;
+    private String resolucion;
+    private boolean activa = true;
 
     @OneToMany(mappedBy = "carrera", cascade = CascadeType.ALL)
     private List<PlanEstudio> planes = new ArrayList<>();

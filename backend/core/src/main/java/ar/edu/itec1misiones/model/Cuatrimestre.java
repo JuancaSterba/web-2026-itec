@@ -16,4 +16,5 @@ public class Cuatrimestre {
     private Integer numero;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+    private boolean actual = false;
 }

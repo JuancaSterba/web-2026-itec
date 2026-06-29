@@ -13,8 +13,10 @@ public class Materia {
     private Long id;
 
     private String nombre;
+    private Integer cargaHoraria;
     private Integer anio;
     private Integer cuatrimestre;
+    private boolean activa = true;
 
     @ManyToOne
     private PlanEstudio planEstudio;
