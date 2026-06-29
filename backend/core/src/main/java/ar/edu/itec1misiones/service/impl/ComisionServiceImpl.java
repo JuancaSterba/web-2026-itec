@@ -15,6 +15,7 @@ import ar.edu.itec1misiones.repository.CuatrimestreRepository;
 import ar.edu.itec1misiones.repository.MateriaRepository;
 import ar.edu.itec1misiones.repository.ProfesorRepository;
 import ar.edu.itec1misiones.service.ComisionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,22 +23,13 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ComisionServiceImpl implements ComisionService {
 
     private final ComisionMateriaRepository comisionRepository;
     private final MateriaRepository materiaRepository;
     private final CuatrimestreRepository cuatrimestreRepository;
     private final ProfesorRepository profesorRepository;
-
-    public ComisionServiceImpl(ComisionMateriaRepository comisionRepository,
-                               MateriaRepository materiaRepository,
-                               CuatrimestreRepository cuatrimestreRepository,
-                               ProfesorRepository profesorRepository) {
-        this.comisionRepository = comisionRepository;
-        this.materiaRepository = materiaRepository;
-        this.cuatrimestreRepository = cuatrimestreRepository;
-        this.profesorRepository = profesorRepository;
-    }
 
     @Override
     public ComisionResponse crear(ComisionRequest request) {
