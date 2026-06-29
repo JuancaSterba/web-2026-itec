@@ -47,16 +47,16 @@ El Core centraliza la gestión académica y la seguridad. Todo el trabajo de est
 - **Estructura Dinámica**:
   - [x] Cuatrimestres
   - [x] Comisiones
-  - [ ] Horarios y Módulos
+  - [x] Horarios y Módulos
 - **Procesos (Transacciones Core)**:
   - [ ] Inscripciones a Carreras
-  - [ ] Inscripciones a Cursadas (Comisiones)
+  - [ ] Inscripciones a Materias
 
 > **Regla de oro:** *Solo cuando el Alumno pueda estar inscripto a una Comisión, el Core se considerará estable para pasar a la Fase 2.*
 
 > 📝 **Memo de Avance:**
-> En la última sesión se completó todo el CRUD de la **Estructura Académica Base**, **Actores**, **Cuatrimestres** y **Comisiones**. 
-> El próximo paso para la siguiente sesión es continuar con **Horarios y Módulos**, y luego avanzar hacia los **Procesos (Inscripciones)**.
+> En la última sesión implementamos toda la lógica y Controladores de **Horarios y Módulos** usando Claude. Ya quedaron listos los CRUDs completos de la Estructura Dinámica.
+> El próximo paso es abordar los **Procesos (Inscripciones a Carreras e Inscripciones a Materias)**.
 
 ---
 
