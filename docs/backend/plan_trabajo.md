@@ -49,14 +49,14 @@ El Core centraliza la gestión académica y la seguridad. Todo el trabajo de est
   - [x] Comisiones
   - [x] Horarios y Módulos
 - **Procesos (Transacciones Core)**:
-  - [ ] Inscripciones a Carreras
+  - [x] Inscripciones a Carreras
   - [ ] Inscripciones a Materias
 
 > **Regla de oro:** *Solo cuando el Alumno pueda estar inscripto a una Comisión, el Core se considerará estable para pasar a la Fase 2.*
 
 > 📝 **Memo de Avance:**
-> En la última sesión implementamos toda la lógica y Controladores de **Horarios y Módulos** usando Claude. Ya quedaron listos los CRUDs completos de la Estructura Dinámica.
-> El próximo paso es abordar los **Procesos (Inscripciones a Carreras e Inscripciones a Materias)**.
+> Hoy completamos la parte de **Horarios y Módulos**, además del hito de **Inscripciones a Carreras** (creando los Repositorios, Servicios con lógica de negocio y Controladores REST correspondientes, apoyándonos en Claude). 
+> El próximo y gran último paso del Core es encarar **Inscripciones a Materias (`AlumnoInscripto`)**.
 
 ---
 
