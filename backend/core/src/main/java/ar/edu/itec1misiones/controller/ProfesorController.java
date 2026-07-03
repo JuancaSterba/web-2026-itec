@@ -6,6 +6,8 @@ import ar.edu.itec1misiones.dto.request.ProfesorUpdateRequest;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.dto.response.ProfesorResponse;
 import ar.edu.itec1misiones.service.ProfesorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/profesores")
+@Tag(name = "Profesores", description = "Gestión de profesores y búsqueda por DNI")
 public class ProfesorController {
 
     private final ProfesorService profesorService;
@@ -27,6 +30,7 @@ public class ProfesorController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear un nuevo profesor")
     public ResponseEntity<ApiResponse<ProfesorResponse>> crear(
             @RequestBody @Valid ProfesorRequest request,
             HttpServletRequest httpRequest) {
@@ -41,6 +45,7 @@ public class ProfesorController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todos los profesores activos")
     public ResponseEntity<ApiResponse<ProfesorResponse>> listar(HttpServletRequest httpRequest) {
         List<ProfesorResponse> profesores = profesorService.listarActivos();
         return ResponseEntity.ok(
@@ -52,6 +57,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener un profesor por ID")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -66,6 +72,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/dni/{dni}")
+    @Operation(summary = "Buscar profesor por DNI")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorDni(
             @PathVariable String dni,
             HttpServletRequest httpRequest) {
@@ -81,6 +88,7 @@ public class ProfesorController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar datos de un profesor")
     public ResponseEntity<ApiResponse<ProfesorResponse>> actualizar(
             @PathVariable Long id,
             @RequestBody @Valid ProfesorUpdateRequest request,
@@ -97,6 +105,7 @@ public class ProfesorController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar un profesor (baja lógica)")
     public ResponseEntity<ApiResponse<String>> desactivar(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
