@@ -5,6 +5,8 @@ import ar.edu.itec1misiones.dto.request.PlanEstudioRequest;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.dto.response.PlanEstudioResponse;
 import ar.edu.itec1misiones.service.PlanEstudioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/planes-estudio")
+@Tag(name = "Planes de Estudio", description = "Gestión de planes de estudio por carrera")
 public class PlanEstudioController {
 
     private final PlanEstudioService planEstudioService;
@@ -26,6 +29,7 @@ public class PlanEstudioController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear un nuevo plan de estudio")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> crear(
             @RequestBody @Valid PlanEstudioRequest request,
             HttpServletRequest httpRequest) {
@@ -40,6 +44,7 @@ public class PlanEstudioController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todos los planes de estudio activos")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> listar(HttpServletRequest httpRequest) {
         List<PlanEstudioResponse> planes = planEstudioService.listarActivos();
         return ResponseEntity.ok(
@@ -51,6 +56,7 @@ public class PlanEstudioController {
     }
 
     @GetMapping("/carrera/{carreraId}")
+    @Operation(summary = "Listar planes de estudio activos de una carrera")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> listarPorCarrera(
             @PathVariable Long carreraId,
             HttpServletRequest httpRequest) {
@@ -65,6 +71,7 @@ public class PlanEstudioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener un plan de estudio por ID")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -80,6 +87,7 @@ public class PlanEstudioController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar un plan de estudio existente")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> actualizar(
             @PathVariable Long id,
             @RequestBody @Valid PlanEstudioRequest request,
@@ -96,6 +104,7 @@ public class PlanEstudioController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar un plan de estudio (baja lógica)")
     public ResponseEntity<ApiResponse<String>> desactivar(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {

@@ -5,6 +5,8 @@ import ar.edu.itec1misiones.dto.request.MateriaRequest;
 import ar.edu.itec1misiones.dto.response.MateriaResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.service.MateriaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/materias")
+@Tag(name = "Materias", description = "Gestión de materias y sus correlativas")
 public class MateriaController {
 
     private final MateriaService materiaService;
@@ -26,6 +29,7 @@ public class MateriaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear una nueva materia")
     public ResponseEntity<ApiResponse<MateriaResponse>> crear(
             @RequestBody @Valid MateriaRequest request,
             HttpServletRequest httpRequest) {
@@ -40,6 +44,7 @@ public class MateriaController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todas las materias activas")
     public ResponseEntity<ApiResponse<MateriaResponse>> listar(HttpServletRequest httpRequest) {
         List<MateriaResponse> materias = materiaService.listarActivas();
         return ResponseEntity.ok(
@@ -51,6 +56,7 @@ public class MateriaController {
     }
 
     @GetMapping("/plan/{planId}")
+    @Operation(summary = "Listar materias activas de un plan de estudio")
     public ResponseEntity<ApiResponse<MateriaResponse>> listarPorPlan(
             @PathVariable Long planId,
             HttpServletRequest httpRequest) {
@@ -65,6 +71,7 @@ public class MateriaController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener una materia por ID")
     public ResponseEntity<ApiResponse<MateriaResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -80,6 +87,7 @@ public class MateriaController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar una materia existente")
     public ResponseEntity<ApiResponse<MateriaResponse>> actualizar(
             @PathVariable Long id,
             @RequestBody @Valid MateriaRequest request,
@@ -96,6 +104,7 @@ public class MateriaController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar una materia (baja lógica)")
     public ResponseEntity<ApiResponse<String>> desactivar(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -111,6 +120,7 @@ public class MateriaController {
 
     @PostMapping("/{id}/correlativas")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Asignar correlativas a una materia")
     public ResponseEntity<ApiResponse<MateriaResponse>> asignarCorrelativas(
             @PathVariable Long id,
             @RequestBody List<Long> correlativasIds,
@@ -127,6 +137,7 @@ public class MateriaController {
 
     @DeleteMapping("/{id}/correlativas/{correlativaId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Eliminar una correlativa de una materia")
     public ResponseEntity<ApiResponse<MateriaResponse>> eliminarCorrelativa(
             @PathVariable Long id,
             @PathVariable Long correlativaId,
