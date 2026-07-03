@@ -125,4 +125,60 @@ public class CoreExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(AlumnoInscriptoNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAlumnoInscriptoNotFound(
+            AlumnoInscriptoNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("ALUMNO_INSCRIPTO_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AlumnoYaInscriptoEnMateriaException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAlumnoYaInscriptoEnMateria(
+            AlumnoYaInscriptoEnMateriaException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("ALUMNO_YA_INSCRIPTO_EN_MATERIA", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ComisionInactivaException.class)
+    public ResponseEntity<ApiResponse<Object>> handleComisionInactiva(
+            ComisionInactivaException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("COMISION_INACTIVA", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(CupoComisionLlenoException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCupoComisionLleno(
+            CupoComisionLlenoException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("CUPO_COMISION_LLENO", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
 }
