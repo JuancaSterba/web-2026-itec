@@ -5,6 +5,8 @@ import ar.edu.itec1misiones.dto.request.ModuloHorarioRequest;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.dto.response.ModuloHorarioResponse;
 import ar.edu.itec1misiones.service.ModuloHorarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +20,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/modulos")
 @RequiredArgsConstructor
+@Tag(name = "Módulos Horarios", description = "Gestión de módulos horarios (franjas de tiempo para clases)")
 public class ModuloHorarioController {
 
     private final ModuloHorarioService moduloHorarioService;
 
     @GetMapping
+    @Operation(summary = "Listar todos los módulos horarios")
     public ResponseEntity<ApiResponse<ModuloHorarioResponse>> getAll(HttpServletRequest httpRequest) {
         List<ModuloHorarioResponse> modulos = moduloHorarioService.getAll();
         return ResponseEntity.ok(
@@ -34,6 +38,7 @@ public class ModuloHorarioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener un módulo horario por ID")
     public ResponseEntity<ApiResponse<ModuloHorarioResponse>> getById(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -49,6 +54,7 @@ public class ModuloHorarioController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear un nuevo módulo horario")
     public ResponseEntity<ApiResponse<ModuloHorarioResponse>> create(
             @RequestBody @Valid ModuloHorarioRequest request,
             HttpServletRequest httpRequest) {
@@ -64,6 +70,7 @@ public class ModuloHorarioController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar un módulo horario existente")
     public ResponseEntity<ApiResponse<ModuloHorarioResponse>> update(
             @PathVariable Long id,
             @RequestBody @Valid ModuloHorarioRequest request,
@@ -80,6 +87,7 @@ public class ModuloHorarioController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Eliminar un módulo horario")
     public ResponseEntity<ApiResponse<String>> delete(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
