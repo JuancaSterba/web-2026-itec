@@ -20,3 +20,12 @@ Para satisfacer la expectativa de la UI y los requerimientos del negocio (uso ex
    - Configurar el `password` igual al DNI (encriptado con BCrypt).
    - Crear la entidad `Alumno` o `Profesor` vinculándola a este nuevo usuario.
 3. **Restricción de Acceso:** Dado que por el momento ni alumnos ni profesores usarán la app, esta generación automática de credenciales genéricas (DNI/DNI) es válida y suficiente para mantener la integridad relacional de la BD sin fricción administrativa.
+
+## 2. Pendientes / Deuda Técnica Detectada
+
+### 🔴 A corregir primero (bloqueante de seguridad)
+
+- **Alumnos/Profesores pueden loguearse y leer datos ajenos hoy mismo, sin tener UI propia.** `POST /auth/login` no valida `Alumno.activo`/`Profesor.activo` ni ningún flag de habilitación — cualquier Usuario con credenciales válidas obtiene un JWT funcional, tenga o no pantallas pensadas para su rol. Agrava esto que los endpoints de **lectura** (`GET /api/alumnos`, `/api/materias`, etc.) no tienen `@PreAuthorize` — solo los POST/PUT/DELETE están gateados por rol — así que un Alumno logueado puede leer el listado completo de otros alumnos, materias, comisiones, etc. Confirmado con pruebas reales (login exitoso + `GET /api/core/alumnos` → 200 con rol ALUMNO).
+  - **Fix propuesto:** agregar columna `enabled` (boolean) a `usuarios`, default `true`, pero `false` al crear un Usuario con rol `ALUMNO` o `PROFESOR` (`UserLookupPortImpl.crearConCredencialesPorDni`). Hacer que `User.isEnabled()` devuelva ese campo en vez de `true` hardcodeado — Spring Security ya rechaza el login solo si `isEnabled()` es `false` (`DisabledException`), sin lógica custom. Cuando exista UI para esos roles, un ADMIN habilita la cuenta puntual.
+  - Como fix incremental o complementario, evaluar `@PreAuthorize` en los GET actualmente abiertos.
+  - Relacionado: `DELETE /api/core/alumnos/{id}` solo hace baja lógica (`activo=false`) sobre `Alumno`, nunca toca `Usuario` — mismo síntoma, misma causa raíz (falta de vínculo entre estado del actor y estado de la cuenta).
