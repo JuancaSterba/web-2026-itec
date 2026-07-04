@@ -46,9 +46,23 @@ El cascarón donde vivirán todos los módulos.
 
 ## Fase 4: Integración de Microservicios (Módulos de Negocio)
 Desarrollo de las pantallas que consumirán nuestros microservicios específicos.
-- [ ] **Módulo Core (Gestión Maestros)**: 
-  - Listado de Alumnos y Profesores.
-  - Gestión de Comisiones.
+- [ ] **Módulo Core (Gestión Maestros)**:
+  - [x] Listado de Alumnos (CRUD completo: crear, editar legajo/estado, eliminar).
+  - [ ] Listado de Profesores.
+  - [ ] Gestión de Comisiones.
+
+> ✅ **Memo de Avance (Alumnos):** `/dashboard/alumnos` consume `/api/core/alumnos` vía el Gateway
+> con el `api-client` existente. Hallazgo importante: el contrato real del Core no es un CRUD
+> simple — crear un Alumno requiere el `userId` de un Usuario que ya exista con rol ALUMNO (no se
+> puede cargar nombre/DNI/email directo, esos campos vienen del Usuario asociado); actualizar solo
+> permite legajo y estado activo/inactivo. El formulario y sus mensajes reflejan esa realidad en
+> vez del Nombre/Apellido/DNI/Email genérico que se imaginó originalmente. `Switch` y `AlertDialog`
+> están rotos en este proyecto (`@radix-ui/react-switch` y `@radix-ui/react-alert-dialog` no están
+> instalados) — se resolvió con un toggle de dos `Button` y un `Dialog` de confirmación en su
+> lugar. Se eliminó `/dashboard/students` (scaffold pre-Fase-1 con datos mock que ni siquiera
+> coincidían con el modelo real, huérfano del Sidebar). Validado con curl replicando los shapes
+> exactos de los diálogos contra el Gateway real, incluyendo el caso de error de negocio mostrado
+> en el toast.
 - [ ] **Módulo Asistencias (`ms-asistencias`)**:
   - Interfaz de "Toma de Lista" por comisión y fecha.
 - [ ] **Módulo Calificaciones (`ms-notas`)**:
