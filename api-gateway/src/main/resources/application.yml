@@ -6,6 +6,16 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      # El frontend (localhost:3000) llama al Gateway (localhost:8080) desde el
+      # browser: son origenes distintos, asi que sin esto el navegador bloquea
+      # el login (y todo lo demas) en el preflight, aunque curl no lo note.
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
       routes:
         # Orden importa: core-auth debe ir antes que core-api, porque
         # /api/core/auth/** tambien matchea el predicate mas ancho de core-api.

@@ -3,6 +3,7 @@ import { ReactNode } from "react"
 import { Inter, Space_Grotesk } from "next/font/google"
 import { AuthProvider } from "@/hooks/use-auth"
 import { MyThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <AuthProvider>
             {children}
           </AuthProvider>
+          <Toaster />
         </MyThemeProvider>
       </body>
     </html>

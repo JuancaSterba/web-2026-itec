@@ -68,7 +68,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = useCallback(
     async (username: string, password: string) => {
       const payload: LoginRequest = { username, password }
-      const response = await apiClient.post<LoginResponse[]>("/auth/login", payload)
+      // /api/core/auth/login: ruta del Gateway (core-auth), nunca /auth/login
+      // directo contra el Core -- ver criterios de aceptacion del plan de frontend.
+      // skipAuthRedirect: credenciales invalidas tambien devuelven 401, y no
+      // es una sesion expirada -- no debe forzar un redirect a /login.
+      const response = await apiClient.post<LoginResponse[]>(
+        "/api/core/auth/login",
+        payload,
+        { skipAuthRedirect: true }
+      )
 
       if (!response.data || response.data.length === 0) {
         throw new Error("Token no recibido")
