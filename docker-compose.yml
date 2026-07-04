@@ -2,6 +2,21 @@ include:
   - backend/docker-compose.yml
 
 services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: itec-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      # Dentro de la red de Docker, el Core es alcanzable por el nombre del servicio,
+      # no por localhost. Puerto 8082 = server.port real del perfil 'local' activo
+      # (backend/.env: APP_PROFILE=local -> application-local.yml). En 'prod' sería 8081.
+      - CORE_API_URL=http://backend-app:8082
+    depends_on:
+      - backend-app
+
   frontend-app:
     build:
       context: ./frontend
