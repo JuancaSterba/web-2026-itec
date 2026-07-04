@@ -1,7 +1,5 @@
 import apiClient from "@/lib/api-client"
 
-// ms-notas devuelve el recurso directo, sin envolverlo en {meta,data,errors}
-// como el Core -- mismo motivo que ms-asistencias (ver docs/deuda_tecnica.md #2).
 export interface Examen {
   id: number
   comisionId: number
@@ -36,21 +34,26 @@ const NOTAS_PATH = "/api/notas"
 // Sin filtro por comisionId en el microservicio todavia: se trae todo y se
 // filtra en el cliente (mismo patron que asistencias.service.ts).
 export async function listarExamenes(): Promise<Examen[]> {
-  return apiClient.getRaw<Examen[]>(EXAMENES_PATH)
+  const response = await apiClient.get<Examen[]>(EXAMENES_PATH)
+  return response.data
 }
 
 export async function crearExamen(input: ExamenInput): Promise<Examen> {
-  return apiClient.postRaw<Examen>(EXAMENES_PATH, input)
+  const response = await apiClient.post<Examen[]>(EXAMENES_PATH, input)
+  return response.data[0]
 }
 
 export async function listarNotas(): Promise<Nota[]> {
-  return apiClient.getRaw<Nota[]>(NOTAS_PATH)
+  const response = await apiClient.get<Nota[]>(NOTAS_PATH)
+  return response.data
 }
 
 export async function registrarNota(input: NotaInput): Promise<Nota> {
-  return apiClient.postRaw<Nota>(NOTAS_PATH, input)
+  const response = await apiClient.post<Nota[]>(NOTAS_PATH, input)
+  return response.data[0]
 }
 
 export async function actualizarNota(id: number, input: NotaInput): Promise<Nota> {
-  return apiClient.putRaw<Nota>(`${NOTAS_PATH}/${id}`, input)
+  const response = await apiClient.put<Nota[]>(`${NOTAS_PATH}/${id}`, input)
+  return response.data[0]
 }
