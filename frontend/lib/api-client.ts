@@ -1,5 +1,7 @@
 // lib/api-client.ts
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"
+// Unico punto de entrada al backend: SIEMPRE via el API Gateway (8080),
+// nunca directo a Core (8081/8082) ni a los microservicios (8083/8084).
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
 export interface ApiResponse<T> {
   meta: {
@@ -10,6 +12,22 @@ export interface ApiResponse<T> {
   errors?: Record<string, string[]> | any[]
 }
 
+type RequestOptions = RequestInit & {
+  /** El login tambien devuelve 401 con credenciales invalidas: no es una
+   * sesion expirada, asi que no debe limpiar storage ni redirigir. */
+  skipAuthRedirect?: boolean
+}
+
+function extractErrorMessage(data: any, status: number): string {
+  const firstError = Array.isArray(data?.errors) ? data.errors[0] : undefined
+  return (
+    firstError?.description ||
+    data?.meta?.operation ||
+    data?.message ||
+    `Error ${status} en la petición`
+  )
+}
+
 class ApiClient {
   private baseURL: string
 
@@ -17,43 +35,39 @@ class ApiClient {
     this.baseURL = baseURL
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+    const { skipAuthRedirect, ...fetchOptions } = options
     const url = `${this.baseURL}${endpoint}`
 
     // 👈 el JWT lo guardás en localStorage como "token"
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
 
     const config: RequestInit = {
-      ...options,
+      ...fetchOptions,
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...(options.headers || {}),
+        ...(fetchOptions.headers || {}),
       },
     }
 
     try {
       const response = await fetch(url, config)
+      const data = await response.json().catch(() => ({}))
 
-      // Sesión inválida/expirada → limpiamos y mandamos a /login
-      if (response.status === 401) {
+      // Sesión inválida/expirada → limpiamos y mandamos a /login.
+      // No aplica al propio intento de login (credenciales invalidas = 401 tambien).
+      if (response.status === 401 && !skipAuthRedirect) {
         if (typeof window !== "undefined") {
           localStorage.removeItem("token")
-          // borrar la cookie del lado del cliente también, por las dudas
           document.cookie = "auth-token=; Path=/; Max-Age=0; SameSite=Lax"
           window.location.href = "/login"
         }
-        throw new Error("Token expirado")
+        throw new Error("Sesión expirada")
       }
 
-      const data = await response.json().catch(() => ({}))
-
       if (!response.ok) {
-        const msg =
-          (data as any)?.meta?.operation ||
-          (data as any)?.message ||
-          `Error ${response.status} en la petición`
-        throw new Error(msg)
+        throw new Error(extractErrorMessage(data, response.status))
       }
 
       return data as ApiResponse<T>
@@ -63,11 +77,11 @@ class ApiClient {
     }
   }
 
-  get<T>(endpoint: string, options?: RequestInit) {
+  get<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(endpoint, { method: "GET", ...options })
   }
 
-  post<T>(endpoint: string, body?: any, options?: RequestInit) {
+  post<T>(endpoint: string, body?: any, options?: RequestOptions) {
     return this.request<T>(endpoint, {
       method: "POST",
       body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -75,7 +89,7 @@ class ApiClient {
     })
   }
 
-  put<T>(endpoint: string, body?: any, options?: RequestInit) {
+  put<T>(endpoint: string, body?: any, options?: RequestOptions) {
     return this.request<T>(endpoint, {
       method: "PUT",
       body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -83,7 +97,7 @@ class ApiClient {
     })
   }
 
-  delete<T>(endpoint: string, options?: RequestInit) {
+  delete<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(endpoint, { method: "DELETE", ...options })
   }
 }
