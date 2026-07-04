@@ -101,8 +101,19 @@ Desarrollo de las pantallas que consumirán nuestros microservicios específicos
 > background (POST la primera vez, PUT después con el id capturado, sin duplicar registros).
 > Validado con curl armando la cadena de dependencias completa y probando el ciclo POST→PUT.
 
-- [ ] **Módulo Calificaciones (`ms-notas`)**:
-  - Interfaz para cargar exámenes y asignar notas a los alumnos de una comisión.
+- [x] **Módulo Calificaciones (`ms-notas`)**:
+  - [x] Interfaz para cargar exámenes y asignar notas a los alumnos de una comisión.
+
+> ✅ **Memo de Avance (Calificaciones):** Cierra el módulo transaccional del frontend. Mismo patrón
+> de orquestación que Asistencias — se extrajo la resolución de roster (Core → `alumnoId` real) a
+> `roster.service.ts`, compartido entre ambos módulos para no duplicar el N+1. `/dashboard/notas`
+> se separó en componentes chicos (`ExamenesPanel`, `ExamenFormDialog`, `NotasTable`) en vez de un
+> solo archivo. La carga de notas guarda en `onBlur` (POST la primera vez, PUT después con el id
+> capturado), rechaza valores no numéricos sin llamar al backend, y revierte el valor si el
+> guardado falla. Se centralizaron los 3 hallazgos de arquitectura de backend (N+1, wrapper de
+> respuesta inconsistente, falta de filtros server-side) en `docs/deuda_tecnica.md`. Validado con
+> curl armando la cadena completa de dependencias y probando el ciclo crear examen → POST nota →
+> PUT nota, confirmando que la edición no duplica el registro.
 
 ## Criterios de Aceptación Globales
 1. **Aestética WOW:** Cero diseños básicos. Todo debe sentirse premium, vivo y responsivo.
