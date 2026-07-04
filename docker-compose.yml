@@ -78,9 +78,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Apunta a la URL donde se expone el backend.
-      # Nota: al estar expuesto en el localhost del host, el navegador accederá a http://localhost:8082
-      - NEXT_PUBLIC_API_URL=http://localhost:8082
+      # NEXT_PUBLIC_* corre en el browser del HOST (no dentro de la red docker),
+      # asi que apunta al puerto publicado del Gateway en localhost. Nunca a
+      # Core (8081/8082) ni a los microservicios directo -- criterio de
+      # aceptacion del plan de frontend. Esta variable tiene precedencia sobre
+      # frontend/.env.local dentro del contenedor (Next.js no pisa un
+      # process.env ya seteado), asi que es la fuente real cuando se corre con Docker.
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
     volumes:
       # Montamos el código fuente para tener Hot Reload en modo desarrollo
       - ./frontend:/app

@@ -16,6 +16,12 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
+      # El Core (backend/api) tambien tiene su propio CORS (cors.allowed-origins),
+      # asi que al proxear queda un header duplicado: el que agrega el Gateway +
+      # el que ya trae la respuesta del Core. Los navegadores rechazan un
+      # Access-Control-Allow-Origin repetido. Nos quedamos con el primero.
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
       routes:
         # Orden importa: core-auth debe ir antes que core-api, porque
         # /api/core/auth/** tambien matchea el predicate mas ancho de core-api.
