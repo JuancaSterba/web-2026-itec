@@ -85,8 +85,22 @@ Desarrollo de las pantallas que consumirán nuestros microservicios específicos
 > coincidían con el modelo real, huérfano del Sidebar). Validado con curl replicando los shapes
 > exactos de los diálogos contra el Gateway real, incluyendo el caso de error de negocio mostrado
 > en el toast.
-- [ ] **Módulo Asistencias (`ms-asistencias`)**:
-  - Interfaz de "Toma de Lista" por comisión y fecha.
+- [x] **Módulo Asistencias (`ms-asistencias`)**:
+  - [x] Interfaz de "Toma de Lista" por comisión y fecha.
+
+> ✅ **Memo de Avance (Asistencias):** Primer módulo que orquesta el Core y un microservicio
+> aislado desde el frontend (API Composition Pattern). Hallazgo importante: `AlumnoInscriptoResponse`
+> (Core) no expone `alumnoId`, solo `alumnoCarreraId` — hay que resolverlo aparte vía
+> `GET /api/inscripciones-carreras/{id}` (`AlumnoCarreraResponse` sí lo trae). Ese `alumnoId` es el
+> de la entidad `Alumno`, no el `userId` del `Usuario` asociado — son IDs distintos. Otro hallazgo:
+> `ms-asistencias` devuelve el recurso directo en el body, sin el wrapper `{meta,data,errors}` del
+> Core — se agregaron variantes `*Raw` en `api-client.ts` para consumirlo sin que TypeScript mienta
+> sobre la forma real de la respuesta. Ni el Core (`inscripciones-materias` por comisión) ni
+> `ms-asistencias` (por comisión+fecha) soportan filtros server-side todavía — se trae todo y se
+> filtra en el cliente. El toggle Presente/Tarde/Ausente actualiza optimista y guarda en
+> background (POST la primera vez, PUT después con el id capturado, sin duplicar registros).
+> Validado con curl armando la cadena de dependencias completa y probando el ciclo POST→PUT.
+
 - [ ] **Módulo Calificaciones (`ms-notas`)**:
   - Interfaz para cargar exámenes y asignar notas a los alumnos de una comisión.
 
