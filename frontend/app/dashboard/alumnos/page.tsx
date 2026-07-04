@@ -72,11 +72,14 @@ export default function AlumnosPage() {
     setDeleteOpen(true)
   }
 
-  const handleGuardado = (alumno: Alumno) => {
-    setAlumnos((prev) => {
-      const existe = prev.some((a) => a.id === alumno.id)
-      return existe ? prev.map((a) => (a.id === alumno.id ? alumno : a)) : [...prev, alumno]
-    })
+  const handleGuardado = (alumno: Alumno | null) => {
+    // null = se creo por registro de usuario; register no devuelve el
+    // Alumno creado, asi que no hay nada para insertar de forma optimista.
+    if (!alumno) {
+      cargarAlumnos()
+      return
+    }
+    setAlumnos((prev) => prev.map((a) => (a.id === alumno.id ? alumno : a)))
   }
 
   const handleEliminado = (id: number) => {

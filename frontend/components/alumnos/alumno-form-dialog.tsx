@@ -14,19 +14,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
 import { actualizarAlumno, crearAlumno, type Alumno } from "@/lib/services/alumnos.service"
 
 interface AlumnoFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   alumno: Alumno | null
-  onSuccess: (alumno: Alumno) => void
+  /** null = se creo un alumno nuevo (register no devuelve el objeto, hay que refetchear) */
+  onSuccess: (alumno: Alumno | null) => void
+}
+
+const emptyForm = {
+  username: "",
+  password: "",
+  nombre: "",
+  apellido: "",
+  dni: "",
+  email: "",
+  telefono: "",
 }
 
 export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: AlumnoFormDialogProps) {
   const isEditing = !!alumno
-  const [userId, setUserId] = useState("")
+  const [form, setForm] = useState(emptyForm)
   const [legajo, setLegajo] = useState("")
   const [activo, setActivo] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -34,34 +44,55 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
 
   useEffect(() => {
     if (open) {
-      setUserId(alumno?.userId ? String(alumno.userId) : "")
+      setForm(emptyForm)
       setLegajo(alumno?.legajo ?? "")
       setActivo(alumno?.activo ?? true)
       setError(null)
     }
   }, [open, alumno])
 
+  const setField = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((prev) => ({ ...prev, [field]: e.target.value }))
+
+  const validarCreacion = (): string | null => {
+    if (!form.username.trim()) return "El usuario es obligatorio"
+    if (form.password.length < 6) return "La contraseña debe tener al menos 6 caracteres"
+    if (!form.nombre.trim()) return "El nombre es obligatorio"
+    if (!form.apellido.trim()) return "El apellido es obligatorio"
+    if (!/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) return "El email no es válido"
+    if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono debe tener entre 6 y 15 dígitos"
+    return null
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!legajo.trim()) {
-      setError("El legajo es obligatorio")
-      return
-    }
-    if (!isEditing && (!userId || Number(userId) <= 0)) {
-      setError("El ID de usuario debe ser un número válido")
-      return
+    if (isEditing) {
+      if (!legajo.trim()) {
+        setError("El legajo es obligatorio")
+        return
+      }
+    } else {
+      const validationError = validarCreacion()
+      if (validationError) {
+        setError(validationError)
+        return
+      }
     }
 
     setSubmitting(true)
     setError(null)
     try {
-      const resultado = isEditing
-        ? await actualizarAlumno(alumno!.id, { legajo: legajo.trim(), activo })
-        : await crearAlumno({ userId: Number(userId), legajo: legajo.trim() })
-
-      toast.success(isEditing ? "Alumno actualizado correctamente" : "Alumno creado correctamente")
-      onSuccess(resultado)
+      if (isEditing) {
+        const actualizado = await actualizarAlumno(alumno!.id, { legajo: legajo.trim(), activo })
+        toast.success("Alumno actualizado correctamente")
+        onSuccess(actualizado)
+      } else {
+        await crearAlumno(form)
+        toast.success("Alumno creado correctamente")
+        onSuccess(null)
+      }
       onOpenChange(false)
     } catch (err: any) {
       const message = err?.message || "No se pudo guardar el alumno"
@@ -74,81 +105,118 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={isEditing ? undefined : "sm:max-w-lg"}>
         <DialogHeader>
           <DialogTitle>{isEditing ? "Editar alumno" : "Nuevo alumno"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Actualiza el legajo o el estado del alumno."
-              : "El usuario debe existir previamente con rol ALUMNO. Los datos personales (nombre, DNI, email) se toman de ese usuario."}
+              ? "El legajo y el estado son los únicos datos editables desde acá; el resto viene del usuario asociado."
+              : "Se crea un usuario con rol ALUMNO. El legajo se asigna después, editando el alumno."}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {isEditing && (
-            <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-              {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni}
-            </div>
-          )}
-
-          {!isEditing && (
-            <div className="space-y-2">
-              <Label htmlFor="userId">ID de usuario</Label>
-              <Input
-                id="userId"
-                type="number"
-                min={1}
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="Ej. 2"
-                disabled={submitting}
-              />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="legajo">Legajo</Label>
-            <Input
-              id="legajo"
-              value={legajo}
-              onChange={(e) => setLegajo(e.target.value)}
-              placeholder="Ej. LEG-2026-001"
-              disabled={submitting}
-            />
-          </div>
-
-          {isEditing && (
-            <div className="space-y-2">
-              <Label>Estado</Label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={activo ? "default" : "outline"}
-                  onClick={() => setActivo(true)}
-                  disabled={submitting}
-                  className="flex-1"
-                >
-                  Activo
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={!activo ? "secondary" : "outline"}
-                  onClick={() => setActivo(false)}
-                  disabled={submitting}
-                  className="flex-1"
-                >
-                  Inactivo
-                </Button>
+          {isEditing ? (
+            <>
+              <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni}
               </div>
-            </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="legajo">Legajo</Label>
+                <Input
+                  id="legajo"
+                  value={legajo}
+                  onChange={(e) => setLegajo(e.target.value)}
+                  placeholder="Ej. LEG-2026-001"
+                  disabled={submitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Estado</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={activo ? "default" : "outline"}
+                    onClick={() => setActivo(true)}
+                    disabled={submitting}
+                    className="flex-1"
+                  >
+                    Activo
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={!activo ? "secondary" : "outline"}
+                    onClick={() => setActivo(false)}
+                    disabled={submitting}
+                    className="flex-1"
+                  >
+                    Inactivo
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nombre">Nombre</Label>
+                  <Input id="nombre" value={form.nombre} onChange={setField("nombre")} disabled={submitting} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="apellido">Apellido</Label>
+                  <Input id="apellido" value={form.apellido} onChange={setField("apellido")} disabled={submitting} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dni">DNI</Label>
+                  <Input
+                    id="dni"
+                    value={form.dni}
+                    onChange={setField("dni")}
+                    placeholder="Sin puntos, 7 u 8 dígitos"
+                    disabled={submitting}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="telefono">Teléfono</Label>
+                  <Input id="telefono" value={form.telefono} onChange={setField("telefono")} disabled={submitting} />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={form.email} onChange={setField("email")} disabled={submitting} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Usuario</Label>
+                  <Input id="username" value={form.username} onChange={setField("username")} disabled={submitting} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Contraseña</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={form.password}
+                    onChange={setField("password")}
+                    disabled={submitting}
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <DialogFooter>
-            <Button type="submit" disabled={submitting} className={cn("w-full sm:w-auto")}>
+            <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
               {submitting && <Loader2 className="size-4 animate-spin" />}
               {isEditing ? "Guardar cambios" : "Crear alumno"}
             </Button>
