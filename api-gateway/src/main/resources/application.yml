@@ -8,7 +8,7 @@ spring:
     gateway:
       routes:
         - id: core-api
-          uri: http://localhost:8081
+          uri: ${CORE_API_URL:http://localhost:8081}
           predicates:
             - Path=/api/core/**
           filters:
