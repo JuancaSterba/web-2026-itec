@@ -1,7 +1,7 @@
 package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
-import ar.edu.itec1misiones.dto.request.AlumnoRequest;
+import ar.edu.itec1misiones.dto.request.AlumnoRegistroDTO;
 import ar.edu.itec1misiones.dto.request.AlumnoUpdateRequest;
 import ar.edu.itec1misiones.dto.response.AlumnoResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
@@ -30,12 +30,12 @@ public class AlumnoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Crear un nuevo alumno")
+    @Operation(summary = "Crear un nuevo alumno (alta de un solo paso: crea el Usuario y el Alumno)")
     public ResponseEntity<ApiResponse<AlumnoResponse>> crear(
-            @RequestBody @Valid AlumnoRequest request,
+            @RequestBody @Valid AlumnoRegistroDTO request,
             HttpServletRequest httpRequest) {
 
-        AlumnoResponse alumno = alumnoService.crear(request);
+        AlumnoResponse alumno = alumnoService.crearConUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<AlumnoResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
