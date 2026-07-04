@@ -13,7 +13,15 @@ import lombok.NoArgsConstructor;
 public class AlumnoInscriptoResponse {
     private Long id;
     private Long alumnoCarreraId;
-    private String alumnoNombreCompleto;
+    // DTO aplanado (ver docs/deuda_tecnica.md #1): antes solo traia
+    // alumnoCarreraId + un nombre completo armado, obligando al frontend a
+    // pedir /inscripciones-carreras/{id} por cada fila para resolver el
+    // alumnoId real. Ahora el JOIN FETCH del repository trae todo de una.
+    private Long alumnoId;
+    private String nombre;
+    private String apellido;
+    private String dni;
+    private String legajo;
     private Long comisionMateriaId;
     private String materiaNombre;
     private String comisionNombre;

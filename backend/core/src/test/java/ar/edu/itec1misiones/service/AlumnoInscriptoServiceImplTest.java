@@ -132,7 +132,8 @@ class AlumnoInscriptoServiceImplTest {
 
         assertThat(response.getId()).isEqualTo(10L);
         assertThat(response.getEstado()).isEqualTo(EstadoCursada.REGULAR);
-        assertThat(response.getAlumnoNombreCompleto()).isEqualTo("Juan Perez");
+        assertThat(response.getNombre()).isEqualTo("Juan");
+        assertThat(response.getApellido()).isEqualTo("Perez");
 
         verify(inscriptoRepository).save(argThat(i ->
                 i.getEstado() == EstadoCursada.REGULAR &&
