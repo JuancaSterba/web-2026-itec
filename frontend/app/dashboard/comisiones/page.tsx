@@ -1,0 +1,207 @@
+"use client"
+
+import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
+import { Plus, Search, Pencil, Trash2, Calendar } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Card } from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { ComisionFormDialog } from "@/components/comisiones/comision-form-dialog"
+import { EliminarComisionDialog } from "@/components/comisiones/eliminar-comision-dialog"
+import { listarComisiones, type Comision } from "@/lib/services/comisiones.service"
+
+export default function ComisionesPage() {
+  const [comisiones, setComisiones] = useState<Comision[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingComision, setEditingComision] = useState<Comision | null>(null)
+
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deletingComision, setDeletingComision] = useState<Comision | null>(null)
+
+  const cargarComisiones = async () => {
+    setLoading(true)
+    try {
+      const data = await listarComisiones()
+      setComisiones(data)
+    } catch (err: any) {
+      toast.error(err?.message || "No se pudieron cargar las comisiones")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    cargarComisiones()
+  }, [])
+
+  const comisionesFiltradas = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return comisiones
+    return comisiones.filter((c) =>
+      [c.nombre, c.materiaNombre, c.profesorNombre, c.profesorApellido].some((campo) =>
+        campo?.toLowerCase().includes(term)
+      )
+    )
+  }, [comisiones, searchTerm])
+
+  const abrirCrear = () => {
+    setEditingComision(null)
+    setFormOpen(true)
+  }
+
+  const abrirEditar = (comision: Comision) => {
+    setEditingComision(comision)
+    setFormOpen(true)
+  }
+
+  const abrirEliminar = (comision: Comision) => {
+    setDeletingComision(comision)
+    setDeleteOpen(true)
+  }
+
+  const handleGuardado = (comision: Comision) => {
+    setComisiones((prev) => {
+      const existe = prev.some((c) => c.id === comision.id)
+      return existe ? prev.map((c) => (c.id === comision.id ? comision : c)) : [...prev, comision]
+    })
+  }
+
+  const handleEliminado = (id: number) => {
+    setComisiones((prev) => prev.filter((c) => c.id !== id))
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Gestión de Comisiones</h1>
+          <p className="text-sm text-muted-foreground">Materia, cuatrimestre y profesor a cargo de cada comisión</p>
+        </div>
+        <Button onClick={abrirCrear}>
+          <Plus className="size-4" />
+          Nueva Comisión
+        </Button>
+      </div>
+
+      <Card className="p-4">
+        <div className="relative max-w-sm">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nombre, materia o profesor..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      </Card>
+
+      <Card>
+        {loading ? (
+          <div className="space-y-3 p-6">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : comisiones.length === 0 ? (
+          <EmptyState onCrear={abrirCrear} />
+        ) : comisionesFiltradas.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 p-12 text-center">
+            <Search className="size-8 text-muted-foreground" />
+            <p className="font-medium text-foreground">Sin resultados</p>
+            <p className="text-sm text-muted-foreground">
+              Ninguna comisión coincide con &ldquo;{searchTerm}&rdquo;.
+            </p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Materia</TableHead>
+                <TableHead>Cuatrimestre</TableHead>
+                <TableHead>Profesor</TableHead>
+                <TableHead>Cupo</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {comisionesFiltradas.map((comision) => (
+                <TableRow key={comision.id}>
+                  <TableCell className="font-medium">{comision.nombre}</TableCell>
+                  <TableCell>{comision.materiaNombre}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {comision.cuatrimestreAnio} - {comision.cuatrimestreNumero}°
+                  </TableCell>
+                  <TableCell>
+                    {comision.profesorApellido}, {comision.profesorNombre}
+                  </TableCell>
+                  <TableCell>{comision.cupo}</TableCell>
+                  <TableCell>
+                    <Badge variant={comision.activa ? "default" : "secondary"}>
+                      {comision.activa ? "Activa" : "Inactiva"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => abrirEditar(comision)} aria-label="Editar">
+                        <Pencil className="size-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => abrirEliminar(comision)} aria-label="Eliminar">
+                        <Trash2 className="size-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Card>
+
+      <ComisionFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        comision={editingComision}
+        onSuccess={handleGuardado}
+      />
+      <EliminarComisionDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        comision={deletingComision}
+        onSuccess={handleEliminado}
+      />
+    </div>
+  )
+}
+
+function EmptyState({ onCrear }: { onCrear: () => void }) {
+  return (
+    <div className="flex flex-col items-center gap-3 p-16 text-center">
+      <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <Calendar className="size-7" />
+      </div>
+      <div>
+        <p className="font-display text-lg font-semibold text-foreground">Todavía no hay comisiones</p>
+        <p className="text-sm text-muted-foreground">Creá la primera para empezar a organizar el cursado.</p>
+      </div>
+      <Button onClick={onCrear} className="mt-2">
+        <Plus className="size-4" />
+        Nueva Comisión
+      </Button>
+    </div>
+  )
+}
