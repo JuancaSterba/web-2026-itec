@@ -108,6 +108,9 @@ public class AlumnoServiceImpl implements AlumnoService {
                 .orElseThrow(() -> new AlumnoNotFoundException(id));
         alumno.setActivo(false);
         alumnoRepository.save(alumno);
+        // La baja tambien revoca el acceso, por si esta cuenta llegara a
+        // estar habilitada (ver docs/Reglas_de_Negocio.md).
+        userLookupPort.deshabilitar(alumno.getUser().getId());
     }
 
     private AlumnoResponse toResponse(Alumno alumno) {

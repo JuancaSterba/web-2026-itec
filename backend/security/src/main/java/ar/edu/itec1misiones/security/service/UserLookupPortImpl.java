@@ -62,4 +62,12 @@ public class UserLookupPortImpl implements UserLookupPort {
 
         return userRepository.save(user);
     }
+
+    @Override
+    public void deshabilitar(Long userId) {
+        userRepository.findById(userId).ifPresent(user -> {
+            user.setEnabled(false);
+            userRepository.save(user);
+        });
+    }
 }

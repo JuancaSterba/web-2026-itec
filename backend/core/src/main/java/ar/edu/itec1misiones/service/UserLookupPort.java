@@ -15,4 +15,11 @@ public interface UserLookupPort {
      * IllegalArgumentException si username/DNI/email/telefono ya estan en uso.
      */
     User crearConCredencialesPorDni(String nombre, String apellido, String dni, String email, String telefono, Rol rol);
+
+    /**
+     * Deshabilita el login del Usuario (enabled=false). Usado cuando se da
+     * de baja un Alumno/Profesor, para que la baja tambien revoque acceso
+     * si esa cuenta llegara a estar habilitada.
+     */
+    void deshabilitar(Long userId);
 }

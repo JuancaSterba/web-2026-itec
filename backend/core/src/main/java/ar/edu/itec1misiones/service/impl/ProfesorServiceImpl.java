@@ -93,6 +93,9 @@ public class ProfesorServiceImpl implements ProfesorService {
                 .orElseThrow(() -> new ProfesorNotFoundException(id));
         profesor.setActivo(false);
         profesorRepository.save(profesor);
+        // La baja tambien revoca el acceso, por si esta cuenta llegara a
+        // estar habilitada (ver docs/Reglas_de_Negocio.md).
+        userLookupPort.deshabilitar(profesor.getUser().getId());
     }
 
     private ProfesorResponse toResponse(Profesor profesor) {
