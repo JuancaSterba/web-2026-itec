@@ -3,6 +3,9 @@ package ar.edu.itec1misiones.asistencias.controller;
 import ar.edu.itec1misiones.asistencias.dto.AsistenciaRequest;
 import ar.edu.itec1misiones.asistencias.model.Asistencia;
 import ar.edu.itec1misiones.asistencias.service.AsistenciaService;
+import ar.edu.itec1misiones.dto.ApiResponse;
+import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,23 +31,56 @@ public class AsistenciaController {
     }
 
     @PostMapping
-    public ResponseEntity<Asistencia> crear(@RequestBody @Valid AsistenciaRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(asistenciaService.crear(request));
+    public ResponseEntity<ApiResponse<Asistencia>> crear(
+            @RequestBody @Valid AsistenciaRequest request,
+            HttpServletRequest httpRequest) {
+
+        Asistencia asistencia = asistenciaService.crear(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.<Asistencia>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(asistencia))
+                        .build()
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<Asistencia>> listar() {
-        return ResponseEntity.ok(asistenciaService.listar());
+    public ResponseEntity<ApiResponse<Asistencia>> listar(HttpServletRequest httpRequest) {
+        List<Asistencia> asistencias = asistenciaService.listar();
+        return ResponseEntity.ok(
+                ApiResponse.<Asistencia>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(asistencias)
+                        .build()
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Asistencia> actualizar(@PathVariable Long id, @RequestBody @Valid AsistenciaRequest request) {
-        return ResponseEntity.ok(asistenciaService.actualizar(id, request));
+    public ResponseEntity<ApiResponse<Asistencia>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid AsistenciaRequest request,
+            HttpServletRequest httpRequest) {
+
+        Asistencia actualizada = asistenciaService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<Asistencia>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(actualizada))
+                        .build()
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> eliminar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
         asistenciaService.eliminar(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Asistencia eliminada correctamente"))
+                        .build()
+        );
     }
 }
