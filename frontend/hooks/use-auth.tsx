@@ -29,7 +29,9 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useLocalStorage<string | null>("token", null)
+  // raw:true evita que el hook guarde el token con JSON.stringify (le agrega
+  // comillas), lo que rompe el Authorization: Bearer que arma api-client.ts.
+  const [token, setToken] = useLocalStorage<string | null>("token", null, true)
   const [user, setUser] = useState<AuthUser | null>(null)
   const router = useRouter()
 
