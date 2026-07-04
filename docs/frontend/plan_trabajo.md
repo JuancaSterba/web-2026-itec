@@ -49,7 +49,19 @@ Desarrollo de las pantallas que consumirán nuestros microservicios específicos
 - [ ] **Módulo Core (Gestión Maestros)**:
   - [x] Listado de Alumnos (CRUD completo: crear, editar legajo/estado, eliminar).
   - [x] Listado de Profesores (CRUD completo: crear, editar título/teléfono/estado, eliminar).
-  - [ ] Gestión de Comisiones.
+  - [x] Gestión de Comisiones (CRUD completo: crear, editar, eliminar).
+
+> ✅ **Memo de Avance (Comisiones):** Cierra el Módulo Core de la Fase 4.1. Hallazgo importante:
+> la consigna asumía un campo "Turno" (Mañana/Tarde/Noche) que no existe en el modelo real — una
+> Comisión se define por Materia + Cuatrimestre + **Profesor** (`ComisionRequest`: nombre, cupo,
+> materiaId, cuatrimestreId, profesorId). El formulario se construyó contra ese contrato real.
+> `ComisionFormDialog` carga materias/cuatrimestres/profesores activos al abrir y usa `<select>`
+> nativo estilizado con Tailwind — `@radix-ui/react-select` no está instalado, `components/ui/select.tsx`
+> está roto (mismo problema ya visto con `Switch` y `AlertDialog`). Se agregan `materias.service.ts`
+> y `cuatrimestres.service.ts` (solo lectura, para poblar los selects; CRUD completo de esas
+> entidades queda para cuando tengan pantalla propia). Validado con curl armando la cadena de
+> dependencias completa (Carrera → PlanEstudio → Materia, + Cuatrimestre + Profesor) y probando
+> el CRUD completo contra el Gateway real.
 
 > ✅ **Memo de Avance (Profesores + fix de seguridad):** `/dashboard/profesores` replica el mismo
 > patrón que Alumnos, incluido el alta de un solo paso (`POST /api/core/profesores` crea Usuario+
@@ -73,10 +85,35 @@ Desarrollo de las pantallas que consumirán nuestros microservicios específicos
 > coincidían con el modelo real, huérfano del Sidebar). Validado con curl replicando los shapes
 > exactos de los diálogos contra el Gateway real, incluyendo el caso de error de negocio mostrado
 > en el toast.
-- [ ] **Módulo Asistencias (`ms-asistencias`)**:
-  - Interfaz de "Toma de Lista" por comisión y fecha.
-- [ ] **Módulo Calificaciones (`ms-notas`)**:
-  - Interfaz para cargar exámenes y asignar notas a los alumnos de una comisión.
+- [x] **Módulo Asistencias (`ms-asistencias`)**:
+  - [x] Interfaz de "Toma de Lista" por comisión y fecha.
+
+> ✅ **Memo de Avance (Asistencias):** Primer módulo que orquesta el Core y un microservicio
+> aislado desde el frontend (API Composition Pattern). Hallazgo importante: `AlumnoInscriptoResponse`
+> (Core) no expone `alumnoId`, solo `alumnoCarreraId` — hay que resolverlo aparte vía
+> `GET /api/inscripciones-carreras/{id}` (`AlumnoCarreraResponse` sí lo trae). Ese `alumnoId` es el
+> de la entidad `Alumno`, no el `userId` del `Usuario` asociado — son IDs distintos. Otro hallazgo:
+> `ms-asistencias` devuelve el recurso directo en el body, sin el wrapper `{meta,data,errors}` del
+> Core — se agregaron variantes `*Raw` en `api-client.ts` para consumirlo sin que TypeScript mienta
+> sobre la forma real de la respuesta. Ni el Core (`inscripciones-materias` por comisión) ni
+> `ms-asistencias` (por comisión+fecha) soportan filtros server-side todavía — se trae todo y se
+> filtra en el cliente. El toggle Presente/Tarde/Ausente actualiza optimista y guarda en
+> background (POST la primera vez, PUT después con el id capturado, sin duplicar registros).
+> Validado con curl armando la cadena de dependencias completa y probando el ciclo POST→PUT.
+
+- [x] **Módulo Calificaciones (`ms-notas`)**:
+  - [x] Interfaz para cargar exámenes y asignar notas a los alumnos de una comisión.
+
+> ✅ **Memo de Avance (Calificaciones):** Cierra el módulo transaccional del frontend. Mismo patrón
+> de orquestación que Asistencias — se extrajo la resolución de roster (Core → `alumnoId` real) a
+> `roster.service.ts`, compartido entre ambos módulos para no duplicar el N+1. `/dashboard/notas`
+> se separó en componentes chicos (`ExamenesPanel`, `ExamenFormDialog`, `NotasTable`) en vez de un
+> solo archivo. La carga de notas guarda en `onBlur` (POST la primera vez, PUT después con el id
+> capturado), rechaza valores no numéricos sin llamar al backend, y revierte el valor si el
+> guardado falla. Se centralizaron los 3 hallazgos de arquitectura de backend (N+1, wrapper de
+> respuesta inconsistente, falta de filtros server-side) en `docs/deuda_tecnica.md`. Validado con
+> curl armando la cadena completa de dependencias y probando el ciclo crear examen → POST nota →
+> PUT nota, confirmando que la edición no duplica el registro.
 
 ## Criterios de Aceptación Globales
 1. **Aestética WOW:** Cero diseños básicos. Todo debe sentirse premium, vivo y responsivo.

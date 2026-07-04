@@ -35,7 +35,12 @@ class ApiClient {
     this.baseURL = baseURL
   }
 
-  private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  // Logica compartida de fetch: header Bearer, manejo de 401, extraccion de
+  // error. Devuelve el body ya parseado, sin asumir ninguna forma particular
+  // -- eso lo decide quien la llama (request() para el wrapper {meta,data,
+  // errors} del Core, requestRaw() para microservicios que devuelven el
+  // recurso directo, como ms-asistencias/ms-notas).
+  private async execute(endpoint: string, options: RequestOptions = {}): Promise<any> {
     const { skipAuthRedirect, ...fetchOptions } = options
     const url = `${this.baseURL}${endpoint}`
 
@@ -53,7 +58,7 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config)
-      const data = await response.json().catch(() => ({}))
+      const data = response.status === 204 ? null : await response.json().catch(() => ({}))
 
       // Sesión inválida/expirada → limpiamos y mandamos a /login.
       // No aplica al propio intento de login (credenciales invalidas = 401 tambien).
@@ -70,11 +75,19 @@ class ApiClient {
         throw new Error(extractErrorMessage(data, response.status))
       }
 
-      return data as ApiResponse<T>
+      return data
     } catch (error) {
       console.error("API Error:", error)
       throw error
     }
+  }
+
+  private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+    return (await this.execute(endpoint, options)) as ApiResponse<T>
+  }
+
+  private async requestRaw<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    return (await this.execute(endpoint, options)) as T
   }
 
   get<T>(endpoint: string, options?: RequestOptions) {
@@ -99,6 +112,32 @@ class ApiClient {
 
   delete<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(endpoint, { method: "DELETE", ...options })
+  }
+
+  // Variantes "raw": para microservicios que devuelven el recurso directo en
+  // el body, sin envolverlo en {meta,data,errors} (ms-asistencias, ms-notas).
+  getRaw<T>(endpoint: string, options?: RequestOptions) {
+    return this.requestRaw<T>(endpoint, { method: "GET", ...options })
+  }
+
+  postRaw<T>(endpoint: string, body?: any, options?: RequestOptions) {
+    return this.requestRaw<T>(endpoint, {
+      method: "POST",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      ...options,
+    })
+  }
+
+  putRaw<T>(endpoint: string, body?: any, options?: RequestOptions) {
+    return this.requestRaw<T>(endpoint, {
+      method: "PUT",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      ...options,
+    })
+  }
+
+  deleteRaw<T>(endpoint: string, options?: RequestOptions) {
+    return this.requestRaw<T>(endpoint, { method: "DELETE", ...options })
   }
 }
 
