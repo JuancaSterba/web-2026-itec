@@ -64,7 +64,7 @@ Una vez finalizada la Fase 1, se crearán nuevos proyectos al mismo nivel en la 
 
 ### 3.1 Infraestructura Docker y Red
 - [x] Crear el proyecto `api-gateway` (Spring Cloud Gateway) para enrutar tráfico a los distintos servicios.
-- [ ] Consolidar un archivo `docker-compose.yml` en la raíz del repositorio que levante el Frontend, el Gateway, el Core, los nuevos microservicios y la base de datos.
+- [x] Consolidar un archivo `docker-compose.yml` en la raíz del repositorio que levante el Frontend, el Gateway, el Core, los nuevos microservicios y la base de datos.
 
 ### 3.2 Microservicio de Asistencias (Nuevo proyecto: `ms-asistencias`)
 Liviano y centrado en una sola tarea. Solo guardará los IDs del Alumno y la Comisión, provistos por el Core.
@@ -76,12 +76,12 @@ Liviano y centrado en una sola tarea. Solo guardará los IDs del Alumno y la Com
 ### 3.3 Microservicio de Calificaciones (Nuevo proyecto: `ms-notas`)
 Independiente y enfocado a evaluaciones académicas.
 - **Tipos de Evaluación (Exámenes)**
-  - [ ] `POST /api/examenes` (Crear examen/instancia de evaluación)
-  - [ ] `GET /api/examenes` (Listar evaluaciones de una comisión)
-  - [ ] `PUT /api/examenes/{id}` (Modificar examen)
-  - [ ] `DELETE /api/examenes/{id}` (Eliminar examen)
+  - [x] `POST /api/examenes` (Crear examen/instancia de evaluación)
+  - [x] `GET /api/examenes` (Listar evaluaciones de una comisión)
+  - [x] `PUT /api/examenes/{id}` (Modificar examen)
+  - [x] `DELETE /api/examenes/{id}` (Eliminar examen)
 - **Notas / Calificaciones**
-  - [ ] `POST /api/notas` (Registrar nota parcial o final)
-  - [ ] `GET /api/notas` (Consultar notas de un alumno/comisión)
-  - [ ] `PUT /api/notas/{id}` (Modificar nota)
-  - [ ] `DELETE /api/notas/{id}` (Eliminar nota)
+  - [x] `POST /api/notas` (Registrar nota parcial o final)
+  - [x] `GET /api/notas` (Consultar notas de un alumno/comisión)
+  - [x] `PUT /api/notas/{id}` (Modificar nota)
+  - [x] `DELETE /api/notas/{id}` (Eliminar nota)
