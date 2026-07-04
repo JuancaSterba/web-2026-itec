@@ -46,9 +46,26 @@ El cascarón donde vivirán todos los módulos.
 
 ## Fase 4: Integración de Microservicios (Módulos de Negocio)
 Desarrollo de las pantallas que consumirán nuestros microservicios específicos.
-- [ ] **Módulo Core (Gestión Maestros)**: 
-  - Listado de Alumnos y Profesores.
-  - Gestión de Comisiones.
+- [ ] **Módulo Core (Gestión Maestros)**:
+  - [x] Listado de Alumnos (CRUD completo: crear, editar legajo/estado, eliminar).
+  - [ ] Listado de Profesores.
+  - [ ] Gestión de Comisiones.
+
+> ✅ **Memo de Avance (Alumnos):** `/dashboard/alumnos` consume `/api/core/alumnos` vía el Gateway
+> con el `api-client` existente. Hallazgo importante (y una corrección a mitad de camino): crear un
+> alumno NO es un CRUD simple, y el orden real es el opuesto al que se armó al principio — no se
+> elige un usuario ya existente para asociarle un alumno, sino que el alta registra un Usuario con
+> rol ALUMNO (`POST /auth/register`) y el Core crea el Alumno como efecto secundario de ese
+> registro (`legajo` queda `null`). El endpoint `POST /api/alumnos` (userId+legajo) es solo para el
+> caso borde de un usuario que ya tiene el rol pero no el alumno asociado, no el alta normal. El
+> formulario de creación pide username/password/nombre/apellido/DNI/email/teléfono; el legajo se
+> asigna después desde "Editar" (único momento en que el Core lo acepta). `Switch` y `AlertDialog`
+> están rotos en este proyecto (`@radix-ui/react-switch` y `@radix-ui/react-alert-dialog` no están
+> instalados) — se resolvió con un toggle de dos `Button` y un `Dialog` de confirmación en su
+> lugar. Se eliminó `/dashboard/students` (scaffold pre-Fase-1 con datos mock que ni siquiera
+> coincidían con el modelo real, huérfano del Sidebar). Validado con curl replicando los shapes
+> exactos de los diálogos contra el Gateway real, incluyendo el caso de error de negocio mostrado
+> en el toast.
 - [ ] **Módulo Asistencias (`ms-asistencias`)**:
   - Interfaz de "Toma de Lista" por comisión y fecha.
 - [ ] **Módulo Calificaciones (`ms-notas`)**:
