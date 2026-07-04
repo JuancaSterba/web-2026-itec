@@ -24,7 +24,7 @@ public class AlumnoInscriptoServiceImpl implements AlumnoInscriptoService {
     @Override
     @Transactional(readOnly = true)
     public List<AlumnoInscriptoResponse> getAll() {
-        return alumnoInscriptoRepository.findAll().stream()
+        return alumnoInscriptoRepository.findAllConDetalle().stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -42,7 +42,7 @@ public class AlumnoInscriptoServiceImpl implements AlumnoInscriptoService {
         if (!alumnoCarreraRepository.existsById(alumnoCarreraId)) {
             throw new AlumnoCarreraNotFoundException(alumnoCarreraId);
         }
-        return alumnoInscriptoRepository.findByAlumnoCarreraId(alumnoCarreraId).stream()
+        return alumnoInscriptoRepository.findByAlumnoCarreraIdConDetalle(alumnoCarreraId).stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -89,13 +89,17 @@ public class AlumnoInscriptoServiceImpl implements AlumnoInscriptoService {
     private AlumnoInscriptoResponse toResponse(AlumnoInscripto i) {
         AlumnoCarrera ac = i.getAlumnoCarrera();
         Alumno alumno = ac.getAlumno();
-        String nombreCompleto = alumno.getUser().getNombre() + " " + alumno.getUser().getApellido();
+        User user = alumno.getUser();
         ComisionMateria cm = i.getComision();
 
         return AlumnoInscriptoResponse.builder()
                 .id(i.getId())
                 .alumnoCarreraId(ac.getId())
-                .alumnoNombreCompleto(nombreCompleto)
+                .alumnoId(alumno.getId())
+                .nombre(user.getNombre())
+                .apellido(user.getApellido())
+                .dni(user.getDni())
+                .legajo(alumno.getLegajo())
                 .comisionMateriaId(cm.getId())
                 .materiaNombre(cm.getMateria().getNombre())
                 .comisionNombre(cm.getNombre())
