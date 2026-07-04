@@ -7,12 +7,24 @@ spring:
   cloud:
     gateway:
       routes:
+        # Orden importa: core-auth debe ir antes que core-api, porque
+        # /api/core/auth/** tambien matchea el predicate mas ancho de core-api.
+        - id: core-auth
+          uri: ${CORE_API_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/core/auth/**
+          filters:
+            - RewritePath=/api/core/auth/(?<segment>.*), /auth/${segment}
         - id: core-api
           uri: ${CORE_API_URL:http://localhost:8081}
           predicates:
             - Path=/api/core/**
           filters:
             - RewritePath=/api/core/(?<segment>.*), /api/${segment}
+        - id: core-docs
+          uri: ${CORE_API_URL:http://localhost:8081}
+          predicates:
+            - Path=/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html
 
 logging:
   level:
