@@ -1,6 +1,6 @@
 package ar.edu.itec1misiones.service.impl;
 
-import ar.edu.itec1misiones.dto.request.AlumnoRequest;
+import ar.edu.itec1misiones.dto.request.AlumnoRegistroDTO;
 import ar.edu.itec1misiones.dto.request.AlumnoUpdateRequest;
 import ar.edu.itec1misiones.dto.response.AlumnoResponse;
 import ar.edu.itec1misiones.exception.AlumnoNotFoundException;
@@ -38,26 +38,20 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public AlumnoResponse crear(AlumnoRequest request) {
-        User user = userLookupPort.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Usuario no encontrado con id: " + request.getUserId()));
+    public AlumnoResponse crearConUsuario(AlumnoRegistroDTO dto) {
+        if (alumnoRepository.existsByLegajo(dto.getLegajo())) {
+            throw new IllegalArgumentException(
+                    "El legajo '" + dto.getLegajo() + "' ya está en uso");
+        }
 
-        if (!user.getRoles().contains(Rol.ALUMNO)) {
-            throw new IllegalArgumentException("El usuario no tiene el rol ALUMNO");
-        }
-        if (alumnoRepository.findByUserId(request.getUserId()).isPresent()) {
-            throw new IllegalArgumentException(
-                    "El usuario ya tiene un alumno asociado");
-        }
-        if (alumnoRepository.existsByLegajo(request.getLegajo())) {
-            throw new IllegalArgumentException(
-                    "El legajo '" + request.getLegajo() + "' ya está en uso");
-        }
+        // Si esto falla (DNI/email/telefono duplicado), la transaccion completa
+        // se revierte -- no queda un Usuario huerfano sin Alumno asociado.
+        User user = userLookupPort.crearConCredencialesPorDni(
+                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(), dto.getTelefono(), Rol.ALUMNO);
 
         Alumno alumno = new Alumno();
         alumno.setUser(user);
-        alumno.setLegajo(request.getLegajo());
+        alumno.setLegajo(dto.getLegajo());
         alumno.setActivo(true);
 
         return toResponse(alumnoRepository.save(alumno));
