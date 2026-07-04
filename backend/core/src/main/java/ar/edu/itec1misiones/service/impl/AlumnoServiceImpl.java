@@ -13,6 +13,7 @@ import ar.edu.itec1misiones.service.UserLookupPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -39,9 +40,11 @@ public class AlumnoServiceImpl implements AlumnoService {
 
     @Override
     public AlumnoResponse crearConUsuario(AlumnoRegistroDTO dto) {
-        if (alumnoRepository.existsByLegajo(dto.getLegajo())) {
+        // Legajo autogenerado AAAA-DNI (año de alta + DNI); no se pide manualmente.
+        String legajo = LocalDate.now().getYear() + "-" + dto.getDni();
+        if (alumnoRepository.existsByLegajo(legajo)) {
             throw new IllegalArgumentException(
-                    "El legajo '" + dto.getLegajo() + "' ya está en uso");
+                    "El legajo '" + legajo + "' ya está en uso");
         }
 
         // Si esto falla (DNI/email/telefono duplicado), la transaccion completa
@@ -51,7 +54,7 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         Alumno alumno = new Alumno();
         alumno.setUser(user);
-        alumno.setLegajo(dto.getLegajo());
+        alumno.setLegajo(legajo);
         alumno.setActivo(true);
 
         return toResponse(alumnoRepository.save(alumno));

@@ -56,7 +56,6 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     if (!/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "El email no es válido"
     if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono debe tener entre 6 y 15 dígitos"
-    if (!form.legajo.trim()) return "El legajo es obligatorio"
     return null
   }
 
@@ -84,7 +83,8 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
         toast.success("Alumno actualizado correctamente")
         onSuccess(actualizado)
       } else {
-        const creado = await crearAlumno({ ...form, legajo: form.legajo.trim() })
+        const { legajo, ...datosAlta } = form
+        const creado = await crearAlumno(datosAlta)
         toast.success("Alumno creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
         })
@@ -156,16 +156,17 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
             </>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="legajo">Legajo</Label>
-            <Input
-              id="legajo"
-              value={form.legajo}
-              onChange={setField("legajo")}
-              placeholder="Ej. LEG-2026-001"
-              disabled={submitting}
-            />
-          </div>
+          {isEditing && (
+            <div className="space-y-2">
+              <Label htmlFor="legajo">Legajo</Label>
+              <Input
+                id="legajo"
+                value={form.legajo}
+                onChange={setField("legajo")}
+                disabled={submitting}
+              />
+            </div>
+          )}
 
           {isEditing && (
             <div className="space-y-2">

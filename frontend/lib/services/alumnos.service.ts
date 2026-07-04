@@ -18,13 +18,13 @@ export interface Alumno {
 // POST /api/core/alumnos ahora es un alta de un solo paso: el Core crea el
 // Usuario (username=DNI, password=DNI encriptada, rol=ALUMNO) y el Alumno en
 // la misma transaccion (ver docs/Reglas_de_Negocio.md y AlumnoRegistroDTO).
+// El legajo ya no se pide: el Core lo autogenera como AAAA-DNI.
 export interface CrearAlumnoInput {
   nombre: string
   apellido: string
   dni: string
   email: string
   telefono: string
-  legajo: string
 }
 
 // AlumnoUpdateRequest del Core: solo legajo y estado activo son editables.

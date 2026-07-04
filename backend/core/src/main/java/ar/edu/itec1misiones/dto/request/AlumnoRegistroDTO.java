@@ -30,7 +30,4 @@ public class AlumnoRegistroDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     @Pattern(regexp = "\\d{6,15}", message = "El teléfono debe contener entre 6 y 15 números")
     private String telefono;
-
-    @NotBlank(message = "El legajo es obligatorio")
-    private String legajo;
 }
