@@ -17,8 +17,7 @@ import {
 } from "@/components/ui/table"
 import { EstadoAsistenciaToggle } from "@/components/asistencias/estado-asistencia-toggle"
 import { listarComisiones, type Comision } from "@/lib/services/comisiones.service"
-import { listarInscripciones } from "@/lib/services/inscripciones.service"
-import { obtenerAlumnoCarrera } from "@/lib/services/alumnos-carrera.service"
+import { obtenerRosterComision } from "@/lib/services/roster.service"
 import {
   listarAsistencias,
   registrarAsistencia,
@@ -74,28 +73,23 @@ export default function AsistenciasPage() {
     const cargar = async () => {
       try {
         // Orquestacion entre Core y ms-asistencias (API Composition Pattern):
-        // el Core sabe quien esta inscripto en la comision pero no expone el
-        // alumnoId directo (solo alumnoCarreraId) -- hay que resolverlo por
-        // separado. ms-asistencias sabe el estado pero no el nombre de nadie.
-        const [inscripciones, asistencias] = await Promise.all([
-          listarInscripciones(),
+        // el Core sabe quien esta inscripto en la comision (roster.service.ts
+        // resuelve el alumnoId real, ver docs/deuda_tecnica.md #1). ms-asistencias
+        // sabe el estado pero no el nombre de nadie.
+        const [roster, asistencias] = await Promise.all([
+          obtenerRosterComision(Number(comisionId)),
           listarAsistencias(),
         ])
 
-        const inscriptosComision = inscripciones.filter((i) => i.comisionMateriaId === Number(comisionId))
-        const alumnosCarrera = await Promise.all(
-          inscriptosComision.map((i) => obtenerAlumnoCarrera(i.alumnoCarreraId))
-        )
         const asistenciasDelDia = asistencias.filter(
           (a) => a.comisionId === Number(comisionId) && a.fecha === fecha
         )
 
-        const nuevoRoster: RosterItem[] = inscriptosComision.map((insc, idx) => {
-          const alumnoId = alumnosCarrera[idx].alumnoId
+        const nuevoRoster: RosterItem[] = roster.map(({ alumnoId, nombreCompleto }) => {
           const existente = asistenciasDelDia.find((a) => a.alumnoId === alumnoId)
           return {
             alumnoId,
-            nombreCompleto: insc.alumnoNombreCompleto,
+            nombreCompleto,
             asistenciaId: existente?.id ?? null,
             estado: existente?.estado ?? null,
             saving: false,
