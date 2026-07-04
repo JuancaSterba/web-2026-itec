@@ -1,6 +1,7 @@
 package ar.edu.itec1misiones.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,15 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Set<Rol> roles = new HashSet<>();
 
+    // Cuenta habilitada para loguearse. Default true para no romper usuarios
+    // existentes (columnDefinition cubre el ALTER TABLE sobre filas ya
+    // insertadas); false para Alumnos/Profesores auto-creados, que todavia
+    // no tienen UI propia (ver docs/Reglas_de_Negocio.md).
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Setter(AccessLevel.PUBLIC)
+    @Getter(AccessLevel.NONE)
+    private boolean enabled = true;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
@@ -58,5 +68,5 @@ public class User implements UserDetails {
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override public boolean isEnabled() { return enabled; }
 }

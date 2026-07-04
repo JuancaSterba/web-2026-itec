@@ -1,7 +1,7 @@
 package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
-import ar.edu.itec1misiones.dto.request.ProfesorRequest;
+import ar.edu.itec1misiones.dto.request.ProfesorRegistroDTO;
 import ar.edu.itec1misiones.dto.request.ProfesorUpdateRequest;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.dto.response.ProfesorResponse;
@@ -30,12 +30,12 @@ public class ProfesorController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Crear un nuevo profesor")
+    @Operation(summary = "Crear un nuevo profesor (alta de un solo paso: crea el Usuario y el Profesor)")
     public ResponseEntity<ApiResponse<ProfesorResponse>> crear(
-            @RequestBody @Valid ProfesorRequest request,
+            @RequestBody @Valid ProfesorRegistroDTO request,
             HttpServletRequest httpRequest) {
 
-        ProfesorResponse profesor = profesorService.crear(request);
+        ProfesorResponse profesor = profesorService.crearConUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<ProfesorResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
@@ -45,6 +45,7 @@ public class ProfesorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todos los profesores activos")
     public ResponseEntity<ApiResponse<ProfesorResponse>> listar(HttpServletRequest httpRequest) {
         List<ProfesorResponse> profesores = profesorService.listarActivos();
@@ -57,6 +58,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener un profesor por ID")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorId(
             @PathVariable Long id,
@@ -72,6 +74,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/dni/{dni}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Buscar profesor por DNI")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorDni(
             @PathVariable String dni,

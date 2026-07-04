@@ -48,8 +48,16 @@ El cascarón donde vivirán todos los módulos.
 Desarrollo de las pantallas que consumirán nuestros microservicios específicos.
 - [ ] **Módulo Core (Gestión Maestros)**:
   - [x] Listado de Alumnos (CRUD completo: crear, editar legajo/estado, eliminar).
-  - [ ] Listado de Profesores.
+  - [x] Listado de Profesores (CRUD completo: crear, editar título/teléfono/estado, eliminar).
   - [ ] Gestión de Comisiones.
+
+> ✅ **Memo de Avance (Profesores + fix de seguridad):** `/dashboard/profesores` replica el mismo
+> patrón que Alumnos, incluido el alta de un solo paso (`POST /api/core/profesores` crea Usuario+
+> Profesor). Antes de construirlo se resolvieron los dos hallazgos de seguridad detectados en la
+> validación de flujos: Alumnos/Profesores ya no pueden loguearse (`User.enabled=false` al
+> crearse, chequeado explícitamente en `AuthServiceImpl.login()` porque ese método no pasa por
+> `AuthenticationManager`) y los `GET` de los controladores maestros ahora exigen rol ADMIN/
+> ADMINISTRATIVO (antes cualquier token válido leía todo).
 
 > ✅ **Memo de Avance (Alumnos):** `/dashboard/alumnos` consume `/api/core/alumnos` vía el Gateway
 > con el `api-client` existente. El formulario terminó siendo, después de dos vueltas, exactamente

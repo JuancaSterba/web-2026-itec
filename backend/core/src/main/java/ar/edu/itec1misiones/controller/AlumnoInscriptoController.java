@@ -26,6 +26,7 @@ public class AlumnoInscriptoController {
     private final AlumnoInscriptoService alumnoInscriptoService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todas las inscripciones a materias")
     public ResponseEntity<ApiResponse<AlumnoInscriptoResponse>> getAll(HttpServletRequest httpRequest) {
         List<AlumnoInscriptoResponse> inscripciones = alumnoInscriptoService.getAll();
@@ -38,6 +39,7 @@ public class AlumnoInscriptoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener una inscripción a materia por ID")
     public ResponseEntity<ApiResponse<AlumnoInscriptoResponse>> getById(
             @PathVariable Long id,
@@ -53,6 +55,7 @@ public class AlumnoInscriptoController {
     }
 
     @GetMapping("/alumno-carrera/{alumnoCarreraId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar inscripciones a materias de un alumno-carrera")
     public ResponseEntity<ApiResponse<AlumnoInscriptoResponse>> getByAlumnoCarreraId(
             @PathVariable Long alumnoCarreraId,

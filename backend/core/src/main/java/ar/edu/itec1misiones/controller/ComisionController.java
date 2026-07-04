@@ -44,6 +44,7 @@ public class ComisionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todas las comisiones activas")
     public ResponseEntity<ApiResponse<ComisionResponse>> listar(HttpServletRequest httpRequest) {
         List<ComisionResponse> comisiones = comisionService.listarActivas();
@@ -56,6 +57,7 @@ public class ComisionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener una comisión por ID")
     public ResponseEntity<ApiResponse<ComisionResponse>> buscarPorId(
             @PathVariable Long id,
@@ -71,6 +73,7 @@ public class ComisionController {
     }
 
     @GetMapping("/materia/{materiaId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar comisiones activas de una materia")
     public ResponseEntity<ApiResponse<ComisionResponse>> listarPorMateria(
             @PathVariable Long materiaId,
@@ -86,6 +89,7 @@ public class ComisionController {
     }
 
     @GetMapping("/cuatrimestre/{cuatrimestreId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar comisiones activas de un cuatrimestre")
     public ResponseEntity<ApiResponse<ComisionResponse>> listarPorCuatrimestre(
             @PathVariable Long cuatrimestreId,
@@ -101,6 +105,7 @@ public class ComisionController {
     }
 
     @GetMapping("/profesor/{profesorId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar comisiones activas de un profesor")
     public ResponseEntity<ApiResponse<ComisionResponse>> listarPorProfesor(
             @PathVariable Long profesorId,

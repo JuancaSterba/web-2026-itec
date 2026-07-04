@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,21 @@ public class SecurityExceptionHandler {
         ErrorDto errorDto = new ErrorDto(ExceptionConstants.ERROR_AUTH, ExceptionConstants.MSG_CREDENTIALS_INVALID);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.builder()
+                        .meta(new Meta(request.getMethod(), request.getRequestURI()))
+                        .errors(List.of(errorDto))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDisabledAccount(
+            DisabledException ex,
+            HttpServletRequest request) {
+
+        ErrorDto errorDto = new ErrorDto("ACCOUNT_DISABLED", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 ApiResponse.builder()
                         .meta(new Meta(request.getMethod(), request.getRequestURI()))
                         .errors(List.of(errorDto))

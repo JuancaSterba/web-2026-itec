@@ -45,6 +45,7 @@ public class AlumnoController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todos los alumnos activos")
     public ResponseEntity<ApiResponse<AlumnoResponse>> listar(HttpServletRequest httpRequest) {
         List<AlumnoResponse> alumnos = alumnoService.listarActivos();
@@ -57,6 +58,7 @@ public class AlumnoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener un alumno por ID")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorId(
             @PathVariable Long id,
@@ -72,6 +74,7 @@ public class AlumnoController {
     }
 
     @GetMapping("/legajo/{legajo}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Buscar alumno por número de legajo")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorLegajo(
             @PathVariable String legajo,
@@ -87,6 +90,7 @@ public class AlumnoController {
     }
 
     @GetMapping("/dni/{dni}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Buscar alumno por DNI")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorDni(
             @PathVariable String dni,
