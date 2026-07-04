@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ms-asistencias
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+server:
+  port: 8083
+
+logging:
+  level:
+    root: info

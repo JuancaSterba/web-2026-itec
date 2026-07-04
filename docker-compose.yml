@@ -14,8 +14,34 @@ services:
       # no por localhost. Puerto 8082 = server.port real del perfil 'local' activo
       # (backend/.env: APP_PROFILE=local -> application-local.yml). En 'prod' sería 8081.
       - CORE_API_URL=http://backend-app:8082
+      - ASISTENCIAS_API_URL=http://ms-asistencias:8083
     depends_on:
       - backend-app
+      - ms-asistencias
+
+  ms-asistencias:
+    build:
+      context: ./ms-asistencias
+      dockerfile: Dockerfile
+    container_name: itec-ms-asistencias
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # mysql-db es el nombre del servicio (alcanzable tambien como itec-mysql,
+      # su container_name, ya que Docker agrega ambos como alias de red).
+      # db_asistencias es un esquema logico propio, separado de backoffice_itec
+      # (aislamiento logico: mismo servidor MySQL, sin JOINs entre servicios).
+      # createDatabaseIfNotExist evita el error de "unknown database" en el primer arranque.
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/db_asistencias?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD:-root}
+      # application-prod.yml por defecto usa ddl-auto=validate; en el primer arranque
+      # el esquema esta vacio, asi que necesitamos "update" para que Hibernate cree las tablas.
+      - DB_DDL_AUTO=update
+    depends_on:
+      mysql-db:
+        condition: service_healthy
 
   frontend-app:
     build:
