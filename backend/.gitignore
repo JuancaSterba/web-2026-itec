@@ -86,3 +86,6 @@ coverage/
 *.lcov
 *.exec
 .env
+/.claude/
+/.remember/
+/docs/
