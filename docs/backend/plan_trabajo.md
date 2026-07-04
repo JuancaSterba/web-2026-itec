@@ -63,7 +63,7 @@ El Core centraliza la gestión académica y la seguridad. Todo el trabajo de est
 Una vez finalizada la Fase 1, se crearán nuevos proyectos al mismo nivel en la raíz del repositorio (`web-2026-itec/`).
 
 ### 3.1 Infraestructura Docker y Red
-- [ ] Crear el proyecto `api-gateway` (Spring Cloud Gateway) para enrutar tráfico a los distintos servicios.
+- [x] Crear el proyecto `api-gateway` (Spring Cloud Gateway) para enrutar tráfico a los distintos servicios.
 - [ ] Consolidar un archivo `docker-compose.yml` en la raíz del repositorio que levante el Frontend, el Gateway, el Core, los nuevos microservicios y la base de datos.
 
 ### 3.2 Microservicio de Asistencias (Nuevo proyecto: `ms-asistencias`)
