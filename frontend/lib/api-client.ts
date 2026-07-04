@@ -36,10 +36,8 @@ class ApiClient {
   }
 
   // Logica compartida de fetch: header Bearer, manejo de 401, extraccion de
-  // error. Devuelve el body ya parseado, sin asumir ninguna forma particular
-  // -- eso lo decide quien la llama (request() para el wrapper {meta,data,
-  // errors} del Core, requestRaw() para microservicios que devuelven el
-  // recurso directo, como ms-asistencias/ms-notas).
+  // error. El body siempre viene envuelto en {meta,data,errors} (Core y
+  // microservicios usan la misma libreria commons para construir la respuesta).
   private async execute(endpoint: string, options: RequestOptions = {}): Promise<any> {
     const { skipAuthRedirect, ...fetchOptions } = options
     const url = `${this.baseURL}${endpoint}`
@@ -86,10 +84,6 @@ class ApiClient {
     return (await this.execute(endpoint, options)) as ApiResponse<T>
   }
 
-  private async requestRaw<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    return (await this.execute(endpoint, options)) as T
-  }
-
   get<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(endpoint, { method: "GET", ...options })
   }
@@ -112,32 +106,6 @@ class ApiClient {
 
   delete<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(endpoint, { method: "DELETE", ...options })
-  }
-
-  // Variantes "raw": para microservicios que devuelven el recurso directo en
-  // el body, sin envolverlo en {meta,data,errors} (ms-asistencias, ms-notas).
-  getRaw<T>(endpoint: string, options?: RequestOptions) {
-    return this.requestRaw<T>(endpoint, { method: "GET", ...options })
-  }
-
-  postRaw<T>(endpoint: string, body?: any, options?: RequestOptions) {
-    return this.requestRaw<T>(endpoint, {
-      method: "POST",
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-      ...options,
-    })
-  }
-
-  putRaw<T>(endpoint: string, body?: any, options?: RequestOptions) {
-    return this.requestRaw<T>(endpoint, {
-      method: "PUT",
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-      ...options,
-    })
-  }
-
-  deleteRaw<T>(endpoint: string, options?: RequestOptions) {
-    return this.requestRaw<T>(endpoint, { method: "DELETE", ...options })
   }
 }
 

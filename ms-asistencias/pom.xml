@@ -22,6 +22,13 @@
     </properties>
 
     <dependencies>
+        <!-- ApiResponse/ErrorDto/Meta compartidos con el Core (deuda_tecnica.md #2) -->
+        <dependency>
+            <groupId>ar.edu.itec1misiones</groupId>
+            <artifactId>commons</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

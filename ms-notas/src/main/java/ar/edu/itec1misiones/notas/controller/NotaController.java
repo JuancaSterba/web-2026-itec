@@ -1,8 +1,11 @@
 package ar.edu.itec1misiones.notas.controller;
 
+import ar.edu.itec1misiones.dto.ApiResponse;
+import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.notas.dto.NotaRequest;
 import ar.edu.itec1misiones.notas.model.Nota;
 import ar.edu.itec1misiones.notas.service.NotaService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,23 +31,56 @@ public class NotaController {
     }
 
     @PostMapping
-    public ResponseEntity<Nota> crear(@RequestBody @Valid NotaRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(notaService.crear(request));
+    public ResponseEntity<ApiResponse<Nota>> crear(
+            @RequestBody @Valid NotaRequest request,
+            HttpServletRequest httpRequest) {
+
+        Nota nota = notaService.crear(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.<Nota>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(nota))
+                        .build()
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<Nota>> listar() {
-        return ResponseEntity.ok(notaService.listar());
+    public ResponseEntity<ApiResponse<Nota>> listar(HttpServletRequest httpRequest) {
+        List<Nota> notas = notaService.listar();
+        return ResponseEntity.ok(
+                ApiResponse.<Nota>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(notas)
+                        .build()
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Nota> actualizar(@PathVariable Long id, @RequestBody @Valid NotaRequest request) {
-        return ResponseEntity.ok(notaService.actualizar(id, request));
+    public ResponseEntity<ApiResponse<Nota>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid NotaRequest request,
+            HttpServletRequest httpRequest) {
+
+        Nota actualizada = notaService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<Nota>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(actualizada))
+                        .build()
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> eliminar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
         notaService.eliminar(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Nota eliminada correctamente"))
+                        .build()
+        );
     }
 }
