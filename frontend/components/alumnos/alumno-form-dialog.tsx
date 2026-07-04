@@ -20,32 +20,28 @@ interface AlumnoFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   alumno: Alumno | null
-  /** null = se creo un alumno nuevo (register no devuelve el objeto, hay que refetchear) */
-  onSuccess: (alumno: Alumno | null) => void
+  onSuccess: (alumno: Alumno) => void
 }
 
 const emptyForm = {
-  username: "",
-  password: "",
   nombre: "",
   apellido: "",
   dni: "",
   email: "",
   telefono: "",
+  legajo: "",
 }
 
 export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: AlumnoFormDialogProps) {
   const isEditing = !!alumno
   const [form, setForm] = useState(emptyForm)
-  const [legajo, setLegajo] = useState("")
   const [activo, setActivo] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (open) {
-      setForm(emptyForm)
-      setLegajo(alumno?.legajo ?? "")
+      setForm({ ...emptyForm, legajo: alumno?.legajo ?? "" })
       setActivo(alumno?.activo ?? true)
       setError(null)
     }
@@ -55,13 +51,12 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
 
   const validarCreacion = (): string | null => {
-    if (!form.username.trim()) return "El usuario es obligatorio"
-    if (form.password.length < 6) return "La contraseña debe tener al menos 6 caracteres"
     if (!form.nombre.trim()) return "El nombre es obligatorio"
     if (!form.apellido.trim()) return "El apellido es obligatorio"
     if (!/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "El email no es válido"
     if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono debe tener entre 6 y 15 dígitos"
+    if (!form.legajo.trim()) return "El legajo es obligatorio"
     return null
   }
 
@@ -69,7 +64,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     e.preventDefault()
 
     if (isEditing) {
-      if (!legajo.trim()) {
+      if (!form.legajo.trim()) {
         setError("El legajo es obligatorio")
         return
       }
@@ -85,13 +80,15 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     setError(null)
     try {
       if (isEditing) {
-        const actualizado = await actualizarAlumno(alumno!.id, { legajo: legajo.trim(), activo })
+        const actualizado = await actualizarAlumno(alumno!.id, { legajo: form.legajo.trim(), activo })
         toast.success("Alumno actualizado correctamente")
         onSuccess(actualizado)
       } else {
-        await crearAlumno(form)
-        toast.success("Alumno creado correctamente")
-        onSuccess(null)
+        const creado = await crearAlumno({ ...form, legajo: form.legajo.trim() })
+        toast.success("Alumno creado correctamente", {
+          description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
+        })
+        onSuccess(creado)
       }
       onOpenChange(false)
     } catch (err: any) {
@@ -111,55 +108,18 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
           <DialogDescription>
             {isEditing
               ? "El legajo y el estado son los únicos datos editables desde acá; el resto viene del usuario asociado."
-              : "Se crea un usuario con rol ALUMNO. El legajo se asigna después, editando el alumno."}
+              : "El sistema crea automáticamente el usuario del alumno (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {isEditing ? (
-            <>
-              <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni}
-              </div>
+          {isEditing && (
+            <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+              {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni}
+            </div>
+          )}
 
-              <div className="space-y-2">
-                <Label htmlFor="legajo">Legajo</Label>
-                <Input
-                  id="legajo"
-                  value={legajo}
-                  onChange={(e) => setLegajo(e.target.value)}
-                  placeholder="Ej. LEG-2026-001"
-                  disabled={submitting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Estado</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={activo ? "default" : "outline"}
-                    onClick={() => setActivo(true)}
-                    disabled={submitting}
-                    className="flex-1"
-                  >
-                    Activo
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={!activo ? "secondary" : "outline"}
-                    onClick={() => setActivo(false)}
-                    disabled={submitting}
-                    className="flex-1"
-                  >
-                    Inactivo
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
+          {!isEditing && (
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -193,24 +153,46 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" value={form.email} onChange={setField("email")} disabled={submitting} />
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="username">Usuario</Label>
-                  <Input id="username" value={form.username} onChange={setField("username")} disabled={submitting} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={form.password}
-                    onChange={setField("password")}
-                    disabled={submitting}
-                  />
-                </div>
-              </div>
             </>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="legajo">Legajo</Label>
+            <Input
+              id="legajo"
+              value={form.legajo}
+              onChange={setField("legajo")}
+              placeholder="Ej. LEG-2026-001"
+              disabled={submitting}
+            />
+          </div>
+
+          {isEditing && (
+            <div className="space-y-2">
+              <Label>Estado</Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={activo ? "default" : "outline"}
+                  onClick={() => setActivo(true)}
+                  disabled={submitting}
+                  className="flex-1"
+                >
+                  Activo
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={!activo ? "secondary" : "outline"}
+                  onClick={() => setActivo(false)}
+                  disabled={submitting}
+                  className="flex-1"
+                >
+                  Inactivo
+                </Button>
+              </div>
+            </div>
           )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
