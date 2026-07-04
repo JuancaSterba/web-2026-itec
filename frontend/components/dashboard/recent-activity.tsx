@@ -46,10 +46,10 @@ export default function RecentActivity() {
                 {activity.type === "success" ? "Nuevo" : "Actualización"}
               </Badge>
               <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium">{activity.action}</p>
-                <p className="text-xs text-gray-500">por {activity.user}</p>
+                <p className="text-sm font-medium text-foreground">{activity.action}</p>
+                <p className="text-xs text-muted-foreground">por {activity.user}</p>
               </div>
-              <div className="text-xs text-gray-400">{activity.time}</div>
+              <div className="text-xs text-muted-foreground">{activity.time}</div>
             </div>
           ))}
         </div>
