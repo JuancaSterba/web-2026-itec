@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: core-api
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/core/**
+          filters:
+            - RewritePath=/api/core/(?<segment>.*), /api/${segment}
+
+logging:
+  level:
+    root: info
+    org.springframework.cloud.gateway: debug
