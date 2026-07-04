@@ -38,6 +38,19 @@ Draft inicial de infraestructura, sin lógica de negocio propia. Validación:
 
 No se agregan tests automatizados en este draft — es config de arranque, no lógica de negocio. Se puede añadir un test de contrato de rutas en una iteración posterior si el gateway crece.
 
+## Actualización: Dockerización (rama `feature/docker-gateway`)
+
+- `api-gateway/Dockerfile`: multi-stage Maven+JRE alpine, igual patrón que `backend/Dockerfile` pero sin submódulos.
+- `application.yml`: `uri` del route `core-api` pasa a `${CORE_API_URL:http://localhost:8081}` — dentro de Docker, `localhost` no resuelve al contenedor del core.
+- `docker-compose.yml` (raíz): nuevo servicio `api-gateway`, puerto `8080:8080`, `CORE_API_URL=http://backend-app:8082`.
+
+**Hallazgo: puerto real del Core en runtime Docker es 8082, no 8081.** El `.env` del backend usa `APP_PROFILE=local`, y `application-local.yml` fija `server.port: 8081` — dicho `8081` solo aplica al profile `prod` (`application-prod.yml`). Se usó 8082 para que el smoke test funcione contra el compose actual; si el compose pasa a levantar el Core en profile `prod`, hay que actualizar `CORE_API_URL` a 8081.
+
+**Smoke test en Docker (confirmado):**
+- `docker compose up --build -d` — 4 contenedores up, `mysql-db` healthy.
+- `GET http://localhost:8080/api/core/alumnos` (vía Gateway) y `GET http://localhost:8082/api/alumnos` (directo al Core) devuelven ambos `403` (sin auth) — confirma que el Gateway proxea correctamente al Core a través de la red Docker interna.
+- Nota: `/api/core/v3/api-docs` **no** es proxeable con la ruta actual — `RewritePath` siempre antepone `/api/`, pero Swagger vive en `/v3/api-docs` (sin prefijo `/api`) y `/auth/**` vive en `/auth` (sin prefijo `/api`). La ruta `core-api` solo cubre endpoints de negocio bajo `/api/**`. Si se necesita proxear Swagger o login a través del Gateway, hace falta una ruta adicional sin el filtro `RewritePath`.
+
 ## Fuera de alcance
 
 - Autenticación/JWT a nivel Gateway (hoy la maneja `backend/security`).
