@@ -26,6 +26,7 @@ public class ModuloHorarioController {
     private final ModuloHorarioService moduloHorarioService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todos los módulos horarios")
     public ResponseEntity<ApiResponse<ModuloHorarioResponse>> getAll(HttpServletRequest httpRequest) {
         List<ModuloHorarioResponse> modulos = moduloHorarioService.getAll();
@@ -38,6 +39,7 @@ public class ModuloHorarioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener un módulo horario por ID")
     public ResponseEntity<ApiResponse<ModuloHorarioResponse>> getById(
             @PathVariable Long id,

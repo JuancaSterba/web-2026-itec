@@ -44,6 +44,7 @@ public class MateriaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todas las materias activas")
     public ResponseEntity<ApiResponse<MateriaResponse>> listar(HttpServletRequest httpRequest) {
         List<MateriaResponse> materias = materiaService.listarActivas();
@@ -56,6 +57,7 @@ public class MateriaController {
     }
 
     @GetMapping("/plan/{planId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar materias activas de un plan de estudio")
     public ResponseEntity<ApiResponse<MateriaResponse>> listarPorPlan(
             @PathVariable Long planId,
@@ -71,6 +73,7 @@ public class MateriaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener una materia por ID")
     public ResponseEntity<ApiResponse<MateriaResponse>> buscarPorId(
             @PathVariable Long id,

@@ -9,6 +9,7 @@ import ar.edu.itec1misiones.security.service.impl.AuthService;
 import ar.edu.itec1misiones.service.UsuarioCallback;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +43,13 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordEncoder.matches(password, user.getPassword()))
             throw new BadCredentialsException(SecurityConstants.MSG_CREDENTIALS_INVALID);
+
+        // El login no pasa por AuthenticationManager/DaoAuthenticationProvider
+        // (matchea la password a mano arriba), asi que isEnabled() no se
+        // valida solo -- hay que chequearlo explicitamente aca.
+        if (!user.isEnabled()) {
+            throw new DisabledException("La cuenta está deshabilitada");
+        }
 
         Map<String, Object> extraClaims = usuarioCallback.obtenerDatosUsuario(user);
         return jwtServiceImpl.generateToken(user, extraClaims);

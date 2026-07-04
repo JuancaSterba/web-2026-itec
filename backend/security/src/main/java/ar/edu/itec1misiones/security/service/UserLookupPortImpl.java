@@ -56,6 +56,9 @@ public class UserLookupPortImpl implements UserLookupPort {
         user.setDni(dni);
         user.setEmail(email);
         user.setTelefono(telefono);
+        // Alumnos/Profesores no tienen UI propia todavia: la cuenta se crea
+        // deshabilitada para que no puedan loguearse (ver Reglas_de_Negocio.md).
+        user.setEnabled(false);
 
         return userRepository.save(user);
     }

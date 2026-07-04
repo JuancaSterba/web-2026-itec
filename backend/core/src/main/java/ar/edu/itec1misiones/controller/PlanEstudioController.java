@@ -44,6 +44,7 @@ public class PlanEstudioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todos los planes de estudio activos")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> listar(HttpServletRequest httpRequest) {
         List<PlanEstudioResponse> planes = planEstudioService.listarActivos();
@@ -56,6 +57,7 @@ public class PlanEstudioController {
     }
 
     @GetMapping("/carrera/{carreraId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar planes de estudio activos de una carrera")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> listarPorCarrera(
             @PathVariable Long carreraId,
@@ -71,6 +73,7 @@ public class PlanEstudioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener un plan de estudio por ID")
     public ResponseEntity<ApiResponse<PlanEstudioResponse>> buscarPorId(
             @PathVariable Long id,

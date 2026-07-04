@@ -44,6 +44,7 @@ public class CarreraController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todas las carreras activas")
     public ResponseEntity<ApiResponse<CarreraResponse>> listar(HttpServletRequest httpRequest) {
         List<CarreraResponse> carreras = carreraService.listarActivas();
@@ -56,6 +57,7 @@ public class CarreraController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener una carrera por ID")
     public ResponseEntity<ApiResponse<CarreraResponse>> buscarPorId(
             @PathVariable Long id,

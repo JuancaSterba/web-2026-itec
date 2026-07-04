@@ -26,6 +26,7 @@ public class HorarioClaseController {
     private final HorarioClaseService horarioClaseService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todos los horarios de clase")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getAll(HttpServletRequest httpRequest) {
         List<HorarioClaseResponse> horarios = horarioClaseService.getAll();
@@ -38,6 +39,7 @@ public class HorarioClaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener un horario de clase por ID")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getById(
             @PathVariable Long id,
@@ -53,6 +55,7 @@ public class HorarioClaseController {
     }
 
     @GetMapping("/comision/{comisionId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar horarios de clase de una comisión")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getByComisionId(
             @PathVariable Long comisionId,

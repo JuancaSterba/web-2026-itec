@@ -44,6 +44,7 @@ public class CuatrimestreController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Listar todos los cuatrimestres")
     public ResponseEntity<ApiResponse<CuatrimestreResponse>> listar(HttpServletRequest httpRequest) {
         List<CuatrimestreResponse> cuatrimestres = cuatrimestreService.listarTodos();
@@ -56,6 +57,7 @@ public class CuatrimestreController {
     }
 
     @GetMapping("/actual")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener el cuatrimestre actualmente en curso")
     public ResponseEntity<ApiResponse<CuatrimestreResponse>> buscarActual(
             HttpServletRequest httpRequest) {
@@ -70,6 +72,7 @@ public class CuatrimestreController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
     @Operation(summary = "Obtener un cuatrimestre por ID")
     public ResponseEntity<ApiResponse<CuatrimestreResponse>> buscarPorId(
             @PathVariable Long id,
