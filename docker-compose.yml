@@ -15,9 +15,11 @@ services:
       # (backend/.env: APP_PROFILE=local -> application-local.yml). En 'prod' sería 8081.
       - CORE_API_URL=http://backend-app:8082
       - ASISTENCIAS_API_URL=http://ms-asistencias:8083
+      - NOTAS_API_URL=http://ms-notas:8084
     depends_on:
       - backend-app
       - ms-asistencias
+      - ms-notas
 
   ms-asistencias:
     build:
@@ -38,6 +40,24 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD:-root}
       # application-prod.yml por defecto usa ddl-auto=validate; en el primer arranque
       # el esquema esta vacio, asi que necesitamos "update" para que Hibernate cree las tablas.
+      - DB_DDL_AUTO=update
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  ms-notas:
+    build:
+      context: ./ms-notas
+      dockerfile: Dockerfile
+    container_name: itec-ms-notas
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # db_calificaciones es su propio esquema logico, igual criterio que db_asistencias.
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/db_calificaciones?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD:-root}
       - DB_DDL_AUTO=update
     depends_on:
       mysql-db:

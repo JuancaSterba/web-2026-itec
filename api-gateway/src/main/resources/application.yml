@@ -29,6 +29,10 @@ spring:
           uri: ${ASISTENCIAS_API_URL:http://localhost:8083}
           predicates:
             - Path=/api/asistencias/**
+        - id: notas-api
+          uri: ${NOTAS_API_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/examenes/**,/api/notas/**
 
 logging:
   level:
