@@ -31,9 +31,18 @@ Integración con el backend para garantizar el flujo de seguridad basado en JWT.
 
 ## Fase 3: Layout y Estructura del Backoffice (Dashboard)
 El cascarón donde vivirán todos los módulos.
-- [ ] Sidebar dinámico y colapsable (menú de navegación).
-- [ ] Navbar superior (perfil del usuario, botón de logout, breadcrumbs).
-- [ ] Pantalla de Inicio (Dashboard General) con tarjetas resumen y métricas vacías.
+- [x] Sidebar dinámico y colapsable (menú de navegación).
+- [x] Navbar superior (perfil del usuario, botón de logout, breadcrumbs).
+- [x] Pantalla de Inicio (Dashboard General) con tarjetas resumen y métricas vacías.
+
+> ✅ **Memo de Avance:** Sidebar/Navbar/Dashboard ya existían como scaffolding pre-Fase-1 (colores
+> hardcodeados bg-white/bg-gray-50, sin relación con el design system). Se restyleó todo con los
+> tokens `--sidebar-*` (definidos en Fase 1 pero sin usar hasta ahora) y la paleta tierra
+> colorada/selva. El Sidebar exporta la lista de navegación para que el Header arme el breadcrumb
+> dinámico a partir del pathname, sin duplicar la data. KPIs y actividad reciente con datos mock
+> (no hay backend de métricas todavía); el gráfico es un mock de barras CSS, no una librería de
+> charts real. Probado contra el Gateway real en Docker con sesión autenticada (login → cookie →
+> `/dashboard` 200, contenido de las 4 secciones confirmado en el HTML servido).
 
 ## Fase 4: Integración de Microservicios (Módulos de Negocio)
 Desarrollo de las pantallas que consumirán nuestros microservicios específicos.
