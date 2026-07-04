@@ -52,11 +52,14 @@ Desarrollo de las pantallas que consumirán nuestros microservicios específicos
   - [ ] Gestión de Comisiones.
 
 > ✅ **Memo de Avance (Alumnos):** `/dashboard/alumnos` consume `/api/core/alumnos` vía el Gateway
-> con el `api-client` existente. Hallazgo importante: el contrato real del Core no es un CRUD
-> simple — crear un Alumno requiere el `userId` de un Usuario que ya exista con rol ALUMNO (no se
-> puede cargar nombre/DNI/email directo, esos campos vienen del Usuario asociado); actualizar solo
-> permite legajo y estado activo/inactivo. El formulario y sus mensajes reflejan esa realidad en
-> vez del Nombre/Apellido/DNI/Email genérico que se imaginó originalmente. `Switch` y `AlertDialog`
+> con el `api-client` existente. Hallazgo importante (y una corrección a mitad de camino): crear un
+> alumno NO es un CRUD simple, y el orden real es el opuesto al que se armó al principio — no se
+> elige un usuario ya existente para asociarle un alumno, sino que el alta registra un Usuario con
+> rol ALUMNO (`POST /auth/register`) y el Core crea el Alumno como efecto secundario de ese
+> registro (`legajo` queda `null`). El endpoint `POST /api/alumnos` (userId+legajo) es solo para el
+> caso borde de un usuario que ya tiene el rol pero no el alumno asociado, no el alta normal. El
+> formulario de creación pide username/password/nombre/apellido/DNI/email/teléfono; el legajo se
+> asigna después desde "Editar" (único momento en que el Core lo acepta). `Switch` y `AlertDialog`
 > están rotos en este proyecto (`@radix-ui/react-switch` y `@radix-ui/react-alert-dialog` no están
 > instalados) — se resolvió con un toggle de dos `Button` y un `Dialog` de confirmación en su
 > lugar. Se eliminó `/dashboard/students` (scaffold pre-Fase-1 con datos mock que ni siquiera
