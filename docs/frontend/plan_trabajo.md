@@ -49,7 +49,19 @@ Desarrollo de las pantallas que consumirán nuestros microservicios específicos
 - [ ] **Módulo Core (Gestión Maestros)**:
   - [x] Listado de Alumnos (CRUD completo: crear, editar legajo/estado, eliminar).
   - [x] Listado de Profesores (CRUD completo: crear, editar título/teléfono/estado, eliminar).
-  - [ ] Gestión de Comisiones.
+  - [x] Gestión de Comisiones (CRUD completo: crear, editar, eliminar).
+
+> ✅ **Memo de Avance (Comisiones):** Cierra el Módulo Core de la Fase 4.1. Hallazgo importante:
+> la consigna asumía un campo "Turno" (Mañana/Tarde/Noche) que no existe en el modelo real — una
+> Comisión se define por Materia + Cuatrimestre + **Profesor** (`ComisionRequest`: nombre, cupo,
+> materiaId, cuatrimestreId, profesorId). El formulario se construyó contra ese contrato real.
+> `ComisionFormDialog` carga materias/cuatrimestres/profesores activos al abrir y usa `<select>`
+> nativo estilizado con Tailwind — `@radix-ui/react-select` no está instalado, `components/ui/select.tsx`
+> está roto (mismo problema ya visto con `Switch` y `AlertDialog`). Se agregan `materias.service.ts`
+> y `cuatrimestres.service.ts` (solo lectura, para poblar los selects; CRUD completo de esas
+> entidades queda para cuando tengan pantalla propia). Validado con curl armando la cadena de
+> dependencias completa (Carrera → PlanEstudio → Materia, + Cuatrimestre + Profesor) y probando
+> el CRUD completo contra el Gateway real.
 
 > ✅ **Memo de Avance (Profesores + fix de seguridad):** `/dashboard/profesores` replica el mismo
 > patrón que Alumnos, incluido el alta de un solo paso (`POST /api/core/profesores` crea Usuario+
