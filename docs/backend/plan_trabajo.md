@@ -68,10 +68,10 @@ Una vez finalizada la Fase 1, se crearán nuevos proyectos al mismo nivel en la 
 
 ### 3.2 Microservicio de Asistencias (Nuevo proyecto: `ms-asistencias`)
 Liviano y centrado en una sola tarea. Solo guardará los IDs del Alumno y la Comisión, provistos por el Core.
-- [ ] `POST /api/asistencias` (Registrar asistencia por clase/alumno)
-- [ ] `GET /api/asistencias` (Consultar asistencias)
-- [ ] `PUT /api/asistencias/{id}` (Actualizar registro de asistencia)
-- [ ] `DELETE /api/asistencias/{id}` (Eliminar registro)
+- [x] `POST /api/asistencias` (Registrar asistencia por clase/alumno)
+- [x] `GET /api/asistencias` (Consultar asistencias)
+- [x] `PUT /api/asistencias/{id}` (Actualizar registro de asistencia)
+- [x] `DELETE /api/asistencias/{id}` (Eliminar registro)
 
 ### 3.3 Microservicio de Calificaciones (Nuevo proyecto: `ms-notas`)
 Independiente y enfocado a evaluaciones académicas.
