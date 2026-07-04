@@ -27,13 +27,14 @@ El módulo `api` del core ya usaba el puerto 8080 en su profile `prod` (dev=8081
 - `ApiGatewayApplication.java`: clase `@SpringBootApplication` mínima, paquete `ar.edu.itec1misiones.gateway`.
 - `application.yml`:
   - `server.port: 8080`
-  - `spring.cloud.gateway.routes`: una ruta `id: core-api`, `predicates: Path=/api/core/**`, `uri: http://localhost:8081` (puerto unificado del core).
+  - `spring.cloud.gateway.routes`: una ruta `id: core-api`, `predicates: Path=/api/core/**`, `uri: http://localhost:8081` (puerto unificado del core), `filters: RewritePath=/api/core/(?<segment>.*), /api/${segment}`.
+  - El filtro `RewritePath` es necesario porque los controllers del core están mapeados en `/api/*` (ej. `/api/alumnos`), no en `/api/core/*`. Sin reescritura, el Gateway reenviaría el path literal `/api/core/alumnos` que no existe en el core.
 
 ## Testing
 
 Draft inicial de infraestructura, sin lógica de negocio propia. Validación:
 - `mvn -q -pl api-gateway compile` (o build standalone) para confirmar que compila y las dependencias resuelven sin conflictos.
-- Smoke manual: levantar `backend/api` y `api-gateway`, `GET http://localhost:8080/api/core/**` debe proxear al core en 8081.
+- Smoke manual: levantar `backend/api` y `api-gateway`, `GET http://localhost:8080/api/core/alumnos` debe devolver el mismo status code que `GET http://localhost:8081/api/alumnos` directo (confirmado: ambos 403 sin auth, mientras que un path sin ruta definida en el Gateway da 404).
 
 No se agregan tests automatizados en este draft — es config de arranque, no lógica de negocio. Se puede añadir un test de contrato de rutas en una iteración posterior si el gateway crece.
 
