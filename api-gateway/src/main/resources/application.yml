@@ -25,6 +25,10 @@ spring:
           uri: ${CORE_API_URL:http://localhost:8081}
           predicates:
             - Path=/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html
+        - id: asistencias-api
+          uri: ${ASISTENCIAS_API_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/asistencias/**
 
 logging:
   level:
