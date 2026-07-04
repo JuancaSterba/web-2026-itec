@@ -85,10 +85,5 @@ services:
       # frontend/.env.local dentro del contenedor (Next.js no pisa un
       # process.env ya seteado), asi que es la fuente real cuando se corre con Docker.
       - NEXT_PUBLIC_API_URL=http://localhost:8080
-    volumes:
-      # Montamos el código fuente para tener Hot Reload en modo desarrollo
-      - ./frontend:/app
-      # Protegemos la carpeta node_modules del contenedor para que no se sobreescriba con la local
-      - /app/node_modules
     depends_on:
-      - backend-app
+      - api-gateway
