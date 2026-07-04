@@ -30,8 +30,8 @@ services:
 
   ms-asistencias:
     build:
-      context: ./ms-asistencias
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-asistencias/Dockerfile
     container_name: itec-ms-asistencias
     ports:
       - "8083:8083"
@@ -54,8 +54,8 @@ services:
 
   ms-notas:
     build:
-      context: ./ms-notas
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-notas/Dockerfile
     container_name: itec-ms-notas
     ports:
       - "8084:8084"
