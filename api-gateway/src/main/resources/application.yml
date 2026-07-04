@@ -20,6 +20,7 @@ spring:
           predicates:
             - Path=/api/core/**
           filters:
+            - JwtAuth
             - RewritePath=/api/core/(?<segment>.*), /api/${segment}
         - id: core-docs
           uri: ${CORE_API_URL:http://localhost:8081}
@@ -29,10 +30,19 @@ spring:
           uri: ${ASISTENCIAS_API_URL:http://localhost:8083}
           predicates:
             - Path=/api/asistencias/**
+          filters:
+            - JwtAuth
         - id: notas-api
           uri: ${NOTAS_API_URL:http://localhost:8084}
           predicates:
             - Path=/api/examenes/**,/api/notas/**
+          filters:
+            - JwtAuth
+
+# Misma clave y default que backend/security (application-security.yml).
+# En Docker, ambas apps deben recibir el mismo JWT_SECRET (ver docker-compose.yml).
+jwt:
+  secret: ${JWT_SECRET:tu-clave-muy-segura-de-32-caracteres-o-mas-1234}
 
 logging:
   level:

@@ -16,6 +16,13 @@ services:
       - CORE_API_URL=http://backend-app:8082
       - ASISTENCIAS_API_URL=http://ms-asistencias:8083
       - NOTAS_API_URL=http://ms-notas:8084
+      # Debe ser IDENTICO al JWT_SECRET de backend-app (ver backend/docker-compose.yml)
+      # para poder validar los tokens que el Core emite. Este archivo no tiene su
+      # propio .env, asi que solo toma un valor distinto del default si exportas
+      # JWT_SECRET en la shell antes de "docker compose up" (mayor precedencia
+      # que cualquier .env). Si backend/.env define un JWT_SECRET propio, hay que
+      # exportarlo tambien aca para que ambos coincidan.
+      - JWT_SECRET=${JWT_SECRET:-tu-clave-muy-segura-de-32-caracteres-o-mas-1234}
     depends_on:
       - backend-app
       - ms-asistencias
