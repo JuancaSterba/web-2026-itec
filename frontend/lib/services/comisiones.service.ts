@@ -37,6 +37,11 @@ export async function listarComisiones(): Promise<Comision[]> {
   return response.data
 }
 
+export async function obtenerComisionPorId(id: number): Promise<Comision> {
+  const response = await apiClient.get<Comision[]>(`${BASE_PATH}/${id}`)
+  return response.data[0]
+}
+
 export async function crearComision(input: ComisionInput): Promise<Comision> {
   const response = await apiClient.post<Comision[]>(BASE_PATH, input)
   return response.data[0]
