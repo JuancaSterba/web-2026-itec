@@ -29,7 +29,8 @@ public class UserLookupPortImpl implements UserLookupPort {
     }
 
     @Override
-    public User crearConCredencialesPorDni(String nombre, String apellido, String dni, String email, String telefono, Rol rol) {
+    public User crearConCredencialesPorDni(String nombre, String apellido, String dni, String email,
+                                            String telefono, String telefonoSecundario, Rol rol) {
         List<String> errores = new ArrayList<>();
         if (userRepository.existsByUsername(dni)) {
             errores.add("Ya existe un usuario con username '" + dni + "'");
@@ -40,7 +41,9 @@ public class UserLookupPortImpl implements UserLookupPort {
         if (userRepository.existsByEmail(email)) {
             errores.add("El email '" + email + "' ya está en uso");
         }
-        if (userRepository.existsByTelefono(telefono)) {
+        // Alumnos de una misma familia pueden compartir telefono del hogar;
+        // para el resto de los roles el telefono sigue siendo personal/unico.
+        if (rol != Rol.ALUMNO && userRepository.existsByTelefono(telefono)) {
             errores.add("El teléfono '" + telefono + "' ya está en uso");
         }
         if (!errores.isEmpty()) {
@@ -56,6 +59,7 @@ public class UserLookupPortImpl implements UserLookupPort {
         user.setDni(dni);
         user.setEmail(email);
         user.setTelefono(telefono);
+        user.setTelefonoSecundario(telefonoSecundario);
         // Alumnos/Profesores no tienen UI propia todavia: la cuenta se crea
         // deshabilitada para que no puedan loguearse (ver Reglas_de_Negocio.md).
         user.setEnabled(false);
