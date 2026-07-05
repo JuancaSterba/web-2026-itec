@@ -45,6 +45,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     if (open) {
       setForm({
         ...emptyForm,
+        dni: alumno?.dni ?? "",
         telefonoSecundario: alumno?.telefonoSecundario ?? "",
       })
       setActivo(alumno?.activo ?? true)
@@ -87,7 +88,12 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!isEditing) {
+    if (isEditing) {
+      if (!/^\d{7,8}$/.test(form.dni)) {
+        setError("El DNI debe tener 7 u 8 dígitos")
+        return
+      }
+    } else {
       const validationError = validarCreacion()
       if (validationError) {
         setError(validationError)
@@ -100,6 +106,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     try {
       if (isEditing) {
         const actualizado = await actualizarAlumno(alumno!.id, {
+          dni: form.dni.trim(),
           activo,
           telefonoSecundario: form.telefonoSecundario.trim(),
         })
@@ -129,7 +136,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
           <DialogTitle>{isEditing ? "Editar alumno" : "Nuevo alumno"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "El teléfono secundario y el estado son los únicos datos editables desde acá; el resto viene del usuario asociado."
+              ? "DNI, teléfono secundario y estado son los únicos datos editables desde acá. Si cambiás el DNI, el legajo se recalcula automáticamente."
               : "El sistema crea automáticamente el usuario del alumno (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
@@ -137,7 +144,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
         <form onSubmit={handleSubmit} className="space-y-4">
           {isEditing && (
             <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-              {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni} · Legajo {alumno!.legajo}
+              {alumno!.nombre} {alumno!.apellido} · Legajo {alumno!.legajo}
             </div>
           )}
 
@@ -203,14 +210,26 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
           )}
 
           {isEditing && (
-            <div className="space-y-2">
-              <Label htmlFor="telefonoSecundario">Teléfono Secundario (opcional)</Label>
-              <Input
-                id="telefonoSecundario"
-                value={form.telefonoSecundario}
-                onChange={setField("telefonoSecundario")}
-                disabled={submitting}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="dni">DNI</Label>
+                <Input
+                  id="dni"
+                  value={form.dni}
+                  onChange={setField("dni")}
+                  placeholder="Sin puntos, 7 u 8 dígitos"
+                  disabled={submitting}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefonoSecundario">Teléfono Secundario (opcional)</Label>
+                <Input
+                  id="telefonoSecundario"
+                  value={form.telefonoSecundario}
+                  onChange={setField("telefonoSecundario")}
+                  disabled={submitting}
+                />
+              </div>
             </div>
           )}
 

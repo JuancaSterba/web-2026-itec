@@ -31,8 +31,10 @@ export interface CrearAlumnoInput {
 }
 
 // AlumnoUpdateRequest del Core: legajo NO es editable (vive en el Usuario,
-// es identidad de por vida); solo estado activo y telefonoSecundario.
+// es identidad de por vida) -- pero dni si es editable, y si cambia el
+// Core recalcula el legajo automaticamente con el DNI nuevo.
 export interface ActualizarAlumnoInput {
+  dni: string
   activo: boolean
   telefonoSecundario?: string
 }

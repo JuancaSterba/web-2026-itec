@@ -29,6 +29,7 @@ export interface CrearAdministradorInput {
 }
 
 export interface ActualizarAdministradorInput {
+  dni: string
   nombre: string
   apellido: string
   email: string

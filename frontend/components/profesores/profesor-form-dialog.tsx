@@ -46,6 +46,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     if (open) {
       setForm({
         ...emptyForm,
+        dni: profesor?.dni ?? "",
         titulo: profesor?.titulo ?? "",
         telefonoSecundario: profesor?.telefonoSecundario ?? "",
       })
@@ -94,6 +95,10 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     e.preventDefault()
 
     if (isEditing) {
+      if (!/^\d{7,8}$/.test(form.dni)) {
+        setError("El DNI debe tener 7 u 8 dígitos")
+        return
+      }
       if (!form.titulo.trim()) {
         setError("El título es obligatorio")
         return
@@ -115,6 +120,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     try {
       if (isEditing) {
         const actualizado = await actualizarProfesor(profesor!.id, {
+          dni: form.dni.trim(),
           titulo: form.titulo.trim(),
           telefonoSecundario: form.telefonoSecundario.trim(),
           activo,
@@ -145,7 +151,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
           <DialogTitle>{isEditing ? "Editar profesor" : "Nuevo profesor"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Título, teléfono secundario y estado son los únicos datos editables desde acá."
+              ? "DNI, título, teléfono secundario y estado son los únicos datos editables desde acá. Si cambiás el DNI, el legajo se recalcula automáticamente."
               : "El sistema crea automáticamente el usuario del profesor (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
@@ -153,7 +159,20 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isEditing && (
             <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-              {profesor!.nombre} {profesor!.apellido} · DNI {profesor!.dni} · Legajo {profesor!.legajo}
+              {profesor!.nombre} {profesor!.apellido} · Legajo {profesor!.legajo}
+            </div>
+          )}
+
+          {isEditing && (
+            <div className="space-y-2">
+              <Label htmlFor="dni">DNI</Label>
+              <Input
+                id="dni"
+                value={form.dni}
+                onChange={setField("dni")}
+                placeholder="Sin puntos, 7 u 8 dígitos"
+                disabled={submitting}
+              />
             </div>
           )}
 

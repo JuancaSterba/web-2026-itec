@@ -94,7 +94,7 @@ export function AdministradorFormDialog({
   }
 
   const validar = (): string | null => {
-    if (!isEditing && !/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
+    if (!/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
     if (!isEditing && personaExistente) return null
     if (!form.nombre.trim()) return "El nombre es obligatorio"
     if (!form.apellido.trim()) return "El apellido es obligatorio"
@@ -117,6 +117,7 @@ export function AdministradorFormDialog({
     try {
       if (isEditing) {
         const actualizado = await actualizarAdministrador(administrador!.id, {
+          dni: form.dni.trim(),
           nombre: form.nombre.trim(),
           apellido: form.apellido.trim(),
           email: form.email.trim(),
@@ -157,25 +158,23 @@ export function AdministradorFormDialog({
           <DialogTitle>{isEditing ? "Editar administrador" : "Nuevo administrador"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? `Legajo ${administrador?.legajo}. Datos de contacto, rol y estado son editables desde acá.`
+              ? `Legajo ${administrador?.legajo}. DNI, datos de contacto, rol y estado son editables desde acá. Si cambiás el DNI, el legajo se recalcula automáticamente.`
               : "El sistema crea automáticamente el usuario (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isEditing && (
-            <div className="space-y-2">
-              <Label htmlFor="dni">DNI</Label>
-              <Input
-                id="dni"
-                value={form.dni}
-                onChange={setField("dni")}
-                onBlur={handleDniBlur}
-                placeholder="Sin puntos, 7 u 8 dígitos"
-                disabled={submitting}
-              />
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="dni">DNI</Label>
+            <Input
+              id="dni"
+              value={form.dni}
+              onChange={setField("dni")}
+              onBlur={isEditing ? undefined : handleDniBlur}
+              placeholder="Sin puntos, 7 u 8 dígitos"
+              disabled={submitting}
+            />
+          </div>
 
           {personaExistente && (
             <div className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm">
