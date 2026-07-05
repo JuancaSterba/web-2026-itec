@@ -17,14 +17,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 import { ComisionFormDialog } from "@/components/comisiones/comision-form-dialog"
 import { EliminarComisionDialog } from "@/components/comisiones/eliminar-comision-dialog"
 import { listarComisiones, type Comision } from "@/lib/services/comisiones.service"
+import { listarMaterias, type Materia } from "@/lib/services/materias.service"
+import { listarPlanesEstudio, type PlanEstudio } from "@/lib/services/planes-estudio.service"
+
+const selectClassName =
+  "flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-all duration-200 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
 
 export default function ComisionesPage() {
   const [comisiones, setComisiones] = useState<Comision[]>([])
+  const [materias, setMaterias] = useState<Materia[]>([])
+  const [planes, setPlanes] = useState<PlanEstudio[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [carreraFiltro, setCarreraFiltro] = useState("")
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingComision, setEditingComision] = useState<Comision | null>(null)
@@ -32,11 +41,17 @@ export default function ComisionesPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingComision, setDeletingComision] = useState<Comision | null>(null)
 
-  const cargarComisiones = async () => {
+  const cargarDatos = async () => {
     setLoading(true)
     try {
-      const data = await listarComisiones()
-      setComisiones(data)
+      const [comisionesData, materiasData, planesData] = await Promise.all([
+        listarComisiones(),
+        listarMaterias(),
+        listarPlanesEstudio(),
+      ])
+      setComisiones(comisionesData)
+      setMaterias(materiasData)
+      setPlanes(planesData)
     } catch (err: any) {
       toast.error(err?.message || "No se pudieron cargar las comisiones")
     } finally {
@@ -45,18 +60,45 @@ export default function ComisionesPage() {
   }
 
   useEffect(() => {
-    cargarComisiones()
+    cargarDatos()
   }, [])
+
+  // Comision -> Materia -> Plan de Estudio -> Carrera: no hay relacion
+  // directa Comision-Carrera en el backend, se resuelve cruzando estos
+  // 3 listados ya cargados.
+  const carreraPorMateriaId = useMemo(() => {
+    const planPorId = new Map(planes.map((p) => [p.id, p]))
+    const mapa = new Map<number, { carreraId: number; carreraNombre: string }>()
+    for (const materia of materias) {
+      const plan = planPorId.get(materia.planEstudioId)
+      if (plan) {
+        mapa.set(materia.id, { carreraId: plan.carreraId, carreraNombre: plan.carreraNombre })
+      }
+    }
+    return mapa
+  }, [materias, planes])
+
+  const carrerasDisponibles = useMemo(() => {
+    const unicas = new Map<number, string>()
+    for (const plan of planes) {
+      unicas.set(plan.carreraId, plan.carreraNombre)
+    }
+    return Array.from(unicas.entries()).map(([id, nombre]) => ({ id, nombre }))
+  }, [planes])
 
   const comisionesFiltradas = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
-    if (!term) return comisiones
-    return comisiones.filter((c) =>
-      [c.nombre, c.materiaNombre, c.profesorNombre, c.profesorApellido].some((campo) =>
-        campo?.toLowerCase().includes(term)
-      )
-    )
-  }, [comisiones, searchTerm])
+    return comisiones.filter((c) => {
+      const coincideTexto =
+        !term ||
+        [c.nombre, c.materiaNombre, c.profesorNombre, c.profesorApellido].some((campo) =>
+          campo?.toLowerCase().includes(term)
+        )
+      const carrera = carreraPorMateriaId.get(c.materiaId)
+      const coincideCarrera = !carreraFiltro || String(carrera?.carreraId) === carreraFiltro
+      return coincideTexto && coincideCarrera
+    })
+  }, [comisiones, searchTerm, carreraFiltro, carreraPorMateriaId])
 
   const abrirCrear = () => {
     setEditingComision(null)
@@ -97,8 +139,8 @@ export default function ComisionesPage() {
         </Button>
       </div>
 
-      <Card className="p-4">
-        <div className="relative max-w-sm">
+      <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+        <div className="relative max-w-sm flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por nombre, materia o profesor..."
@@ -107,6 +149,18 @@ export default function ComisionesPage() {
             className="pl-9"
           />
         </div>
+        <select
+          value={carreraFiltro}
+          onChange={(e) => setCarreraFiltro(e.target.value)}
+          className={cn(selectClassName, "sm:max-w-xs")}
+        >
+          <option value="">Todas las carreras</option>
+          {carrerasDisponibles.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
       </Card>
 
       <Card>
@@ -122,9 +176,7 @@ export default function ComisionesPage() {
           <div className="flex flex-col items-center gap-2 p-12 text-center">
             <Search className="size-8 text-muted-foreground" />
             <p className="font-medium text-foreground">Sin resultados</p>
-            <p className="text-sm text-muted-foreground">
-              Ninguna comisión coincide con &ldquo;{searchTerm}&rdquo;.
-            </p>
+            <p className="text-sm text-muted-foreground">Ninguna comisión coincide con el filtro aplicado.</p>
           </div>
         ) : (
           <Table>
@@ -132,6 +184,7 @@ export default function ComisionesPage() {
               <TableRow>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Materia</TableHead>
+                <TableHead>Carrera</TableHead>
                 <TableHead>Cuatrimestre</TableHead>
                 <TableHead>Profesor</TableHead>
                 <TableHead>Cupo</TableHead>
@@ -144,6 +197,9 @@ export default function ComisionesPage() {
                 <TableRow key={comision.id}>
                   <TableCell className="font-medium">{comision.nombre}</TableCell>
                   <TableCell>{comision.materiaNombre}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {carreraPorMateriaId.get(comision.materiaId)?.carreraNombre || "—"}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">
                     {comision.cuatrimestreAnio} - {comision.cuatrimestreNumero}°
                   </TableCell>
