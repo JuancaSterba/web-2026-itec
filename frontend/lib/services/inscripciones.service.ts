@@ -20,6 +20,11 @@ export interface AlumnoInscripto {
   notaFinal: number | null
 }
 
+export interface InscripcionMateriaInput {
+  alumnoCarreraId: number
+  comisionMateriaId: number
+}
+
 const BASE_PATH = "/api/core/inscripciones-materias"
 
 // No hay filtro por comisionMateriaId en el Core todavia: se trae todo y se
@@ -27,4 +32,13 @@ const BASE_PATH = "/api/core/inscripciones-materias"
 export async function listarInscripciones(): Promise<AlumnoInscripto[]> {
   const response = await apiClient.get<AlumnoInscripto[]>(BASE_PATH)
   return response.data
+}
+
+export async function crearInscripcionMateria(input: InscripcionMateriaInput): Promise<AlumnoInscripto> {
+  const response = await apiClient.post<AlumnoInscripto[]>(BASE_PATH, input)
+  return response.data[0]
+}
+
+export async function eliminarInscripcionMateria(id: number): Promise<void> {
+  await apiClient.delete<string>(`${BASE_PATH}/${id}`)
 }
