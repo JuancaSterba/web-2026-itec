@@ -7,6 +7,7 @@ import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -45,8 +48,11 @@ public class AsistenciaController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Asistencia>> listar(HttpServletRequest httpRequest) {
-        List<Asistencia> asistencias = asistenciaService.listar();
+    public ResponseEntity<ApiResponse<Asistencia>> listar(
+            @RequestParam(required = false) Long comisionId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            HttpServletRequest httpRequest) {
+        List<Asistencia> asistencias = asistenciaService.listar(comisionId, fecha);
         return ResponseEntity.ok(
                 ApiResponse.<Asistencia>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))

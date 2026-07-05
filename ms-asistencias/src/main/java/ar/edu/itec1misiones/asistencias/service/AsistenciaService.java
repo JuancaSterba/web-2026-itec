@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -27,8 +28,8 @@ public class AsistenciaService {
         return asistenciaRepository.save(asistencia);
     }
 
-    public List<Asistencia> listar() {
-        return asistenciaRepository.findAll();
+    public List<Asistencia> listar(Long comisionId, LocalDate fecha) {
+        return asistenciaRepository.buscarPorFiltros(comisionId, fecha);
     }
 
     public Asistencia actualizar(Long id, AsistenciaRequest request) {
