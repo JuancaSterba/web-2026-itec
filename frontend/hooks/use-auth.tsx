@@ -154,13 +154,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Cambia el rol activo de un usuario multi-rol sin volver a loguearse: el
   // JWT ya trae todos los roles (localStorage "roles"), esto solo cambia
   // cual es el activo (localStorage "user-role" + contexto).
-  const switchRole = useCallback(
-    (rol: string) => {
-      localStorage.setItem("user-role", rol)
-      setUser((prev) => (prev ? { ...prev, role: rol } : prev))
-    },
-    []
-  )
+  // Si prev es null (primer switch tras un login multi-rol, donde login()
+  // redirige a /seleccionar-rol sin llamar setUser), arma el user desde
+  // localStorage en vez de descartar el cambio.
+  const switchRole = useCallback((rol: string) => {
+    localStorage.setItem("user-role", rol)
+    setUser((prev) => {
+      if (prev) return { ...prev, role: rol }
+
+      let roles: string[] | undefined
+      try {
+        const parsed = JSON.parse(localStorage.getItem("roles") || "[]")
+        roles = Array.isArray(parsed) ? parsed : undefined
+      } catch {
+        roles = undefined
+      }
+
+      return {
+        username: localStorage.getItem("username") || "",
+        role: rol,
+        roles,
+        nombres: localStorage.getItem("nombres") || undefined,
+        apellido: localStorage.getItem("apellido") || undefined,
+        dni: localStorage.getItem("dni") || undefined,
+        email: localStorage.getItem("email") || undefined,
+        telefono: localStorage.getItem("telefono") || undefined,
+      }
+    })
+  }, [])
 
   return (
     <AuthContext.Provider value={{ token, user, login, logout, setUser, switchRole }}>
