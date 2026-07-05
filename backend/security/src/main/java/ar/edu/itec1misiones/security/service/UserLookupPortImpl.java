@@ -116,6 +116,18 @@ public class UserLookupPortImpl implements UserLookupPort {
         if (userRepository.existsByDni(nuevoDni)) {
             throw new IllegalArgumentException("El DNI '" + nuevoDni + "' ya está en uso");
         }
+        // Si el username seguia la convencion de alta (username = DNI), se
+        // actualiza junto con el DNI para liberar tambien el username viejo
+        // -- si no se hiciera, el username original quedaria bloqueando
+        // futuras altas con ese DNI aunque el campo dni ya este libre. Si el
+        // username fue personalizado (ej. el admin seed, que no sigue esta
+        // convencion), se deja intacto.
+        if (user.getUsername().equals(user.getDni())) {
+            if (userRepository.existsByUsername(nuevoDni)) {
+                throw new IllegalArgumentException("El DNI '" + nuevoDni + "' ya está en uso como username");
+            }
+            user.setUsername(nuevoDni);
+        }
         user.setDni(nuevoDni);
         user.setLegajo(LegajoGenerator.generar(nuevoDni));
     }

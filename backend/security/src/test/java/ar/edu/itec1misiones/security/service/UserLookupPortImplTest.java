@@ -25,10 +25,10 @@ class UserLookupPortImplTest {
 
     @InjectMocks UserLookupPortImpl service;
 
-    private User buildUser(String dni, String legajo) {
+    private User buildUser(String username, String dni, String legajo) {
         User user = new User();
         user.setId(1L);
-        user.setUsername(dni);
+        user.setUsername(username);
         user.setNombre("Ana");
         user.setApellido("Gómez");
         user.setDni(dni);
@@ -39,15 +39,50 @@ class UserLookupPortImplTest {
         return user;
     }
 
+    private User buildUser(String dni, String legajo) {
+        return buildUser(dni, dni, legajo);
+    }
+
     @Test
-    void actualizarDniSiCambio_recalculaLegajoConElNuevoDni_siElDniCambio() {
+    void actualizarDniSiCambio_recalculaLegajoYSincronizaUsername_siElUsernameSeguiaElDniViejo() {
         User user = buildUser("30111222", "2024-30111222");
+        when(userRepository.existsByDni("40999888")).thenReturn(false);
+        when(userRepository.existsByUsername("40999888")).thenReturn(false);
+
+        service.actualizarDniSiCambio(user, "40999888");
+
+        assertThat(user.getDni()).isEqualTo("40999888");
+        assertThat(user.getUsername()).isEqualTo("40999888");
+        assertThat(user.getLegajo()).isEqualTo(LocalDate.now().getYear() + "-40999888");
+    }
+
+    @Test
+    void actualizarDniSiCambio_noTocaElUsername_siEraPersonalizado() {
+        // Ej. el seed de ADMIN: username="admin", dni="11111111" -- no siguen
+        // la convencion username=DNI, no hay que tocar el username al
+        // corregir el DNI.
+        User user = buildUser("admin", "30111222", "2024-30111222");
         when(userRepository.existsByDni("40999888")).thenReturn(false);
 
         service.actualizarDniSiCambio(user, "40999888");
 
         assertThat(user.getDni()).isEqualTo("40999888");
+        assertThat(user.getUsername()).isEqualTo("admin");
         assertThat(user.getLegajo()).isEqualTo(LocalDate.now().getYear() + "-40999888");
+    }
+
+    @Test
+    void actualizarDniSiCambio_lanzaIllegalArgumentException_siElNuevoDniYaEstaEnUsoComoUsername() {
+        User user = buildUser("30111222", "2024-30111222");
+        when(userRepository.existsByDni("40999888")).thenReturn(false);
+        when(userRepository.existsByUsername("40999888")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.actualizarDniSiCambio(user, "40999888"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(user.getDni()).isEqualTo("30111222");
+        assertThat(user.getUsername()).isEqualTo("30111222");
+        assertThat(user.getLegajo()).isEqualTo("2024-30111222");
     }
 
     @Test
