@@ -1414,99 +1414,48 @@ git commit -m "refactor(backend): UserAdminServiceImpl.crear() delega en UserLoo
 
 ---
 
-### Task 13: `AdminInitializer` usa `UserLookupPort`
+### Task 13: `AdminInitializer` gana legajo (SIN pasar por `UserLookupPort`)
+
+**Corrección sobre el diseño original:** el spec asumía que `AdminInitializer` podía rutear por `UserLookupPort.crearConCredencialesPorDni(...)`, pero ese método fuerza `username=dni` y `password=dni` — el seed real (`backend/.env`: `ADMIN_LOCAL_USERNAME=admin`, `ADMIN_LOCAL_PASSWORD=admin123`, `ADMIN_LOCAL_DNI=11.111.111`) usa un username/password custom, DISTINTO del DNI. Rutear por el puerto habría reemplazado el login `admin/admin123` conocido por uno basado en el DNI, rompiendo el acceso de desarrollo. Se detectó al verificar Task 11/12 contra Docker. Corrección: `AdminInitializer` sigue construyendo el `User` a mano (como antes), solo se le agrega `legajo`.
 
 **Files:**
 - Modify: `backend/security/src/main/java/ar/edu/itec1misiones/security/config/AdminInitializer.java`
 
 **Interfaces:**
-- Consumes: `UserLookupPort.crearConCredencialesPorDni(...)` (Task 9).
+- Consumes: `LegajoGenerator.generar(String)` (Task 2).
 
-- [ ] **Step 1: Reemplazar el archivo completo**
+- [ ] **Step 1: Agregar el import**
 
 ```java
-package ar.edu.itec1misiones.security.config;
-
-import ar.edu.itec1misiones.model.Profesor;
-import ar.edu.itec1misiones.model.Rol;
-import ar.edu.itec1misiones.model.User;
-import ar.edu.itec1misiones.repository.ProfesorRepository;
-import ar.edu.itec1misiones.security.repository.UserRepository;
-import ar.edu.itec1misiones.service.UserLookupPort;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
-@Component
-public class AdminInitializer {
-
-    private final UserRepository userRepository;
-    private final ProfesorRepository profesorRepository;
-    private final UserLookupPort userLookupPort;
-
-    @Value("${admin.username}")
-    private String username;
-    @Value("${admin.nombre}")
-    private String nombre;
-    @Value("${admin.apellido}")
-    private String apellido;
-    @Value("${admin.dni}")
-    private String dni;
-    @Value("${admin.email}")
-    private String email;
-    @Value("${admin.telefono}")
-    private String telefono;
-
-    public AdminInitializer(UserRepository userRepository,
-                            ProfesorRepository profesorRepository,
-                            UserLookupPort userLookupPort) {
-        this.userRepository = userRepository;
-        this.profesorRepository = profesorRepository;
-        this.userLookupPort = userLookupPort;
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        if (userRepository.findByUsername(username).isPresent()) {
-            return;
-        }
-
-        try {
-            // ADMIN primero (User nuevo, username/password = DNI, legajo
-            // autogenerado); PROFESOR despues adjunta el rol al mismo User
-            // (mismo mecanismo que usa cualquier alta con DNI repetido).
-            User user = userLookupPort.crearConCredencialesPorDni(
-                    nombre, apellido, dni, email, telefono, null, Rol.ADMIN);
-            userLookupPort.crearConCredencialesPorDni(
-                    nombre, apellido, dni, email, telefono, null, Rol.PROFESOR);
-
-            Profesor profesor = new Profesor();
-            profesor.setUser(user);
-            profesor.setActivo(true);
-            profesorRepository.save(profesor);
-
-            System.out.println("✅ Usuario administrador creado exitosamente.");
-        } catch (RuntimeException e) {
-            // DNI/Email duplicado u otro conflicto: no crashea el arranque.
-            System.out.println("⚠️ No se pudo crear el administrador inicial: " + e.getMessage());
-        }
-    }
-}
+import ar.edu.itec1misiones.util.LegajoGenerator;
 ```
 
-Nota: `admin.password` deja de usarse acá (el password del seed ADMIN siempre es su DNI, igual que cualquier alta por `UserLookupPort` — ya no se setea una password custom vía `${admin.password}`). Si `application-local.yml`/`application-prod.yml` definen `admin.password`, la propiedad queda sin uso pero no rompe nada (Spring no valida properties no consumidas). No se toca la config en esta task — se limpia si sobra tiempo, no es bloqueante.
+- [ ] **Step 2: Setear `legajo` al crear el `User`**
 
-- [ ] **Step 2: Compilar**
+Reemplazar:
+```java
+                user.setTelefono(telefono);
+                user.setRoles(Set.of(Rol.ADMIN, Rol.PROFESOR));
+                userRepository.save(user);
+```
+por:
+```java
+                user.setTelefono(telefono);
+                user.setRoles(Set.of(Rol.ADMIN, Rol.PROFESOR));
+                user.setLegajo(LegajoGenerator.generar(dni));
+                userRepository.save(user);
+```
+
+- [ ] **Step 3: Compilar**
 
 Run: `cd backend && mvn -pl security -am compile -q`
 Expected: `BUILD SUCCESS`
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add backend/security/src/main/java/ar/edu/itec1misiones/security/config/AdminInitializer.java
-git commit -m "refactor(backend): AdminInitializer usa UserLookupPort (legajo + adjuntar rol)"
+git commit -m "feat(backend): AdminInitializer genera legajo para el seed ADMIN"
 ```
 
 ---
