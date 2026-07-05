@@ -2,6 +2,7 @@ import apiClient from "@/lib/api-client"
 
 // Coincide con AlumnoResponse del Core. nombre/apellido/dni/email/telefono
 // vienen denormalizados desde el Usuario asociado -- no son editables aca.
+// telefonoSecundario si es editable (dato opcional de contacto).
 export interface Alumno {
   id: number
   legajo: string
@@ -13,6 +14,7 @@ export interface Alumno {
   dni: string
   email: string
   telefono: string
+  telefonoSecundario: string
 }
 
 // POST /api/core/alumnos ahora es un alta de un solo paso: el Core crea el
@@ -25,12 +27,14 @@ export interface CrearAlumnoInput {
   dni: string
   email: string
   telefono: string
+  telefonoSecundario?: string
 }
 
-// AlumnoUpdateRequest del Core: solo legajo y estado activo son editables.
+// AlumnoUpdateRequest del Core: legajo, estado activo y telefonoSecundario son editables.
 export interface ActualizarAlumnoInput {
   legajo: string
   activo: boolean
+  telefonoSecundario?: string
 }
 
 const BASE_PATH = "/api/core/alumnos"

@@ -29,6 +29,7 @@ const emptyForm = {
   dni: "",
   email: "",
   telefono: "",
+  telefonoSecundario: "",
   legajo: "",
 }
 
@@ -41,7 +42,11 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
 
   useEffect(() => {
     if (open) {
-      setForm({ ...emptyForm, legajo: alumno?.legajo ?? "" })
+      setForm({
+        ...emptyForm,
+        legajo: alumno?.legajo ?? "",
+        telefonoSecundario: alumno?.telefonoSecundario ?? "",
+      })
       setActivo(alumno?.activo ?? true)
       setError(null)
     }
@@ -79,7 +84,11 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     setError(null)
     try {
       if (isEditing) {
-        const actualizado = await actualizarAlumno(alumno!.id, { legajo: form.legajo.trim(), activo })
+        const actualizado = await actualizarAlumno(alumno!.id, {
+          legajo: form.legajo.trim(),
+          activo,
+          telefonoSecundario: form.telefonoSecundario.trim(),
+        })
         toast.success("Alumno actualizado correctamente")
         onSuccess(actualizado)
       } else {
@@ -153,6 +162,16 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" value={form.email} onChange={setField("email")} disabled={submitting} />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="telefonoSecundario">Teléfono Secundario (opcional)</Label>
+                <Input
+                  id="telefonoSecundario"
+                  value={form.telefonoSecundario}
+                  onChange={setField("telefonoSecundario")}
+                  disabled={submitting}
+                />
+              </div>
             </>
           )}
 
@@ -163,6 +182,18 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
                 id="legajo"
                 value={form.legajo}
                 onChange={setField("legajo")}
+                disabled={submitting}
+              />
+            </div>
+          )}
+
+          {isEditing && (
+            <div className="space-y-2">
+              <Label htmlFor="telefonoSecundario">Teléfono Secundario (opcional)</Label>
+              <Input
+                id="telefonoSecundario"
+                value={form.telefonoSecundario}
+                onChange={setField("telefonoSecundario")}
                 disabled={submitting}
               />
             </div>
