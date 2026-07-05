@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { ProfesorFormDialog } from "@/components/profesores/profesor-form-dialog"
 import { EliminarProfesorDialog } from "@/components/profesores/eliminar-profesor-dialog"
+import { RequireRole } from "@/components/auth/require-role"
 import { listarProfesores, type Profesor } from "@/lib/services/profesores.service"
 
 export default function ProfesoresPage() {
@@ -84,6 +85,7 @@ export default function ProfesoresPage() {
   }
 
   return (
+    <RequireRole roles={["ADMIN", "ADMINISTRATIVO"]}>
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -181,6 +183,7 @@ export default function ProfesoresPage() {
         onSuccess={handleEliminado}
       />
     </div>
+    </RequireRole>
   )
 }
 

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { AdministradorFormDialog } from "@/components/administradores/administrador-form-dialog"
 import { ResetPasswordAdministradorDialog } from "@/components/administradores/reset-password-administrador-dialog"
+import { RequireRole } from "@/components/auth/require-role"
 import { listarAdministradores, type Administrador } from "@/lib/services/administradores.service"
 
 export default function AdministradoresPage() {
@@ -78,6 +79,7 @@ export default function AdministradoresPage() {
   }
 
   return (
+    <RequireRole roles={["ADMIN"]}>
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -177,6 +179,7 @@ export default function AdministradoresPage() {
         onSuccess={handleGuardado}
       />
     </div>
+    </RequireRole>
   )
 }
 

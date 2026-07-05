@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { AlumnoFormDialog } from "@/components/alumnos/alumno-form-dialog"
 import { EliminarAlumnoDialog } from "@/components/alumnos/eliminar-alumno-dialog"
+import { RequireRole } from "@/components/auth/require-role"
 import { listarAlumnos, type Alumno } from "@/lib/services/alumnos.service"
 
 export default function AlumnosPage() {
@@ -84,6 +85,7 @@ export default function AlumnosPage() {
   }
 
   return (
+    <RequireRole roles={["ADMIN", "ADMINISTRATIVO"]}>
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -181,6 +183,7 @@ export default function AlumnosPage() {
         onSuccess={handleEliminado}
       />
     </div>
+    </RequireRole>
   )
 }
 
