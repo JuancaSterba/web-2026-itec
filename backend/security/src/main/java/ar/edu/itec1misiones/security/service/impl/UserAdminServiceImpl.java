@@ -12,6 +12,7 @@ import ar.edu.itec1misiones.security.exception.SelfActionNotAllowedException;
 import ar.edu.itec1misiones.security.repository.UserRepository;
 import ar.edu.itec1misiones.security.service.UserAdminService;
 import ar.edu.itec1misiones.security.util.SecurityUtils;
+import ar.edu.itec1misiones.service.UserLookupPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +30,13 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserLookupPort userLookupPort;
 
-    public UserAdminServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserAdminServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                                 UserLookupPort userLookupPort) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userLookupPort = userLookupPort;
     }
 
     @Override
@@ -47,32 +51,11 @@ public class UserAdminServiceImpl implements UserAdminService {
     public UsuarioAdminResponse crear(CrearAdministradorRequest request) {
         validarRolGestionable(request.getRol());
 
-        List<String> errores = new ArrayList<>();
-        if (userRepository.existsByUsername(request.getDni())) {
-            errores.add("Ya existe un usuario con username '" + request.getDni() + "'");
-        }
-        if (userRepository.existsByDni(request.getDni())) {
-            errores.add("El DNI '" + request.getDni() + "' ya está en uso");
-        }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            errores.add("El email '" + request.getEmail() + "' ya está en uso");
-        }
-        if (!errores.isEmpty()) {
-            throw new AdministradorDatosDuplicadosException(errores);
-        }
+        User user = userLookupPort.crearConCredencialesPorDni(
+                request.getNombre(), request.getApellido(), request.getDni(), request.getEmail(),
+                request.getTelefono(), null, request.getRol());
 
-        User user = new User();
-        user.setUsername(request.getDni());
-        user.setPassword(passwordEncoder.encode(request.getDni()));
-        user.setRoles(new HashSet<>(Set.of(request.getRol())));
-        user.setNombre(request.getNombre());
-        user.setApellido(request.getApellido());
-        user.setDni(request.getDni());
-        user.setEmail(request.getEmail());
-        user.setTelefono(request.getTelefono());
-        user.setEnabled(true);
-
-        return toResponse(userRepository.save(user));
+        return toResponse(user);
     }
 
     @Override

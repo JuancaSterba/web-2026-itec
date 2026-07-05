@@ -10,6 +10,7 @@ import ar.edu.itec1misiones.security.exception.AdministradorNotFoundException;
 import ar.edu.itec1misiones.security.exception.RolNoGestionableException;
 import ar.edu.itec1misiones.security.exception.SelfActionNotAllowedException;
 import ar.edu.itec1misiones.security.repository.UserRepository;
+import ar.edu.itec1misiones.service.UserLookupPort;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,7 @@ class UserAdminServiceImplTest {
 
     @Mock UserRepository userRepository;
     @Mock PasswordEncoder passwordEncoder;
+    @Mock UserLookupPort userLookupPort;
 
     @InjectMocks UserAdminServiceImpl service;
 
@@ -84,43 +86,35 @@ class UserAdminServiceImplTest {
     }
 
     @Test
-    void crear_lanzaAdministradorDatosDuplicadosException_siDniYaExiste() {
+    void crear_propagaExcepcionDelPuerto_siDniYaEstaEnUso() {
         CrearAdministradorRequest request = buildCrearRequest(Rol.ADMINISTRATIVO);
-        when(userRepository.existsByUsername("30111222")).thenReturn(true);
-        when(userRepository.existsByDni("30111222")).thenReturn(true);
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(userLookupPort.crearConCredencialesPorDni(
+                anyString(), anyString(), anyString(), anyString(), anyString(), any(), any()))
+                .thenThrow(new IllegalArgumentException("El email '" + request.getEmail() + "' ya está en uso"));
 
         assertThatThrownBy(() -> service.crear(request))
-                .isInstanceOf(AdministradorDatosDuplicadosException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    void crear_creaUsuarioConUsernameYPasswordIgualesAlDni_siDatosValidos() {
+    void crear_delegaEnUserLookupPortYMapeaLaRespuesta_siDatosValidos() {
         CrearAdministradorRequest request = buildCrearRequest(Rol.ADMIN);
-        when(userRepository.existsByUsername(anyString())).thenReturn(false);
-        when(userRepository.existsByDni(anyString())).thenReturn(false);
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode("30111222")).thenReturn("HASH_30111222");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            u.setId(1L);
-            return u;
-        });
+        User creado = buildUser(1L, "30111222", Rol.ADMIN, true);
+        creado.setLegajo("2026-30111222");
+        when(userLookupPort.crearConCredencialesPorDni(
+                "Ana", "Gómez", "30111222", "ana@itec.edu.ar", "3760000000", null, Rol.ADMIN))
+                .thenReturn(creado);
 
         UsuarioAdminResponse response = service.crear(request);
 
         assertThat(response.getUsername()).isEqualTo("30111222");
+        assertThat(response.getLegajo()).isEqualTo("2026-30111222");
         assertThat(response.isEnabled()).isTrue();
         assertThat(response.getRol()).isEqualTo(Rol.ADMIN);
 
-        verify(userRepository).save(argThat(u ->
-                u.getUsername().equals("30111222")
-                        && u.getPassword().equals("HASH_30111222")
-                        && u.isEnabled()
-                        && u.getRoles().equals(Set.of(Rol.ADMIN))
-        ));
+        verifyNoInteractions(userRepository);
     }
 
     @Test
