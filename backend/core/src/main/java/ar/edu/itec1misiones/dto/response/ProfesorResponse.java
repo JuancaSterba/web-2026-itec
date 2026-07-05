@@ -16,6 +16,7 @@ public class ProfesorResponse {
     private boolean activo;
     private Long userId;
     private String username;
+    private String legajo;
     private String nombre;
     private String apellido;
     private String dni;

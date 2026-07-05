@@ -13,7 +13,6 @@ import ar.edu.itec1misiones.service.UserLookupPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -40,22 +39,16 @@ public class AlumnoServiceImpl implements AlumnoService {
 
     @Override
     public AlumnoResponse crearConUsuario(AlumnoRegistroDTO dto) {
-        // Legajo autogenerado AAAA-DNI (año de alta + DNI); no se pide manualmente.
-        String legajo = LocalDate.now().getYear() + "-" + dto.getDni();
-        if (alumnoRepository.existsByLegajo(legajo)) {
-            throw new IllegalArgumentException(
-                    "El legajo '" + legajo + "' ya está en uso");
-        }
-
-        // Si esto falla (DNI/email/telefono duplicado), la transaccion completa
+        // Si esto falla (DNI/email duplicado), la transaccion completa
         // se revierte -- no queda un Usuario huerfano sin Alumno asociado.
+        // Si el DNI ya existe (persona con otro rol), userLookupPort le
+        // adjunta el rol ALUMNO en vez de crear un Usuario nuevo.
         User user = userLookupPort.crearConCredencialesPorDni(
                 dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(),
                 dto.getTelefono(), dto.getTelefonoSecundario(), Rol.ALUMNO);
 
         Alumno alumno = new Alumno();
         alumno.setUser(user);
-        alumno.setLegajo(legajo);
         alumno.setActivo(true);
 
         return toResponse(alumnoRepository.save(alumno));
@@ -79,7 +72,7 @@ public class AlumnoServiceImpl implements AlumnoService {
     @Override
     @Transactional(readOnly = true)
     public AlumnoResponse buscarPorLegajo(String legajo) {
-        return toResponse(alumnoRepository.findByLegajo(legajo)
+        return toResponse(alumnoRepository.findByUserLegajo(legajo)
                 .orElseThrow(() -> new AlumnoNotFoundException("legajo", legajo)));
     }
 
@@ -95,12 +88,6 @@ public class AlumnoServiceImpl implements AlumnoService {
         Alumno alumno = alumnoRepository.findById(id)
                 .orElseThrow(() -> new AlumnoNotFoundException(id));
 
-        if (alumnoRepository.existsByLegajoAndIdNot(request.getLegajo(), id)) {
-            throw new IllegalArgumentException(
-                    "El legajo '" + request.getLegajo() + "' ya está en uso");
-        }
-
-        alumno.setLegajo(request.getLegajo());
         alumno.setActivo(request.isActivo());
         alumno.getUser().setTelefonoSecundario(request.getTelefonoSecundario());
 
@@ -122,7 +109,7 @@ public class AlumnoServiceImpl implements AlumnoService {
         User user = alumno.getUser();
         return AlumnoResponse.builder()
                 .id(alumno.getId())
-                .legajo(alumno.getLegajo())
+                .legajo(user.getLegajo())
                 .activo(alumno.isActivo())
                 .userId(user.getId())
                 .username(user.getUsername())

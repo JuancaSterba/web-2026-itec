@@ -145,6 +145,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         return UsuarioAdminResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .legajo(user.getLegajo())
                 .nombre(user.getNombre())
                 .apellido(user.getApellido())
                 .dni(user.getDni())
