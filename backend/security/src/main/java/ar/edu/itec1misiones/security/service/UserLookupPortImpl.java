@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.security.service;
 
+import ar.edu.itec1misiones.dto.response.PersonaResumenResponse;
 import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 import ar.edu.itec1misiones.security.repository.UserRepository;
@@ -27,6 +28,18 @@ public class UserLookupPortImpl implements UserLookupPort {
     @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<PersonaResumenResponse> buscarPorDni(String dni) {
+        return userRepository.findByDni(dni).map(user -> PersonaResumenResponse.builder()
+                .nombre(user.getNombre())
+                .apellido(user.getApellido())
+                .email(user.getEmail())
+                .telefono(user.getTelefono())
+                .legajo(user.getLegajo())
+                .roles(user.getRoles())
+                .build());
     }
 
     @Override

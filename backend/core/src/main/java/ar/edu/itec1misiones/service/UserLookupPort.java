@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.service;
 
+import ar.edu.itec1misiones.dto.response.PersonaResumenResponse;
 import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 
@@ -7,6 +8,13 @@ import java.util.Optional;
 
 public interface UserLookupPort {
     Optional<User> findById(Long id);
+
+    /**
+     * Resumen de una persona ya existente por DNI (cualquiera sea su rol),
+     * para que el frontend detecte "esta persona ya existe" antes de dar de
+     * alta un rol nuevo. Vacio si el DNI no esta registrado.
+     */
+    Optional<PersonaResumenResponse> buscarPorDni(String dni);
 
     /**
      * Crea un Usuario con credenciales autogeneradas a partir del DNI
