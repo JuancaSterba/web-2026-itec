@@ -11,7 +11,7 @@ export default function SeleccionarRolPage() {
   const [roles, setRoles] = useState<string[]>([])
   const [error, setError] = useState("")
   const router = useRouter()
-  const { setUser } = useAuth()
+  const { switchRole } = useAuth()
 
   useEffect(() => {
     const storedRoles = localStorage.getItem("pending-roles")
@@ -32,21 +32,8 @@ export default function SeleccionarRolPage() {
   }, [])
 
   const handleRoleSelect = (rol: string) => {
-    // Guardar rol seleccionado
-    localStorage.setItem("user-role", rol)
     localStorage.removeItem("pending-roles")
-
-    // Actualizar contexto
-    setUser({
-      username: localStorage.getItem("username") || "",
-      role: rol,
-      nombres: localStorage.getItem("nombres") || undefined,
-      apellido: localStorage.getItem("apellido") || undefined,
-      dni: localStorage.getItem("dni") || undefined,
-      email: localStorage.getItem("email") || undefined,
-      telefono: localStorage.getItem("telefono") || undefined,
-    })
-
+    switchRole(rol)
     router.push("/dashboard")
   }
 
