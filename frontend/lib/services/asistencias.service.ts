@@ -22,10 +22,12 @@ export interface AsistenciaInput {
 
 const BASE_PATH = "/api/asistencias"
 
-// Sin filtro por comisionId/fecha en el microservicio todavia: se trae todo
-// y se filtra en el cliente.
-export async function listarAsistencias(): Promise<Asistencia[]> {
-  const response = await apiClient.get<Asistencia[]>(BASE_PATH)
+export async function listarAsistencias(comisionId?: number, fecha?: string): Promise<Asistencia[]> {
+  const params = new URLSearchParams()
+  if (comisionId !== undefined) params.set("comisionId", String(comisionId))
+  if (fecha) params.set("fecha", fecha)
+  const query = params.toString()
+  const response = await apiClient.get<Asistencia[]>(query ? `${BASE_PATH}?${query}` : BASE_PATH)
   return response.data
 }
 

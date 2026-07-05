@@ -78,15 +78,11 @@ export default function AsistenciasPage() {
         // sabe el estado pero no el nombre de nadie.
         const [roster, asistencias] = await Promise.all([
           obtenerRosterComision(Number(comisionId)),
-          listarAsistencias(),
+          listarAsistencias(Number(comisionId), fecha),
         ])
 
-        const asistenciasDelDia = asistencias.filter(
-          (a) => a.comisionId === Number(comisionId) && a.fecha === fecha
-        )
-
         const nuevoRoster: RosterItem[] = roster.map(({ alumnoId, nombreCompleto }) => {
-          const existente = asistenciasDelDia.find((a) => a.alumnoId === alumnoId)
+          const existente = asistencias.find((a) => a.alumnoId === alumnoId)
           return {
             alumnoId,
             nombreCompleto,
