@@ -70,7 +70,9 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        throw new Error(extractErrorMessage(data, response.status))
+        const apiError = new Error(extractErrorMessage(data, response.status)) as Error & { status?: number }
+        apiError.status = response.status
+        throw apiError
       }
 
       return data

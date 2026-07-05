@@ -21,6 +21,7 @@ import {
   type Administrador,
   type RolAdministrador,
 } from "@/lib/services/administradores.service"
+import { buscarPersonaPorDni, type PersonaResumen } from "@/lib/services/personas.service"
 
 interface AdministradorFormDialogProps {
   open: boolean
@@ -52,6 +53,7 @@ export function AdministradorFormDialog({
   const [enabled, setEnabled] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [personaExistente, setPersonaExistente] = useState<PersonaResumen | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -66,16 +68,36 @@ export function AdministradorFormDialog({
       })
       setEnabled(administrador?.enabled ?? true)
       setError(null)
+      setPersonaExistente(null)
     }
   }, [open, administrador])
 
   const setField = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
 
+  const handleDniBlur = async () => {
+    if (isEditing || !/^\d{7,8}$/.test(form.dni)) {
+      setPersonaExistente(null)
+      return
+    }
+    const persona = await buscarPersonaPorDni(form.dni).catch(() => null)
+    setPersonaExistente(persona)
+    if (persona) {
+      setForm((prev) => ({
+        ...prev,
+        nombre: persona.nombre,
+        apellido: persona.apellido,
+        email: persona.email,
+        telefono: persona.telefono,
+      }))
+    }
+  }
+
   const validar = (): string | null => {
+    if (!isEditing && !/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
+    if (!isEditing && personaExistente) return null
     if (!form.nombre.trim()) return "El nombre es obligatorio"
     if (!form.apellido.trim()) return "El apellido es obligatorio"
-    if (!isEditing && !/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "El email no es válido"
     if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono debe tener entre 6 y 15 dígitos"
     return null
@@ -141,17 +163,6 @@ export function AdministradorFormDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nombre">Nombre</Label>
-              <Input id="nombre" value={form.nombre} onChange={setField("nombre")} disabled={submitting} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="apellido">Apellido</Label>
-              <Input id="apellido" value={form.apellido} onChange={setField("apellido")} disabled={submitting} />
-            </div>
-          </div>
-
           {!isEditing && (
             <div className="space-y-2">
               <Label htmlFor="dni">DNI</Label>
@@ -159,22 +170,45 @@ export function AdministradorFormDialog({
                 id="dni"
                 value={form.dni}
                 onChange={setField("dni")}
+                onBlur={handleDniBlur}
                 placeholder="Sin puntos, 7 u 8 dígitos"
                 disabled={submitting}
               />
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={form.email} onChange={setField("email")} disabled={submitting} />
+          {personaExistente && (
+            <div className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm">
+              Persona existente: {personaExistente.nombre} {personaExistente.apellido} · Legajo{" "}
+              {personaExistente.legajo}. Se le va a agregar el rol {form.rol}.
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="telefono">Teléfono</Label>
-              <Input id="telefono" value={form.telefono} onChange={setField("telefono")} disabled={submitting} />
+          )}
+
+          {!personaExistente && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nombre">Nombre</Label>
+                <Input id="nombre" value={form.nombre} onChange={setField("nombre")} disabled={submitting} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="apellido">Apellido</Label>
+                <Input id="apellido" value={form.apellido} onChange={setField("apellido")} disabled={submitting} />
+              </div>
             </div>
-          </div>
+          )}
+
+          {!personaExistente && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={form.email} onChange={setField("email")} disabled={submitting} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefono">Teléfono</Label>
+                <Input id="telefono" value={form.telefono} onChange={setField("telefono")} disabled={submitting} />
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Rol</Label>

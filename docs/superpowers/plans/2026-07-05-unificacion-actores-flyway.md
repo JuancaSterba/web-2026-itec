@@ -1462,7 +1462,10 @@ git commit -m "feat(backend): AdminInitializer genera legajo para el seed ADMIN"
 
 ### Task 14: Frontend — auto-detección de DNI en los 3 formularios de alta
 
+**Corrección sobre el diseño original:** `frontend/lib/api-client.ts` NO es axios, es un wrapper `fetch` propio (`ApiClient.execute`) que en caso de error solo tira `new Error(mensaje)` — no existe `err.response.status`. Se detectó al implementar este task. Se agrega `status` al `Error` que tira `api-client.ts` (cambio retrocompatible: nadie más lo lee hoy) para poder distinguir 404 de otros errores.
+
 **Files:**
+- Modify: `frontend/lib/api-client.ts`
 - Create: `frontend/lib/services/personas.service.ts`
 - Modify: `frontend/components/alumnos/alumno-form-dialog.tsx`
 - Modify: `frontend/components/profesores/profesor-form-dialog.tsx`
@@ -1471,6 +1474,23 @@ git commit -m "feat(backend): AdminInitializer genera legajo para el seed ADMIN"
 **Interfaces:**
 - Consumes: `GET /api/core/personas/dni/{dni}` (Task 8, vía gateway).
 - Produces: `buscarPersonaPorDni(dni: string): Promise<PersonaResumen | null>` — usado por los 3 form dialogs.
+
+- [ ] **Step 0: Agregar `status` al error de `api-client.ts`**
+
+En `frontend/lib/api-client.ts`, reemplazar:
+```typescript
+      if (!response.ok) {
+        throw new Error(extractErrorMessage(data, response.status))
+      }
+```
+por:
+```typescript
+      if (!response.ok) {
+        const apiError = new Error(extractErrorMessage(data, response.status)) as Error & { status?: number }
+        apiError.status = response.status
+        throw apiError
+      }
+```
 
 - [ ] **Step 1: Crear el servicio**
 
@@ -1494,7 +1514,7 @@ export async function buscarPersonaPorDni(dni: string): Promise<PersonaResumen |
     const response = await apiClient.get<PersonaResumen[]>(`/api/core/personas/dni/${dni}`)
     return response.data[0] ?? null
   } catch (err: any) {
-    if (err?.response?.status === 404) {
+    if (err?.status === 404) {
       return null
     }
     throw err
