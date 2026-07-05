@@ -1,16 +1,8 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import Link from "next/link"
-import { ArrowRight, GraduationCap, Search, SlidersHorizontal } from "lucide-react"
+import { ArrowRight, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 
 export default async function Home() {
   const cookieStore = await cookies()
@@ -46,33 +38,11 @@ export default async function Home() {
 
           <Button asChild size="lg" className="mt-2">
             <Link href="/login">
-              Iniciar sesión
+              Ingresar al Sistema
               <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>
-
-        <Card glass className="w-full max-w-md text-left animate-fadeIn [animation-delay:150ms]">
-          <CardHeader>
-            <CardTitle>Buscar alumno</CardTitle>
-            <CardDescription>Vista previa del sistema de diseño</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Nombre, DNI o legajo..." className="pl-9" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button className="flex-1">Buscar</Button>
-              <Button variant="outline" className="flex-1">
-                Ver todos
-              </Button>
-              <Button variant="ghost" size="icon" aria-label="Filtros">
-                <SlidersHorizontal className="size-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </main>
   )
