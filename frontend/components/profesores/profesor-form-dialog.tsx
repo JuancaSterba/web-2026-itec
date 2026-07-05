@@ -131,7 +131,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isEditing && (
             <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-              {profesor!.nombre} {profesor!.apellido} · DNI {profesor!.dni}
+              {profesor!.nombre} {profesor!.apellido} · DNI {profesor!.dni} · Legajo {profesor!.legajo}
             </div>
           )}
 

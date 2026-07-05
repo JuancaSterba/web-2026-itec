@@ -30,7 +30,6 @@ const emptyForm = {
   email: "",
   telefono: "",
   telefonoSecundario: "",
-  legajo: "",
 }
 
 export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: AlumnoFormDialogProps) {
@@ -44,7 +43,6 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     if (open) {
       setForm({
         ...emptyForm,
-        legajo: alumno?.legajo ?? "",
         telefonoSecundario: alumno?.telefonoSecundario ?? "",
       })
       setActivo(alumno?.activo ?? true)
@@ -67,12 +65,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (isEditing) {
-      if (!form.legajo.trim()) {
-        setError("El legajo es obligatorio")
-        return
-      }
-    } else {
+    if (!isEditing) {
       const validationError = validarCreacion()
       if (validationError) {
         setError(validationError)
@@ -85,15 +78,13 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     try {
       if (isEditing) {
         const actualizado = await actualizarAlumno(alumno!.id, {
-          legajo: form.legajo.trim(),
           activo,
           telefonoSecundario: form.telefonoSecundario.trim(),
         })
         toast.success("Alumno actualizado correctamente")
         onSuccess(actualizado)
       } else {
-        const { legajo, ...datosAlta } = form
-        const creado = await crearAlumno(datosAlta)
+        const creado = await crearAlumno(form)
         toast.success("Alumno creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
         })
@@ -116,7 +107,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
           <DialogTitle>{isEditing ? "Editar alumno" : "Nuevo alumno"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "El legajo y el estado son los únicos datos editables desde acá; el resto viene del usuario asociado."
+              ? "El teléfono secundario y el estado son los únicos datos editables desde acá; el resto viene del usuario asociado."
               : "El sistema crea automáticamente el usuario del alumno (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
@@ -124,7 +115,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
         <form onSubmit={handleSubmit} className="space-y-4">
           {isEditing && (
             <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-              {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni}
+              {alumno!.nombre} {alumno!.apellido} · DNI {alumno!.dni} · Legajo {alumno!.legajo}
             </div>
           )}
 
@@ -173,18 +164,6 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
                 />
               </div>
             </>
-          )}
-
-          {isEditing && (
-            <div className="space-y-2">
-              <Label htmlFor="legajo">Legajo</Label>
-              <Input
-                id="legajo"
-                value={form.legajo}
-                onChange={setField("legajo")}
-                disabled={submitting}
-              />
-            </div>
           )}
 
           {isEditing && (

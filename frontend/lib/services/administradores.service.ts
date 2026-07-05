@@ -6,6 +6,7 @@ export type RolAdministrador = "ADMIN" | "ADMINISTRATIVO"
 export interface Administrador {
   id: number
   username: string
+  legajo: string
   nombre: string
   apellido: string
   dni: string

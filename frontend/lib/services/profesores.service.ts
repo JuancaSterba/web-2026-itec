@@ -9,6 +9,7 @@ export interface Profesor {
   activo: boolean
   userId: number
   username: string
+  legajo: string
   nombre: string
   apellido: string
   dni: string

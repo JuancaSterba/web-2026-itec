@@ -30,9 +30,9 @@ export interface CrearAlumnoInput {
   telefonoSecundario?: string
 }
 
-// AlumnoUpdateRequest del Core: legajo, estado activo y telefonoSecundario son editables.
+// AlumnoUpdateRequest del Core: legajo NO es editable (vive en el Usuario,
+// es identidad de por vida); solo estado activo y telefonoSecundario.
 export interface ActualizarAlumnoInput {
-  legajo: string
   activo: boolean
   telefonoSecundario?: string
 }

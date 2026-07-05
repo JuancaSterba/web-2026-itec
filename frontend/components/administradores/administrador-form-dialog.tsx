@@ -135,7 +135,7 @@ export function AdministradorFormDialog({
           <DialogTitle>{isEditing ? "Editar administrador" : "Nuevo administrador"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Datos de contacto, rol y estado son editables desde acá."
+              ? `Legajo ${administrador?.legajo}. Datos de contacto, rol y estado son editables desde acá.`
               : "El sistema crea automáticamente el usuario (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
