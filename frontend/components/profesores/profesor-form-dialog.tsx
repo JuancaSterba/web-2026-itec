@@ -184,7 +184,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefonoSecundario">Teléfono Secundario (opcional)</Label>
+              <Label htmlFor="telefonoSecundario">Teléfono Secundario</Label>
               <Input
                 id="telefonoSecundario"
                 value={form.telefonoSecundario}
