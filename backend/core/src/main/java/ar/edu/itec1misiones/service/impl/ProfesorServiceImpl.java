@@ -80,6 +80,7 @@ public class ProfesorServiceImpl implements ProfesorService {
         Profesor profesor = profesorRepository.findById(id)
                 .orElseThrow(() -> new ProfesorNotFoundException(id));
 
+        userLookupPort.actualizarDniSiCambio(profesor.getUser(), request.getDni());
         profesor.setTitulo(request.getTitulo());
         profesor.getUser().setTelefonoSecundario(request.getTelefonoSecundario());
         profesor.setActivo(request.isActivo());

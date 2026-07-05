@@ -10,6 +10,10 @@ import lombok.Data;
 @Data
 public class ActualizarAdministradorRequest {
 
+    @NotBlank(message = "El DNI es obligatorio")
+    @Pattern(regexp = "\\d{7,8}", message = "El DNI debe tener 7 u 8 dígitos numéricos")
+    private String dni;
+
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 

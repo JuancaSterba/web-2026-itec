@@ -89,6 +89,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         nuevosRoles.removeAll(ROLES_GESTIONABLES);
         nuevosRoles.add(request.getRol());
 
+        userLookupPort.actualizarDniSiCambio(user, request.getDni());
         user.setNombre(request.getNombre());
         user.setApellido(request.getApellido());
         user.setEmail(request.getEmail());

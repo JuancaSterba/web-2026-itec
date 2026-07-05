@@ -88,6 +88,7 @@ public class AlumnoServiceImpl implements AlumnoService {
         Alumno alumno = alumnoRepository.findById(id)
                 .orElseThrow(() -> new AlumnoNotFoundException(id));
 
+        userLookupPort.actualizarDniSiCambio(alumno.getUser(), request.getDni());
         alumno.setActivo(request.isActivo());
         alumno.getUser().setTelefonoSecundario(request.getTelefonoSecundario());
 
