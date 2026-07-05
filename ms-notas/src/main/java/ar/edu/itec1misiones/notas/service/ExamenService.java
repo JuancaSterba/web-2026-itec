@@ -26,8 +26,8 @@ public class ExamenService {
         return examenRepository.save(examen);
     }
 
-    public List<Examen> listar() {
-        return examenRepository.findAll();
+    public List<Examen> listar(Long comisionId) {
+        return examenRepository.buscarPorFiltros(comisionId);
     }
 
     public Examen actualizar(Long id, ExamenRequest request) {

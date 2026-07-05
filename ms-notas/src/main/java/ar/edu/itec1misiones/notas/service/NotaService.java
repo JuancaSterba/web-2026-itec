@@ -27,8 +27,8 @@ public class NotaService {
         return notaRepository.save(nota);
     }
 
-    public List<Nota> listar() {
-        return notaRepository.findAll();
+    public List<Nota> listar(Long examenId) {
+        return notaRepository.buscarPorFiltros(examenId);
     }
 
     public Nota actualizar(Long id, NotaRequest request) {

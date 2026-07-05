@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -45,8 +46,10 @@ public class ExamenController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Examen>> listar(HttpServletRequest httpRequest) {
-        List<Examen> examenes = examenService.listar();
+    public ResponseEntity<ApiResponse<Examen>> listar(
+            @RequestParam(required = false) Long comisionId,
+            HttpServletRequest httpRequest) {
+        List<Examen> examenes = examenService.listar(comisionId);
         return ResponseEntity.ok(
                 ApiResponse.<Examen>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
