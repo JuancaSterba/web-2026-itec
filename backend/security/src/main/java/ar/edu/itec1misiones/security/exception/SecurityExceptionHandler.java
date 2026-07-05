@@ -7,6 +7,8 @@ import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.security.constants.ExceptionConstants;
 import ar.edu.itec1misiones.security.constants.SecurityConstants;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,6 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// @Order(LOWEST_PRECEDENCE): esta clase tiene un catch-all de Exception.class,
+// que sin esto se evalua antes que los handlers especificos de otros
+// @ControllerAdvice (ej. CoreExceptionHandler) y los tapa devolviendo siempre
+// 500 INTERNAL_ERROR en vez del status especifico de cada excepcion.
+@Order(Ordered.LOWEST_PRECEDENCE)
 @ControllerAdvice
 public class SecurityExceptionHandler {
 

@@ -4,6 +4,8 @@ import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.ErrorDto;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
 
+// @Order(HIGHEST_PRECEDENCE): garantiza que estos handlers especificos se
+// evaluen ANTES que el catch-all de Exception.class en SecurityExceptionHandler
+// (sin esto, ambos @ControllerAdvice quedan en el mismo orden por defecto y
+// el catch-all puede ganar el empate, devolviendo 500 en vez del status real).
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class CoreExceptionHandler {
 
