@@ -4,6 +4,7 @@ import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 import ar.edu.itec1misiones.security.repository.UserRepository;
 import ar.edu.itec1misiones.service.UserLookupPort;
+import ar.edu.itec1misiones.util.LegajoGenerator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,9 +56,11 @@ public class UserLookupPortImpl implements UserLookupPort {
         user.setEmail(email);
         user.setTelefono(telefono);
         user.setTelefonoSecundario(telefonoSecundario);
-        // Alumnos/Profesores no tienen UI propia todavia: la cuenta se crea
-        // deshabilitada para que no puedan loguearse (ver Reglas_de_Negocio.md).
-        user.setEnabled(false);
+        user.setLegajo(LegajoGenerator.generar(dni));
+        // ADMIN/ADMINISTRATIVO tienen login inmediato; Alumnos/Profesores no
+        // tienen UI propia todavia y la cuenta se crea deshabilitada (ver
+        // Reglas_de_Negocio.md).
+        user.setEnabled(rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO);
 
         return userRepository.save(user);
     }
