@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -217,5 +218,99 @@ class UserAdminServiceImplTest {
         service.resetPassword(3L);
 
         verify(userRepository).save(argThat(u -> u.getPassword().equals("HASH_33333333")));
+    }
+
+    @Test
+    void actualizar_preservaRolesNoGestionables_siElUsuarioTieneRolAdicional() {
+        User otro = buildUser(2L, "22222222", Rol.ADMIN, true);
+        otro.setRoles(new java.util.HashSet<>(Set.of(Rol.ADMIN, Rol.PROFESOR)));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(otro));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        autenticarComo("11111111");
+
+        ActualizarAdministradorRequest request = new ActualizarAdministradorRequest();
+        request.setNombre("Ana");
+        request.setApellido("Gómez");
+        request.setEmail("22222222@itec.edu.ar");
+        request.setTelefono("3760000000");
+        request.setRol(Rol.ADMINISTRATIVO);
+        request.setEnabled(true);
+
+        service.actualizar(2L, request);
+
+        verify(userRepository).save(argThat(u -> u.getRoles().equals(Set.of(Rol.ADMINISTRATIVO, Rol.PROFESOR))));
+    }
+
+    @Test
+    void actualizar_lanzaAdministradorNotFoundException_siElUsuarioTargetNoEsGestionable() {
+        User alumno = buildUser(5L, "55555555", Rol.ALUMNO, true);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(alumno));
+
+        ActualizarAdministradorRequest request = new ActualizarAdministradorRequest();
+        request.setNombre("Ana");
+        request.setApellido("Gómez");
+        request.setEmail("55555555@itec.edu.ar");
+        request.setTelefono("3760000000");
+        request.setRol(Rol.ADMIN);
+        request.setEnabled(true);
+
+        assertThatThrownBy(() -> service.actualizar(5L, request))
+                .isInstanceOf(AdministradorNotFoundException.class);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void resetPassword_lanzaAdministradorNotFoundException_siElUsuarioTargetNoEsGestionable() {
+        User alumno = buildUser(6L, "66666666", Rol.ALUMNO, true);
+        when(userRepository.findById(6L)).thenReturn(Optional.of(alumno));
+
+        assertThatThrownBy(() -> service.resetPassword(6L))
+                .isInstanceOf(AdministradorNotFoundException.class);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void actualizar_lanzaAdministradorDatosDuplicadosException_siElEmailPerteneceAOtroUsuario() {
+        User otro = buildUser(2L, "22222222", Rol.ADMINISTRATIVO, true);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(otro));
+        when(userRepository.existsByEmail("colision@itec.edu.ar")).thenReturn(true);
+        autenticarComo("11111111");
+
+        ActualizarAdministradorRequest request = new ActualizarAdministradorRequest();
+        request.setNombre("Ana");
+        request.setApellido("Gómez");
+        request.setEmail("colision@itec.edu.ar");
+        request.setTelefono("3760000000");
+        request.setRol(Rol.ADMINISTRATIVO);
+        request.setEnabled(true);
+
+        assertThatThrownBy(() -> service.actualizar(2L, request))
+                .isInstanceOf(AdministradorDatosDuplicadosException.class);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void actualizar_noLanzaExcepcion_siElEmailYTelefonoNoCambian() {
+        User otro = buildUser(2L, "22222222", Rol.ADMINISTRATIVO, true);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(otro));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        autenticarComo("11111111");
+
+        ActualizarAdministradorRequest request = new ActualizarAdministradorRequest();
+        request.setNombre("Ana");
+        request.setApellido("Gómez");
+        request.setEmail(otro.getEmail());
+        request.setTelefono(otro.getTelefono());
+        request.setRol(Rol.ADMINISTRATIVO);
+        request.setEnabled(true);
+
+        assertThatCode(() -> service.actualizar(2L, request)).doesNotThrowAnyException();
+
+        verify(userRepository, never()).existsByEmail(anyString());
+        verify(userRepository, never()).existsByTelefono(anyString());
+        verify(userRepository).save(any());
     }
 }

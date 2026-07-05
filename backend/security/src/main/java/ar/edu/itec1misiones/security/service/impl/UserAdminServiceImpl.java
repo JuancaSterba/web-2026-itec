@@ -83,6 +83,10 @@ public class UserAdminServiceImpl implements UserAdminService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AdministradorNotFoundException(id));
 
+        if (user.getRoles().stream().noneMatch(ROLES_GESTIONABLES::contains)) {
+            throw new AdministradorNotFoundException(id);
+        }
+
         validarRolGestionable(request.getRol());
 
         boolean esUsuarioActual = user.getUsername().equals(SecurityUtils.getUsername());
@@ -93,11 +97,26 @@ public class UserAdminServiceImpl implements UserAdminService {
             throw new SelfActionNotAllowedException("No podés deshabilitarte o cambiar tu propio rol");
         }
 
+        List<String> errores = new ArrayList<>();
+        if (!request.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            errores.add("El email '" + request.getEmail() + "' ya está en uso");
+        }
+        if (!request.getTelefono().equals(user.getTelefono()) && userRepository.existsByTelefono(request.getTelefono())) {
+            errores.add("El teléfono '" + request.getTelefono() + "' ya está en uso");
+        }
+        if (!errores.isEmpty()) {
+            throw new AdministradorDatosDuplicadosException(errores);
+        }
+
+        Set<Rol> nuevosRoles = new HashSet<>(user.getRoles());
+        nuevosRoles.removeAll(ROLES_GESTIONABLES);
+        nuevosRoles.add(request.getRol());
+
         user.setNombre(request.getNombre());
         user.setApellido(request.getApellido());
         user.setEmail(request.getEmail());
         user.setTelefono(request.getTelefono());
-        user.setRoles(new HashSet<>(Set.of(request.getRol())));
+        user.setRoles(nuevosRoles);
         user.setEnabled(request.isEnabled());
 
         return toResponse(userRepository.save(user));
@@ -107,6 +126,10 @@ public class UserAdminServiceImpl implements UserAdminService {
     public UsuarioAdminResponse resetPassword(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AdministradorNotFoundException(id));
+
+        if (user.getRoles().stream().noneMatch(ROLES_GESTIONABLES::contains)) {
+            throw new AdministradorNotFoundException(id);
+        }
 
         user.setPassword(passwordEncoder.encode(user.getDni()));
 
