@@ -9,8 +9,8 @@ public class ProfesorUpdateRequest {
     @NotBlank(message = "El título es obligatorio")
     private String titulo;
 
-    @NotBlank(message = "El teléfono de contacto es obligatorio")
-    private String telefonoContacto;
+    @NotBlank(message = "El teléfono secundario es obligatorio")
+    private String telefonoSecundario;
 
     private boolean activo;
 }

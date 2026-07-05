@@ -39,15 +39,15 @@ public class ProfesorServiceImpl implements ProfesorService {
 
     @Override
     public ProfesorResponse crearConUsuario(ProfesorRegistroDTO dto) {
-        // Si esto falla (DNI/email/telefono duplicado), la transaccion completa
+        // Si esto falla (DNI/email duplicado), la transaccion completa
         // se revierte -- no queda un Usuario huerfano sin Profesor asociado.
         User user = userLookupPort.crearConCredencialesPorDni(
-                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(), dto.getTelefono(), Rol.PROFESOR);
+                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(),
+                dto.getTelefono(), dto.getTelefonoSecundario(), Rol.PROFESOR);
 
         Profesor profesor = new Profesor();
         profesor.setUser(user);
         profesor.setTitulo(dto.getTitulo());
-        profesor.setTelefonoContacto(dto.getTelefonoContacto());
         profesor.setActivo(true);
 
         return toResponse(profesorRepository.save(profesor));
@@ -81,7 +81,7 @@ public class ProfesorServiceImpl implements ProfesorService {
                 .orElseThrow(() -> new ProfesorNotFoundException(id));
 
         profesor.setTitulo(request.getTitulo());
-        profesor.setTelefonoContacto(request.getTelefonoContacto());
+        profesor.getUser().setTelefonoSecundario(request.getTelefonoSecundario());
         profesor.setActivo(request.isActivo());
 
         return toResponse(profesorRepository.save(profesor));
@@ -103,7 +103,7 @@ public class ProfesorServiceImpl implements ProfesorService {
         return ProfesorResponse.builder()
                 .id(profesor.getId())
                 .titulo(profesor.getTitulo())
-                .telefonoContacto(profesor.getTelefonoContacto())
+                .telefonoSecundario(user.getTelefonoSecundario())
                 .activo(profesor.isActivo())
                 .userId(user.getId())
                 .username(user.getUsername())

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ProfesorResponse {
     private Long id;
     private String titulo;
-    private String telefonoContacto;
+    private String telefonoSecundario;
     private boolean activo;
     private Long userId;
     private String username;

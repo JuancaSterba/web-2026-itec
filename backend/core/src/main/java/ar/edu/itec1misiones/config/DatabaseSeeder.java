@@ -85,6 +85,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         userProfesor.setDni("30000001");
         userProfesor.setEmail("carlos.garcia@itec.edu.ar");
         userProfesor.setTelefono("3764000001");
+        userProfesor.setTelefonoSecundario("3764000001");
         userProfesor.setRoles(Set.of(Rol.PROFESOR));
         userProfesor = userRepository.save(userProfesor);
 
@@ -92,7 +93,6 @@ public class DatabaseSeeder implements CommandLineRunner {
         Profesor profesor = new Profesor();
         profesor.setUser(userProfesor);
         profesor.setTitulo("Lic. en Sistemas");
-        profesor.setTelefonoContacto("3764000001");
         profesor.setActivo(true);
         profesor = profesorRepository.save(profesor);
 
