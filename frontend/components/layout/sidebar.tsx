@@ -8,15 +8,11 @@ import {
   Home,
   Users,
   GraduationCap,
-  BookOpen,
   Calendar,
   ClipboardCheck,
-  BarChart3,
-  Settings,
   ChevronLeft,
   ChevronRight,
   UserCheck,
-  FileText,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
@@ -24,13 +20,13 @@ export const navigation = [
   { name: "Inicio", href: "/dashboard", icon: Home, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR", "ALUMNO"] },
   { name: "Alumnos", href: "/dashboard/alumnos", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
   { name: "Profesores", href: "/dashboard/profesores", icon: GraduationCap, roles: ["ADMIN"] },
-  { name: "Materias", href: "/dashboard/materias", icon: BookOpen, roles: ["ADMIN", "ADMINISTRATIVO"] },
+  // { name: "Materias", href: "/dashboard/materias", icon: BookOpen, roles: ["ADMIN", "ADMINISTRATIVO"] }, // oculto: PENDIENTES.md Prioridad 1
   { name: "Comisiones", href: "/dashboard/comisiones", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
   { name: "Asistencias", href: "/dashboard/asistencias", icon: UserCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },
   { name: "Calificaciones", href: "/dashboard/notas", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },
-  { name: "Reportes", href: "/dashboard/reportes", icon: BarChart3, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Certificados", href: "/dashboard/certificados", icon: FileText, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Configuración", href: "/dashboard/configuraciones", icon: Settings, roles: ["ADMIN"] },
+  // { name: "Reportes", href: "/dashboard/reportes", icon: BarChart3, roles: ["ADMIN", "ADMINISTRATIVO"] }, // oculto: PENDIENTES.md Prioridad 1
+  // { name: "Certificados", href: "/dashboard/certificados", icon: FileText, roles: ["ADMIN", "ADMINISTRATIVO"] }, // oculto: PENDIENTES.md Prioridad 1
+  // { name: "Configuración", href: "/dashboard/configuraciones", icon: Settings, roles: ["ADMIN"] }, // oculto: PENDIENTES.md Prioridad 1
 ]
 
 export default function Sidebar() {
