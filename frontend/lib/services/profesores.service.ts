@@ -5,7 +5,7 @@ import apiClient from "@/lib/api-client"
 export interface Profesor {
   id: number
   titulo: string
-  telefonoContacto: string
+  telefonoSecundario: string
   activo: boolean
   userId: number
   username: string
@@ -26,13 +26,13 @@ export interface CrearProfesorInput {
   email: string
   telefono: string
   titulo: string
-  telefonoContacto: string
+  telefonoSecundario: string
 }
 
-// ProfesorUpdateRequest del Core: titulo, telefonoContacto y activo son editables.
+// ProfesorUpdateRequest del Core: titulo, telefonoSecundario y activo son editables.
 export interface ActualizarProfesorInput {
   titulo: string
-  telefonoContacto: string
+  telefonoSecundario: string
   activo: boolean
 }
 

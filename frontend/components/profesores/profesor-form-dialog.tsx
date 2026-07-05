@@ -30,7 +30,7 @@ const emptyForm = {
   email: "",
   telefono: "",
   titulo: "",
-  telefonoContacto: "",
+  telefonoSecundario: "",
 }
 
 export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: ProfesorFormDialogProps) {
@@ -45,7 +45,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
       setForm({
         ...emptyForm,
         titulo: profesor?.titulo ?? "",
-        telefonoContacto: profesor?.telefonoContacto ?? "",
+        telefonoSecundario: profesor?.telefonoSecundario ?? "",
       })
       setActivo(profesor?.activo ?? true)
       setError(null)
@@ -62,7 +62,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "El email no es válido"
     if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono personal debe tener entre 6 y 15 dígitos"
     if (!form.titulo.trim()) return "El título es obligatorio"
-    if (form.telefonoContacto.trim() && !/^\d{6,15}$/.test(form.telefonoContacto)) {
+    if (form.telefonoSecundario.trim() && !/^\d{6,15}$/.test(form.telefonoSecundario)) {
       return "El teléfono secundario debe tener entre 6 y 15 dígitos"
     }
     return null
@@ -76,7 +76,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
         setError("El título es obligatorio")
         return
       }
-      if (form.telefonoContacto.trim() && !/^\d{6,15}$/.test(form.telefonoContacto)) {
+      if (form.telefonoSecundario.trim() && !/^\d{6,15}$/.test(form.telefonoSecundario)) {
         setError("El teléfono secundario debe tener entre 6 y 15 dígitos")
         return
       }
@@ -94,7 +94,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
       if (isEditing) {
         const actualizado = await actualizarProfesor(profesor!.id, {
           titulo: form.titulo.trim(),
-          telefonoContacto: form.telefonoContacto.trim(),
+          telefonoSecundario: form.telefonoSecundario.trim(),
           activo,
         })
         toast.success("Profesor actualizado correctamente")
@@ -184,11 +184,11 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefonoContacto">Teléfono Secundario (opcional)</Label>
+              <Label htmlFor="telefonoSecundario">Teléfono Secundario (opcional)</Label>
               <Input
-                id="telefonoContacto"
-                value={form.telefonoContacto}
-                onChange={setField("telefonoContacto")}
+                id="telefonoSecundario"
+                value={form.telefonoSecundario}
+                onChange={setField("telefonoSecundario")}
                 disabled={submitting}
               />
             </div>
