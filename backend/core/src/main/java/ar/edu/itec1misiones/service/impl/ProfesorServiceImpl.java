@@ -80,9 +80,13 @@ public class ProfesorServiceImpl implements ProfesorService {
         Profesor profesor = profesorRepository.findById(id)
                 .orElseThrow(() -> new ProfesorNotFoundException(id));
 
-        userLookupPort.actualizarDniSiCambio(profesor.getUser(), request.getDni());
+        User user = profesor.getUser();
+        userLookupPort.actualizarDniSiCambio(user, request.getDni());
+        userLookupPort.actualizarEmailSiCambio(user, request.getEmail());
+        user.setNombre(request.getNombre());
+        user.setApellido(request.getApellido());
+        user.setTelefonoSecundario(request.getTelefonoSecundario());
         profesor.setTitulo(request.getTitulo());
-        profesor.getUser().setTelefonoSecundario(request.getTelefonoSecundario());
         profesor.setActivo(request.isActivo());
 
         return toResponse(profesorRepository.save(profesor));
