@@ -112,6 +112,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(PersonaNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handlePersonaNotFound(
+            PersonaNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("PERSONA_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(
             IllegalArgumentException ex,
