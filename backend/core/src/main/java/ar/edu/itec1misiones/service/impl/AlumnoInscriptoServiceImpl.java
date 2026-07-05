@@ -99,7 +99,7 @@ public class AlumnoInscriptoServiceImpl implements AlumnoInscriptoService {
                 .nombre(user.getNombre())
                 .apellido(user.getApellido())
                 .dni(user.getDni())
-                .legajo(alumno.getLegajo())
+                .legajo(user.getLegajo())
                 .comisionMateriaId(cm.getId())
                 .materiaNombre(cm.getMateria().getNombre())
                 .comisionNombre(cm.getNombre())

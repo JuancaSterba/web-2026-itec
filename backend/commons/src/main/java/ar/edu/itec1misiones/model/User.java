@@ -41,6 +41,9 @@ public class User implements UserDetails {
     private String telefono;
     private String telefonoSecundario;
 
+    @Column(unique = true)
+    private String legajo;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
