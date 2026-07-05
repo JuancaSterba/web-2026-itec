@@ -9,7 +9,6 @@ import {
   Users,
   GraduationCap,
   Calendar,
-  CalendarRange,
   ClipboardCheck,
   ClipboardList,
   ChevronLeft,
@@ -23,11 +22,10 @@ import { useAuth } from "@/hooks/use-auth"
 export const navigation = [
   { name: "Inicio", href: "/dashboard", icon: Home, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR", "ALUMNO"] },
   { name: "Carreras y Materias", href: "/dashboard/catalogo", icon: BookOpen, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Gestión de Cursadas", href: "/dashboard/cursadas", icon: CalendarRange, roles: ["ADMIN", "ADMINISTRATIVO"] },
   { name: "Alumnos", href: "/dashboard/alumnos", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
   { name: "Profesores", href: "/dashboard/profesores", icon: GraduationCap, roles: ["ADMIN"] },
   // { name: "Materias", href: "/dashboard/materias", icon: BookOpen, roles: ["ADMIN", "ADMINISTRATIVO"] }, // oculto: PENDIENTES.md Prioridad 1
-  { name: "Comisiones", href: "/dashboard/comisiones", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
+  { name: "Gestión de Cursadas", href: "/dashboard/comisiones", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
   { name: "Mis Comisiones", href: "/dashboard/mis-comisiones", icon: ClipboardList, roles: ["PROFESOR"] },
   { name: "Asistencias", href: "/dashboard/asistencias", icon: UserCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },
   { name: "Calificaciones", href: "/dashboard/notas", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },

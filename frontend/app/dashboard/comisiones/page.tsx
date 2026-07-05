@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Pencil, Trash2, Calendar } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, Calendar, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -157,6 +158,11 @@ export default function ComisionesPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      <Link href={`/dashboard/comisiones/${comision.id}`}>
+                        <Button variant="ghost" size="icon" aria-label="Ver dashboard">
+                          <LayoutDashboard className="size-4" />
+                        </Button>
+                      </Link>
                       <Button variant="ghost" size="icon" onClick={() => abrirEditar(comision)} aria-label="Editar">
                         <Pencil className="size-4" />
                       </Button>
