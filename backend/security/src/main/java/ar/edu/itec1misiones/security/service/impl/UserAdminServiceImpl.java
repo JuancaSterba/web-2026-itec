@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -66,7 +67,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         User user = new User();
         user.setUsername(request.getDni());
         user.setPassword(passwordEncoder.encode(request.getDni()));
-        user.setRoles(Set.of(request.getRol()));
+        user.setRoles(new HashSet<>(Set.of(request.getRol())));
         user.setNombre(request.getNombre());
         user.setApellido(request.getApellido());
         user.setDni(request.getDni());
@@ -96,7 +97,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         user.setApellido(request.getApellido());
         user.setEmail(request.getEmail());
         user.setTelefono(request.getTelefono());
-        user.setRoles(Set.of(request.getRol()));
+        user.setRoles(new HashSet<>(Set.of(request.getRol())));
         user.setEnabled(request.isEnabled());
 
         return toResponse(userRepository.save(user));
