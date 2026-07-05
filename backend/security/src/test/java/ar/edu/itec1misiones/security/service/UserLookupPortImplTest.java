@@ -116,4 +116,34 @@ class UserLookupPortImplTest {
         assertThat(user.getDni()).isEqualTo("30111222");
         assertThat(user.getLegajo()).isEqualTo("2024-30111222");
     }
+
+    @Test
+    void actualizarEmailSiCambio_actualizaElEmail_siElEmailCambioYNoEstaEnUso() {
+        User user = buildUser("30111222", "2024-30111222");
+        when(userRepository.existsByEmail("nuevo@itec.edu.ar")).thenReturn(false);
+
+        service.actualizarEmailSiCambio(user, "nuevo@itec.edu.ar");
+
+        assertThat(user.getEmail()).isEqualTo("nuevo@itec.edu.ar");
+    }
+
+    @Test
+    void actualizarEmailSiCambio_noHaceNada_siElEmailNoCambio() {
+        User user = buildUser("30111222", "2024-30111222");
+
+        service.actualizarEmailSiCambio(user, "ana@itec.edu.ar");
+
+        assertThat(user.getEmail()).isEqualTo("ana@itec.edu.ar");
+    }
+
+    @Test
+    void actualizarEmailSiCambio_lanzaIllegalArgumentException_siElNuevoEmailYaEstaEnUso() {
+        User user = buildUser("30111222", "2024-30111222");
+        when(userRepository.existsByEmail("nuevo@itec.edu.ar")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.actualizarEmailSiCambio(user, "nuevo@itec.edu.ar"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(user.getEmail()).isEqualTo("ana@itec.edu.ar");
+    }
 }

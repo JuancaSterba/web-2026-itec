@@ -131,4 +131,15 @@ public class UserLookupPortImpl implements UserLookupPort {
         user.setDni(nuevoDni);
         user.setLegajo(LegajoGenerator.generar(nuevoDni));
     }
+
+    @Override
+    public void actualizarEmailSiCambio(User user, String nuevoEmail) {
+        if (nuevoEmail == null || nuevoEmail.equals(user.getEmail())) {
+            return;
+        }
+        if (userRepository.existsByEmail(nuevoEmail)) {
+            throw new IllegalArgumentException("El email '" + nuevoEmail + "' ya está en uso");
+        }
+        user.setEmail(nuevoEmail);
+    }
 }

@@ -45,4 +45,12 @@ public interface UserLookupPort {
      * de Alumno/Profesor/Administrador).
      */
     void actualizarDniSiCambio(User user, String nuevoDni);
+
+    /**
+     * Actualiza el email de un usuario existente, si cambio. No hace nada
+     * si nuevoEmail es null o igual al email actual. Lanza
+     * IllegalArgumentException si el nuevo email ya esta en uso por otra
+     * persona. No persiste -- mismo criterio que actualizarDniSiCambio.
+     */
+    void actualizarEmailSiCambio(User user, String nuevoEmail);
 }
