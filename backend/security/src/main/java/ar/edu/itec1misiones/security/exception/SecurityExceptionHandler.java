@@ -158,4 +158,66 @@ public class SecurityExceptionHandler {
                         .build()
         );
     }
+
+    @ExceptionHandler(AdministradorNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAdministradorNotFound(
+            AdministradorNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_ADMIN_NOT_FOUND, ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AdministradorDatosDuplicadosException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAdministradorDatosDuplicados(
+            AdministradorDatosDuplicadosException ex,
+            HttpServletRequest request) {
+
+        List<ErrorDto> errores = ex.getErrores().stream()
+                .map(msg -> new ErrorDto(ExceptionConstants.ERROR_DUPLICATED_FIELD, msg))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(errores)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(SelfActionNotAllowedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSelfActionNotAllowed(
+            SelfActionNotAllowedException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_SELF_ACTION_FORBIDDEN, ex.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(RolNoGestionableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRolNoGestionable(
+            RolNoGestionableException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_ROL_INVALIDO, ex.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
 }
