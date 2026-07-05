@@ -89,7 +89,6 @@ class UserAdminServiceImplTest {
         when(userRepository.existsByUsername("30111222")).thenReturn(true);
         when(userRepository.existsByDni("30111222")).thenReturn(true);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(userRepository.existsByTelefono(anyString())).thenReturn(false);
 
         assertThatThrownBy(() -> service.crear(request))
                 .isInstanceOf(AdministradorDatosDuplicadosException.class);
@@ -103,7 +102,6 @@ class UserAdminServiceImplTest {
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByDni(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(userRepository.existsByTelefono(anyString())).thenReturn(false);
         when(passwordEncoder.encode("30111222")).thenReturn("HASH_30111222");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> {
             User u = inv.getArgument(0);
@@ -310,7 +308,6 @@ class UserAdminServiceImplTest {
         assertThatCode(() -> service.actualizar(2L, request)).doesNotThrowAnyException();
 
         verify(userRepository, never()).existsByEmail(anyString());
-        verify(userRepository, never()).existsByTelefono(anyString());
         verify(userRepository).save(any());
     }
 }

@@ -80,9 +80,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             errores.add("El email ya está en uso.");
         }
-        if (userRepository.existsByTelefono(request.getTelefono())) {
-            errores.add("El teléfono ya está en uso.");
-        }
 
         if (!errores.isEmpty()) {
             throw new MultiDataExistException(errores);

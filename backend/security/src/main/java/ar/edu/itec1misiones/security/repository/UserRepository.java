@@ -17,7 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     boolean existsByDni(String dni);
     boolean existsByEmail(String email);
-    boolean existsByTelefono(String telefono);
 
     @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r IN :roles")
     List<User> findByRolesIn(@Param("roles") Collection<Rol> roles);

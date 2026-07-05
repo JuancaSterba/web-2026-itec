@@ -41,11 +41,6 @@ public class UserLookupPortImpl implements UserLookupPort {
         if (userRepository.existsByEmail(email)) {
             errores.add("El email '" + email + "' ya está en uso");
         }
-        // Alumnos de una misma familia pueden compartir telefono del hogar;
-        // para el resto de los roles el telefono sigue siendo personal/unico.
-        if (rol != Rol.ALUMNO && userRepository.existsByTelefono(telefono)) {
-            errores.add("El teléfono '" + telefono + "' ya está en uso");
-        }
         if (!errores.isEmpty()) {
             throw new IllegalArgumentException(String.join(". ", errores));
         }

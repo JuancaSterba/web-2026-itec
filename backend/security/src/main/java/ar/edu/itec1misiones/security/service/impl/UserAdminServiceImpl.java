@@ -57,9 +57,6 @@ public class UserAdminServiceImpl implements UserAdminService {
         if (userRepository.existsByEmail(request.getEmail())) {
             errores.add("El email '" + request.getEmail() + "' ya está en uso");
         }
-        if (userRepository.existsByTelefono(request.getTelefono())) {
-            errores.add("El teléfono '" + request.getTelefono() + "' ya está en uso");
-        }
         if (!errores.isEmpty()) {
             throw new AdministradorDatosDuplicadosException(errores);
         }
@@ -100,9 +97,6 @@ public class UserAdminServiceImpl implements UserAdminService {
         List<String> errores = new ArrayList<>();
         if (!request.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
             errores.add("El email '" + request.getEmail() + "' ya está en uso");
-        }
-        if (!request.getTelefono().equals(user.getTelefono()) && userRepository.existsByTelefono(request.getTelefono())) {
-            errores.add("El teléfono '" + request.getTelefono() + "' ya está en uso");
         }
         if (!errores.isEmpty()) {
             throw new AdministradorDatosDuplicadosException(errores);
