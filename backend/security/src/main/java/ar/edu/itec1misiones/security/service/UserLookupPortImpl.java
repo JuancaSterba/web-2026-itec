@@ -1,6 +1,7 @@
 package ar.edu.itec1misiones.security.service;
 
 import ar.edu.itec1misiones.dto.response.PersonaResumenResponse;
+import ar.edu.itec1misiones.exception.RolYaAsignadoException;
 import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 import ar.edu.itec1misiones.security.repository.UserRepository;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,12 +47,14 @@ public class UserLookupPortImpl implements UserLookupPort {
     @Override
     public User crearConCredencialesPorDni(String nombre, String apellido, String dni, String email,
                                             String telefono, String telefonoSecundario, Rol rol) {
+        Optional<User> existente = userRepository.findByDni(dni);
+        if (existente.isPresent()) {
+            return adjuntarRol(existente.get(), rol);
+        }
+
         List<String> errores = new ArrayList<>();
         if (userRepository.existsByUsername(dni)) {
             errores.add("Ya existe un usuario con username '" + dni + "'");
-        }
-        if (userRepository.existsByDni(dni)) {
-            errores.add("El DNI '" + dni + "' ya está en uso");
         }
         if (userRepository.existsByEmail(email)) {
             errores.add("El email '" + email + "' ya está en uso");
@@ -74,6 +78,24 @@ public class UserLookupPortImpl implements UserLookupPort {
         // tienen UI propia todavia y la cuenta se crea deshabilitada (ver
         // Reglas_de_Negocio.md).
         user.setEnabled(rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO);
+
+        return userRepository.save(user);
+    }
+
+    private User adjuntarRol(User user, Rol rol) {
+        if (user.getRoles().contains(rol)) {
+            throw new RolYaAsignadoException(user.getDni(), rol);
+        }
+
+        Set<Rol> nuevosRoles = new HashSet<>(user.getRoles());
+        nuevosRoles.add(rol);
+        user.setRoles(nuevosRoles);
+
+        // Si el rol nuevo requiere login inmediato, se habilita la cuenta
+        // (nunca se deshabilita una cuenta que ya estaba habilitada).
+        if (rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO) {
+            user.setEnabled(true);
+        }
 
         return userRepository.save(user);
     }

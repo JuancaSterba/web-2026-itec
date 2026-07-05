@@ -126,6 +126,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(RolYaAsignadoException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRolYaAsignado(
+            RolYaAsignadoException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("ROL_YA_ASIGNADO", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(
             IllegalArgumentException ex,
