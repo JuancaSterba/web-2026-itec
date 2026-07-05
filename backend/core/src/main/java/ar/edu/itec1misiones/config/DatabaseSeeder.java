@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@Profile("dev")
+@Profile("local")
 @RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
 

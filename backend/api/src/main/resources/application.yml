@@ -12,7 +12,7 @@ spring:
     converters:
       preferred-json-mapper: jackson
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
   config:
     import:

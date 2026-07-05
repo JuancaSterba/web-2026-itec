@@ -6,9 +6,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: ${DB_DDL_AUTO:update}
+      ddl-auto: validate
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
+  flyway:
+    enabled: true
 
 logging:
   level:

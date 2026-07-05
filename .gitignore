@@ -17,3 +17,5 @@ prompts/
 backend/skills-lock.json
 backend/AGENT.md
 docs/backend/registro_sesiones.md
+
+.playwright-mcp/
