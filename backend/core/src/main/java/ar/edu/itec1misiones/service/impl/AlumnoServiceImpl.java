@@ -50,7 +50,8 @@ public class AlumnoServiceImpl implements AlumnoService {
         // Si esto falla (DNI/email/telefono duplicado), la transaccion completa
         // se revierte -- no queda un Usuario huerfano sin Alumno asociado.
         User user = userLookupPort.crearConCredencialesPorDni(
-                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(), dto.getTelefono(), Rol.ALUMNO);
+                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(),
+                dto.getTelefono(), dto.getTelefonoSecundario(), Rol.ALUMNO);
 
         Alumno alumno = new Alumno();
         alumno.setUser(user);
@@ -101,6 +102,7 @@ public class AlumnoServiceImpl implements AlumnoService {
 
         alumno.setLegajo(request.getLegajo());
         alumno.setActivo(request.isActivo());
+        alumno.getUser().setTelefonoSecundario(request.getTelefonoSecundario());
 
         return toResponse(alumnoRepository.save(alumno));
     }
@@ -129,6 +131,7 @@ public class AlumnoServiceImpl implements AlumnoService {
                 .dni(user.getDni())
                 .email(user.getEmail())
                 .telefono(user.getTelefono())
+                .telefonoSecundario(user.getTelefonoSecundario())
                 .build();
     }
 }

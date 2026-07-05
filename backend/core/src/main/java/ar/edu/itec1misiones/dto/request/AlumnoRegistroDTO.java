@@ -30,4 +30,7 @@ public class AlumnoRegistroDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     @Pattern(regexp = "\\d{6,15}", message = "El teléfono debe contener entre 6 y 15 números")
     private String telefono;
+
+    @Pattern(regexp = "^$|\\d{6,15}", message = "El teléfono secundario debe contener entre 6 y 15 números")
+    private String telefonoSecundario;
 }

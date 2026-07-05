@@ -20,4 +20,5 @@ public class AlumnoResponse {
     private String dni;
     private String email;
     private String telefono;
+    private String telefonoSecundario;
 }
