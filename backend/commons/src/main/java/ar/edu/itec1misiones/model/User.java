@@ -18,8 +18,7 @@ import java.util.Set;
 @Table(name = "usuarios", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
         @UniqueConstraint(columnNames = "dni"),
-        @UniqueConstraint(columnNames = "email"),
-        @UniqueConstraint(columnNames = "telefono")
+        @UniqueConstraint(columnNames = "email")
 })
 @Getter
 @Setter
@@ -40,6 +39,7 @@ public class User implements UserDetails {
     private String dni;
     private String email;
     private String telefono;
+    private String telefonoSecundario;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))

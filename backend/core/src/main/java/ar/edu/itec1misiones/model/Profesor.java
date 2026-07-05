@@ -14,7 +14,6 @@ public class Profesor {
     private Long id;
 
     private String titulo;
-    private String telefonoContacto;
     private boolean activo = true;
 
     @OneToOne
