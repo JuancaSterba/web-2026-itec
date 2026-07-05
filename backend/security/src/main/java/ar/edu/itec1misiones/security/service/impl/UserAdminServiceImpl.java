@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,11 +50,20 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public UsuarioAdminResponse crear(CrearAdministradorRequest request) {
-        validarRolGestionable(request.getRol());
+        validarRolesGestionables(request.getRoles());
 
-        User user = userLookupPort.crearConCredencialesPorDni(
-                request.getNombre(), request.getApellido(), request.getDni(), request.getEmail(),
-                request.getTelefono(), null, request.getRol());
+        // Un usuario puede tener ADMIN y ADMINISTRATIVO a la vez (ej. un
+        // super-usuario para el director). crearConCredencialesPorDni ya
+        // resuelve "crear si el DNI es nuevo, adjuntar rol si ya existe" --
+        // se reusa ese mismo mecanismo llamandolo una vez por rol: la
+        // primera llamada crea el User, las siguientes le adjuntan el rol
+        // extra al mismo User.
+        User user = null;
+        for (Rol rol : request.getRoles()) {
+            user = userLookupPort.crearConCredencialesPorDni(
+                    request.getNombre(), request.getApellido(), request.getDni(), request.getEmail(),
+                    request.getTelefono(), null, rol);
+        }
 
         return toResponse(user);
     }
@@ -67,14 +77,18 @@ public class UserAdminServiceImpl implements UserAdminService {
             throw new AdministradorNotFoundException(id);
         }
 
-        validarRolGestionable(request.getRol());
+        validarRolesGestionables(request.getRoles());
+
+        Set<Rol> rolesActuales = user.getRoles().stream()
+                .filter(ROLES_GESTIONABLES::contains)
+                .collect(Collectors.toSet());
 
         boolean esUsuarioActual = user.getUsername().equals(SecurityUtils.getUsername());
-        boolean cambiaRol = !user.getRoles().contains(request.getRol());
+        boolean cambiaRoles = !rolesActuales.equals(request.getRoles());
         boolean seDeshabilita = !request.isEnabled();
 
-        if (esUsuarioActual && (cambiaRol || seDeshabilita)) {
-            throw new SelfActionNotAllowedException("No podés deshabilitarte o cambiar tu propio rol");
+        if (esUsuarioActual && (cambiaRoles || seDeshabilita)) {
+            throw new SelfActionNotAllowedException("No podés deshabilitarte o cambiar tus propios roles");
         }
 
         List<String> errores = new ArrayList<>();
@@ -87,7 +101,7 @@ public class UserAdminServiceImpl implements UserAdminService {
 
         Set<Rol> nuevosRoles = new HashSet<>(user.getRoles());
         nuevosRoles.removeAll(ROLES_GESTIONABLES);
-        nuevosRoles.add(request.getRol());
+        nuevosRoles.addAll(request.getRoles());
 
         userLookupPort.actualizarDniSiCambio(user, request.getDni());
         user.setNombre(request.getNombre());
@@ -114,17 +128,18 @@ public class UserAdminServiceImpl implements UserAdminService {
         return toResponse(userRepository.save(user));
     }
 
-    private void validarRolGestionable(Rol rol) {
-        if (!ROLES_GESTIONABLES.contains(rol)) {
-            throw new RolNoGestionableException("Rol no gestionable desde este módulo: " + rol);
+    private void validarRolesGestionables(Set<Rol> roles) {
+        for (Rol rol : roles) {
+            if (!ROLES_GESTIONABLES.contains(rol)) {
+                throw new RolNoGestionableException("Rol no gestionable desde este módulo: " + rol);
+            }
         }
     }
 
     private UsuarioAdminResponse toResponse(User user) {
-        Rol rolPrincipal = user.getRoles().stream()
+        Set<Rol> roles = user.getRoles().stream()
                 .filter(ROLES_GESTIONABLES::contains)
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toSet());
 
         return UsuarioAdminResponse.builder()
                 .id(user.getId())
@@ -135,7 +150,7 @@ public class UserAdminServiceImpl implements UserAdminService {
                 .dni(user.getDni())
                 .email(user.getEmail())
                 .telefono(user.getTelefono())
-                .rol(rolPrincipal)
+                .roles(roles)
                 .enabled(user.isEnabled())
                 .build();
     }

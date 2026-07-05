@@ -64,14 +64,14 @@ class UserAdminServiceImplTest {
         return user;
     }
 
-    private CrearAdministradorRequest buildCrearRequest(Rol rol) {
+    private CrearAdministradorRequest buildCrearRequest(Rol... roles) {
         CrearAdministradorRequest req = new CrearAdministradorRequest();
         req.setNombre("Ana");
         req.setApellido("Gómez");
         req.setDni("30111222");
         req.setEmail("ana@itec.edu.ar");
         req.setTelefono("3760000000");
-        req.setRol(rol);
+        req.setRoles(Set.of(roles));
         return req;
     }
 
@@ -112,9 +112,28 @@ class UserAdminServiceImplTest {
         assertThat(response.getUsername()).isEqualTo("30111222");
         assertThat(response.getLegajo()).isEqualTo("2026-30111222");
         assertThat(response.isEnabled()).isTrue();
-        assertThat(response.getRol()).isEqualTo(Rol.ADMIN);
+        assertThat(response.getRoles()).containsExactly(Rol.ADMIN);
 
         verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void crear_asignaAmbosRoles_siSeSeleccionanAdminYAdministrativoJuntos() {
+        CrearAdministradorRequest request = buildCrearRequest(Rol.ADMIN, Rol.ADMINISTRATIVO);
+        User despuesDeAdmin = buildUser(1L, "30111222", Rol.ADMIN, true);
+        User despuesDeAmbos = buildUser(1L, "30111222", Rol.ADMIN, true);
+        despuesDeAmbos.setRoles(new java.util.HashSet<>(Set.of(Rol.ADMIN, Rol.ADMINISTRATIVO)));
+
+        when(userLookupPort.crearConCredencialesPorDni(
+                "Ana", "Gómez", "30111222", "ana@itec.edu.ar", "3760000000", null, Rol.ADMIN))
+                .thenReturn(despuesDeAdmin);
+        when(userLookupPort.crearConCredencialesPorDni(
+                "Ana", "Gómez", "30111222", "ana@itec.edu.ar", "3760000000", null, Rol.ADMINISTRATIVO))
+                .thenReturn(despuesDeAmbos);
+
+        UsuarioAdminResponse response = service.crear(request);
+
+        assertThat(response.getRoles()).containsExactlyInAnyOrder(Rol.ADMIN, Rol.ADMINISTRATIVO);
     }
 
     @Test
@@ -151,7 +170,7 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail("ana@itec.edu.ar");
         request.setTelefono("3760000000");
-        request.setRol(Rol.ADMIN);
+        request.setRoles(Set.of(Rol.ADMIN));
         request.setEnabled(false);
 
         assertThatThrownBy(() -> service.actualizar(1L, request))
@@ -171,7 +190,7 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail("ana@itec.edu.ar");
         request.setTelefono("3760000000");
-        request.setRol(Rol.ADMINISTRATIVO);
+        request.setRoles(Set.of(Rol.ADMINISTRATIVO));
         request.setEnabled(true);
 
         assertThatThrownBy(() -> service.actualizar(1L, request))
@@ -190,14 +209,34 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail("ana2@itec.edu.ar");
         request.setTelefono("3760000001");
-        request.setRol(Rol.ADMIN);
+        request.setRoles(Set.of(Rol.ADMIN));
         request.setEnabled(false);
 
         UsuarioAdminResponse response = service.actualizar(2L, request);
 
         assertThat(response.getNombre()).isEqualTo("Ana Actualizada");
-        assertThat(response.getRol()).isEqualTo(Rol.ADMIN);
+        assertThat(response.getRoles()).containsExactly(Rol.ADMIN);
         assertThat(response.isEnabled()).isFalse();
+    }
+
+    @Test
+    void actualizar_asignaAmbosRoles_siSeSeleccionanAdminYAdministrativoJuntos() {
+        User otro = buildUser(2L, "22222222", Rol.ADMINISTRATIVO, true);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(otro));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        autenticarComo("11111111");
+
+        ActualizarAdministradorRequest request = new ActualizarAdministradorRequest();
+        request.setNombre("Ana");
+        request.setApellido("Gómez");
+        request.setEmail(otro.getEmail());
+        request.setTelefono(otro.getTelefono());
+        request.setRoles(Set.of(Rol.ADMIN, Rol.ADMINISTRATIVO));
+        request.setEnabled(true);
+
+        UsuarioAdminResponse response = service.actualizar(2L, request);
+
+        assertThat(response.getRoles()).containsExactlyInAnyOrder(Rol.ADMIN, Rol.ADMINISTRATIVO);
     }
 
     @Test
@@ -225,7 +264,7 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail("22222222@itec.edu.ar");
         request.setTelefono("3760000000");
-        request.setRol(Rol.ADMINISTRATIVO);
+        request.setRoles(Set.of(Rol.ADMINISTRATIVO));
         request.setEnabled(true);
 
         service.actualizar(2L, request);
@@ -243,7 +282,7 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail("55555555@itec.edu.ar");
         request.setTelefono("3760000000");
-        request.setRol(Rol.ADMIN);
+        request.setRoles(Set.of(Rol.ADMIN));
         request.setEnabled(true);
 
         assertThatThrownBy(() -> service.actualizar(5L, request))
@@ -275,7 +314,7 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail("colision@itec.edu.ar");
         request.setTelefono("3760000000");
-        request.setRol(Rol.ADMINISTRATIVO);
+        request.setRoles(Set.of(Rol.ADMINISTRATIVO));
         request.setEnabled(true);
 
         assertThatThrownBy(() -> service.actualizar(2L, request))
@@ -296,7 +335,7 @@ class UserAdminServiceImplTest {
         request.setApellido("Gómez");
         request.setEmail(otro.getEmail());
         request.setTelefono(otro.getTelefono());
-        request.setRol(Rol.ADMINISTRATIVO);
+        request.setRoles(Set.of(Rol.ADMINISTRATIVO));
         request.setEnabled(true);
 
         assertThatCode(() -> service.actualizar(2L, request)).doesNotThrowAnyException();
