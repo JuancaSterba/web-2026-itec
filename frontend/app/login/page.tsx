@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { LogIn, Eye, EyeOff, Loader2 } from "lucide-react"
+import Link from "next/link"
+import { LogIn, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,6 +40,13 @@ export default function LoginPage() {
     <div className="flex justify-center items-center min-h-screen bg-background">
       <Card glass className="w-full max-w-sm">
         <CardHeader>
+          <Link
+            href="/"
+            className="mb-2 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            Volver al inicio
+          </Link>
           <CardTitle className="flex items-center gap-2">
             <LogIn className="w-5 h-5" />
             Iniciar Sesión
