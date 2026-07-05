@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserCheck,
+  UserCog,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
@@ -24,6 +25,7 @@ export const navigation = [
   { name: "Comisiones", href: "/dashboard/comisiones", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
   { name: "Asistencias", href: "/dashboard/asistencias", icon: UserCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },
   { name: "Calificaciones", href: "/dashboard/notas", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },
+  { name: "Administradores", href: "/dashboard/administradores", icon: UserCog, roles: ["ADMIN"] },
   // { name: "Reportes", href: "/dashboard/reportes", icon: BarChart3, roles: ["ADMIN", "ADMINISTRATIVO"] }, // oculto: PENDIENTES.md Prioridad 1
   // { name: "Certificados", href: "/dashboard/certificados", icon: FileText, roles: ["ADMIN", "ADMINISTRATIVO"] }, // oculto: PENDIENTES.md Prioridad 1
   // { name: "Configuración", href: "/dashboard/configuraciones", icon: Settings, roles: ["ADMIN"] }, // oculto: PENDIENTES.md Prioridad 1
