@@ -33,4 +33,16 @@ public interface UserLookupPort {
      * si esa cuenta llegara a estar habilitada.
      */
     void deshabilitar(Long userId);
+
+    /**
+     * Actualiza el DNI de un usuario existente, si cambio, y recalcula su
+     * legajo (AAAA-DNI) con el nuevo DNI -- libera el legajo anterior, que
+     * quedaba "secuestrado" si el DNI original era un error de carga. No
+     * hace nada si nuevoDni es null o igual al DNI actual. Lanza
+     * IllegalArgumentException si el nuevo DNI ya esta en uso por otra
+     * persona. No persiste -- el caller es responsable de guardar el User
+     * (normalmente ya sucede como parte de la transaccion del alta/edicion
+     * de Alumno/Profesor/Administrador).
+     */
+    void actualizarDniSiCambio(User user, String nuevoDni);
 }

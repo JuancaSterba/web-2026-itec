@@ -107,4 +107,16 @@ public class UserLookupPortImpl implements UserLookupPort {
             userRepository.save(user);
         });
     }
+
+    @Override
+    public void actualizarDniSiCambio(User user, String nuevoDni) {
+        if (nuevoDni == null || nuevoDni.equals(user.getDni())) {
+            return;
+        }
+        if (userRepository.existsByDni(nuevoDni)) {
+            throw new IllegalArgumentException("El DNI '" + nuevoDni + "' ya está en uso");
+        }
+        user.setDni(nuevoDni);
+        user.setLegajo(LegajoGenerator.generar(nuevoDni));
+    }
 }
