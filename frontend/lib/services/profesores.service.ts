@@ -30,10 +30,14 @@ export interface CrearProfesorInput {
   telefonoSecundario: string
 }
 
-// ProfesorUpdateRequest del Core: dni, titulo, telefonoSecundario y activo
-// son editables. Si el dni cambia, el Core recalcula el legajo.
+// ProfesorUpdateRequest del Core: nombre, apellido, dni, email, titulo,
+// telefonoSecundario y activo son editables. Si el dni cambia, el Core
+// recalcula el legajo.
 export interface ActualizarProfesorInput {
+  nombre: string
+  apellido: string
   dni: string
+  email: string
   titulo: string
   telefonoSecundario: string
   activo: boolean
