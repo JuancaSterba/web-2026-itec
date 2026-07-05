@@ -49,6 +49,11 @@ export async function listarAlumnos(): Promise<Alumno[]> {
   return response.data
 }
 
+export async function buscarAlumnoPorDni(dni: string): Promise<Alumno> {
+  const response = await apiClient.get<Alumno[]>(`${BASE_PATH}/dni/${dni}`)
+  return response.data[0]
+}
+
 export async function crearAlumno(input: CrearAlumnoInput): Promise<Alumno> {
   const response = await apiClient.post<Alumno[]>(BASE_PATH, input)
   return response.data[0]
