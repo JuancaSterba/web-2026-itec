@@ -3,6 +3,8 @@ import apiClient from "@/lib/api-client"
 export type RolAdministrador = "ADMIN" | "ADMINISTRATIVO"
 
 // Coincide con UsuarioAdminResponse del backend (modulo security).
+// Un usuario puede tener ADMIN y ADMINISTRATIVO a la vez (ej. un
+// super-usuario para el director de la institucion).
 export interface Administrador {
   id: number
   username: string
@@ -12,7 +14,7 @@ export interface Administrador {
   dni: string
   email: string
   telefono: string
-  rol: RolAdministrador
+  roles: RolAdministrador[]
   enabled: boolean
 }
 
@@ -25,7 +27,7 @@ export interface CrearAdministradorInput {
   dni: string
   email: string
   telefono: string
-  rol: RolAdministrador
+  roles: RolAdministrador[]
 }
 
 export interface ActualizarAdministradorInput {
@@ -34,7 +36,7 @@ export interface ActualizarAdministradorInput {
   apellido: string
   email: string
   telefono: string
-  rol: RolAdministrador
+  roles: RolAdministrador[]
   enabled: boolean
 }
 

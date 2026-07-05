@@ -142,7 +142,13 @@ export default function AdministradoresPage() {
                   <TableCell>{administrador.dni}</TableCell>
                   <TableCell className="text-muted-foreground">{administrador.email}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{administrador.rol}</Badge>
+                    <div className="flex gap-1">
+                      {administrador.roles.map((rol) => (
+                        <Badge key={rol} variant="outline">
+                          {rol}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={administrador.enabled ? "default" : "secondary"}>

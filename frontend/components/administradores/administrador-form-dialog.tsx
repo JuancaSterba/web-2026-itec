@@ -36,7 +36,7 @@ const emptyForm = {
   dni: "",
   email: "",
   telefono: "",
-  rol: "ADMINISTRATIVO" as RolAdministrador,
+  roles: ["ADMINISTRATIVO"] as RolAdministrador[],
 }
 
 export function AdministradorFormDialog({
@@ -64,7 +64,7 @@ export function AdministradorFormDialog({
         dni: administrador?.dni ?? "",
         email: administrador?.email ?? "",
         telefono: administrador?.telefono ?? "",
-        rol: administrador?.rol ?? "ADMINISTRATIVO",
+        roles: administrador?.roles ?? ["ADMINISTRATIVO"],
       })
       setEnabled(administrador?.enabled ?? true)
       setError(null)
@@ -72,8 +72,15 @@ export function AdministradorFormDialog({
     }
   }, [open, administrador])
 
-  const setField = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const setField = (field: keyof Omit<typeof form, "roles">) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
+
+  const toggleRol = (rol: RolAdministrador) => {
+    setForm((prev) => ({
+      ...prev,
+      roles: prev.roles.includes(rol) ? prev.roles.filter((r) => r !== rol) : [...prev.roles, rol],
+    }))
+  }
 
   const handleDniBlur = async () => {
     if (isEditing || !/^\d{7,8}$/.test(form.dni)) {
@@ -95,6 +102,7 @@ export function AdministradorFormDialog({
 
   const validar = (): string | null => {
     if (!/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
+    if (form.roles.length === 0) return "Hay que seleccionar al menos un rol"
     if (!isEditing && personaExistente) return null
     if (!form.nombre.trim()) return "El nombre es obligatorio"
     if (!form.apellido.trim()) return "El apellido es obligatorio"
@@ -122,7 +130,7 @@ export function AdministradorFormDialog({
           apellido: form.apellido.trim(),
           email: form.email.trim(),
           telefono: form.telefono.trim(),
-          rol: form.rol,
+          roles: form.roles,
           enabled,
         })
         toast.success("Administrador actualizado correctamente")
@@ -134,7 +142,7 @@ export function AdministradorFormDialog({
           dni: form.dni.trim(),
           email: form.email.trim(),
           telefono: form.telefono.trim(),
-          rol: form.rol,
+          roles: form.roles,
         })
         toast.success("Administrador creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
@@ -158,8 +166,8 @@ export function AdministradorFormDialog({
           <DialogTitle>{isEditing ? "Editar administrador" : "Nuevo administrador"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? `Legajo ${administrador?.legajo}. DNI, datos de contacto, rol y estado son editables desde acá. Si cambiás el DNI, el legajo se recalcula automáticamente.`
-              : "El sistema crea automáticamente el usuario (username y contraseña = DNI)."}
+              ? `Legajo ${administrador?.legajo}. DNI, datos de contacto, roles y estado son editables desde acá. Se puede tener ADMIN y ADMINISTRATIVO a la vez. Si cambiás el DNI, el legajo se recalcula automáticamente.`
+              : "El sistema crea automáticamente el usuario (username y contraseña = DNI). Se puede asignar más de un rol a la vez."}
           </DialogDescription>
         </DialogHeader>
 
@@ -179,7 +187,7 @@ export function AdministradorFormDialog({
           {personaExistente && (
             <div className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm">
               Persona existente: {personaExistente.nombre} {personaExistente.apellido} · Legajo{" "}
-              {personaExistente.legajo}. Se le va a agregar el rol {form.rol}.
+              {personaExistente.legajo}. Se le van a agregar los roles: {form.roles.join(", ")}.
             </div>
           )}
 
@@ -210,13 +218,13 @@ export function AdministradorFormDialog({
           )}
 
           <div className="space-y-2">
-            <Label>Rol</Label>
+            <Label>Roles (se puede seleccionar más de uno)</Label>
             <div className="flex gap-2">
               <Button
                 type="button"
                 size="sm"
-                variant={form.rol === "ADMIN" ? "default" : "outline"}
-                onClick={() => setForm((prev) => ({ ...prev, rol: "ADMIN" }))}
+                variant={form.roles.includes("ADMIN") ? "default" : "outline"}
+                onClick={() => toggleRol("ADMIN")}
                 disabled={submitting || esUsuarioActual}
                 className="flex-1"
               >
@@ -225,8 +233,8 @@ export function AdministradorFormDialog({
               <Button
                 type="button"
                 size="sm"
-                variant={form.rol === "ADMINISTRATIVO" ? "default" : "outline"}
-                onClick={() => setForm((prev) => ({ ...prev, rol: "ADMINISTRATIVO" }))}
+                variant={form.roles.includes("ADMINISTRATIVO") ? "default" : "outline"}
+                onClick={() => toggleRol("ADMINISTRATIVO")}
                 disabled={submitting || esUsuarioActual}
                 className="flex-1"
               >
@@ -234,7 +242,7 @@ export function AdministradorFormDialog({
               </Button>
             </div>
             {esUsuarioActual && (
-              <p className="text-xs text-muted-foreground">No podés cambiar tu propio rol.</p>
+              <p className="text-xs text-muted-foreground">No podés cambiar tus propios roles.</p>
             )}
           </div>
 
