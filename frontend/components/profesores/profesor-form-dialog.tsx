@@ -60,9 +60,11 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     if (!form.apellido.trim()) return "El apellido es obligatorio"
     if (!/^\d{7,8}$/.test(form.dni)) return "El DNI debe tener 7 u 8 dígitos"
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "El email no es válido"
-    if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono debe tener entre 6 y 15 dígitos"
+    if (!/^\d{6,15}$/.test(form.telefono)) return "El teléfono personal debe tener entre 6 y 15 dígitos"
     if (!form.titulo.trim()) return "El título es obligatorio"
-    if (!form.telefonoContacto.trim()) return "El teléfono de contacto es obligatorio"
+    if (form.telefonoContacto.trim() && !/^\d{6,15}$/.test(form.telefonoContacto)) {
+      return "El teléfono secundario debe tener entre 6 y 15 dígitos"
+    }
     return null
   }
 
@@ -70,8 +72,12 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     e.preventDefault()
 
     if (isEditing) {
-      if (!form.titulo.trim() || !form.telefonoContacto.trim()) {
-        setError("Título y teléfono de contacto son obligatorios")
+      if (!form.titulo.trim()) {
+        setError("El título es obligatorio")
+        return
+      }
+      if (form.telefonoContacto.trim() && !/^\d{6,15}$/.test(form.telefonoContacto)) {
+        setError("El teléfono secundario debe tener entre 6 y 15 dígitos")
         return
       }
     } else {
@@ -117,7 +123,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
           <DialogTitle>{isEditing ? "Editar profesor" : "Nuevo profesor"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Título, teléfono de contacto y estado son los únicos datos editables desde acá."
+              ? "Título, teléfono secundario y estado son los únicos datos editables desde acá."
               : "El sistema crea automáticamente el usuario del profesor (username y contraseña = DNI)."}
           </DialogDescription>
         </DialogHeader>
@@ -154,7 +160,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="telefono">Teléfono</Label>
+                  <Label htmlFor="telefono">Teléfono Personal</Label>
                   <Input id="telefono" value={form.telefono} onChange={setField("telefono")} disabled={submitting} />
                 </div>
               </div>
@@ -178,7 +184,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefonoContacto">Teléfono de contacto</Label>
+              <Label htmlFor="telefonoContacto">Teléfono Secundario (opcional)</Label>
               <Input
                 id="telefonoContacto"
                 value={form.telefonoContacto}
