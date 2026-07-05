@@ -11,6 +11,7 @@ import apiClient from "@/lib/api-client"
 export type AuthUser = {
   username: string
   role: string
+  roles?: string[]
   nombres?: string
   apellido?: string
   dni?: string
@@ -24,6 +25,7 @@ type AuthContextType = {
   login: (username: string, password: string) => Promise<void>
   logout: () => void
   setUser: (user: AuthUser | null) => void
+  switchRole: (rol: string) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -43,9 +45,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const storedUsername = localStorage.getItem("username")
 
       if (storedToken && storedRole && storedUsername) {
+        let storedRoles: string[] | undefined
+        try {
+          const parsed = JSON.parse(localStorage.getItem("roles") || "[]")
+          storedRoles = Array.isArray(parsed) ? parsed : undefined
+        } catch {
+          storedRoles = undefined
+        }
+
         setUser({
           username: storedUsername,
           role: storedRole,
+          roles: storedRoles,
           nombres: localStorage.getItem("nombres") || undefined,
           apellido: localStorage.getItem("apellido") || undefined,
           dni: localStorage.getItem("dni") || undefined,
@@ -140,8 +151,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.replace("/login")
   }, [setToken, router])
 
+  // Cambia el rol activo de un usuario multi-rol sin volver a loguearse: el
+  // JWT ya trae todos los roles (localStorage "roles"), esto solo cambia
+  // cual es el activo (localStorage "user-role" + contexto).
+  const switchRole = useCallback(
+    (rol: string) => {
+      localStorage.setItem("user-role", rol)
+      setUser((prev) => (prev ? { ...prev, role: rol } : prev))
+    },
+    []
+  )
+
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, setUser }}>
+    <AuthContext.Provider value={{ token, user, login, logout, setUser, switchRole }}>
       {children}
     </AuthContext.Provider>
   )
