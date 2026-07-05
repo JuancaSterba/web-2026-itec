@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { Plus, Search, Pencil, Trash2, GraduationCap } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, GraduationCap, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { AlumnoFormDialog } from "@/components/alumnos/alumno-form-dialog"
 import { EliminarAlumnoDialog } from "@/components/alumnos/eliminar-alumno-dialog"
+import { InscribirCarreraDialog } from "@/components/alumnos/inscribir-carrera-dialog"
 import { RequireRole } from "@/components/auth/require-role"
 import { listarAlumnos, type Alumno } from "@/lib/services/alumnos.service"
 
@@ -31,6 +32,9 @@ export default function AlumnosPage() {
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingAlumno, setDeletingAlumno] = useState<Alumno | null>(null)
+
+  const [inscribirCarreraOpen, setInscribirCarreraOpen] = useState(false)
+  const [alumnoParaInscribir, setAlumnoParaInscribir] = useState<Alumno | null>(null)
 
   const cargarAlumnos = async () => {
     setLoading(true)
@@ -71,6 +75,11 @@ export default function AlumnosPage() {
   const abrirEliminar = (alumno: Alumno) => {
     setDeletingAlumno(alumno)
     setDeleteOpen(true)
+  }
+
+  const abrirInscribirCarrera = (alumno: Alumno) => {
+    setAlumnoParaInscribir(alumno)
+    setInscribirCarreraOpen(true)
   }
 
   const handleGuardado = (alumno: Alumno) => {
@@ -155,6 +164,14 @@ export default function AlumnosPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => abrirInscribirCarrera(alumno)}
+                        aria-label="Inscribir en Carrera"
+                      >
+                        <BookOpen className="size-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => abrirEditar(alumno)} aria-label="Editar">
                         <Pencil className="size-4" />
                       </Button>
@@ -181,6 +198,11 @@ export default function AlumnosPage() {
         onOpenChange={setDeleteOpen}
         alumno={deletingAlumno}
         onSuccess={handleEliminado}
+      />
+      <InscribirCarreraDialog
+        open={inscribirCarreraOpen}
+        onOpenChange={setInscribirCarreraOpen}
+        alumno={alumnoParaInscribir}
       />
     </div>
     </RequireRole>
