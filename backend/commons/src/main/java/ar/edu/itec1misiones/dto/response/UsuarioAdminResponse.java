@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,6 +21,6 @@ public class UsuarioAdminResponse {
     private String dni;
     private String email;
     private String telefono;
-    private Rol rol;
+    private Set<Rol> roles;
     private boolean enabled;
 }
