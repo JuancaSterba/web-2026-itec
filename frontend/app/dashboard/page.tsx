@@ -1,4 +1,4 @@
-import DashboardStats from "@/components/dashboard/dashboard-stats"
+// import DashboardStats from "@/components/dashboard/dashboard-stats" // oculto: KPIs mockeados, PENDIENTES.md Prioridad 1
 import RecentActivity from "@/components/dashboard/recent-activity"
 import AcademicChart from "@/components/dashboard/academic-chart"
 
@@ -10,7 +10,7 @@ export default function DashboardPage() {
         <p className="text-sm text-muted-foreground">Resumen general de la institución</p>
       </div>
 
-      <DashboardStats />
+      {/* <DashboardStats /> oculto: KPIs mockeados, PENDIENTES.md Prioridad 1 */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AcademicChart />
