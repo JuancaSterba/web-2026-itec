@@ -49,10 +49,10 @@ public class AsistenciaController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Asistencia>> listar(
-            @RequestParam(required = false) Long comisionId,
+            @RequestParam(required = false) Long cursadaId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpServletRequest httpRequest) {
-        List<Asistencia> asistencias = asistenciaService.listar(comisionId, fecha);
+        List<Asistencia> asistencias = asistenciaService.listar(cursadaId, fecha);
         return ResponseEntity.ok(
                 ApiResponse.<Asistencia>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))

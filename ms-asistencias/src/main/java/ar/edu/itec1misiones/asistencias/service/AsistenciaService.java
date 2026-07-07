@@ -21,21 +21,19 @@ public class AsistenciaService {
 
     public Asistencia crear(AsistenciaRequest request) {
         Asistencia asistencia = new Asistencia();
-        asistencia.setAlumnoId(request.getAlumnoId());
-        asistencia.setComisionId(request.getComisionId());
+        asistencia.setCursadaId(request.getCursadaId());
         asistencia.setFecha(request.getFecha());
         asistencia.setEstado(request.getEstado());
         return asistenciaRepository.save(asistencia);
     }
 
-    public List<Asistencia> listar(Long comisionId, LocalDate fecha) {
-        return asistenciaRepository.buscarPorFiltros(comisionId, fecha);
+    public List<Asistencia> listar(Long cursadaId, LocalDate fecha) {
+        return asistenciaRepository.buscarPorFiltros(cursadaId, fecha);
     }
 
     public Asistencia actualizar(Long id, AsistenciaRequest request) {
         Asistencia asistencia = buscarPorId(id);
-        asistencia.setAlumnoId(request.getAlumnoId());
-        asistencia.setComisionId(request.getComisionId());
+        asistencia.setCursadaId(request.getCursadaId());
         asistencia.setFecha(request.getFecha());
         asistencia.setEstado(request.getEstado());
         return asistenciaRepository.save(asistencia);

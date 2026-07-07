@@ -2,9 +2,9 @@ package ar.edu.itec1misiones.notas.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
-import ar.edu.itec1misiones.notas.dto.NotaRequest;
-import ar.edu.itec1misiones.notas.model.Nota;
-import ar.edu.itec1misiones.notas.service.NotaService;
+import ar.edu.itec1misiones.notas.dto.CalificacionParcialRequest;
+import ar.edu.itec1misiones.notas.model.CalificacionParcial;
+import ar.edu.itec1misiones.notas.service.CalificacionParcialService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,51 +22,51 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/notas")
-public class NotaController {
+@RequestMapping("/api/calificaciones-parciales")
+public class CalificacionParcialController {
 
-    private final NotaService notaService;
+    private final CalificacionParcialService calificacionParcialService;
 
-    public NotaController(NotaService notaService) {
-        this.notaService = notaService;
+    public CalificacionParcialController(CalificacionParcialService calificacionParcialService) {
+        this.calificacionParcialService = calificacionParcialService;
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Nota>> crear(
-            @RequestBody @Valid NotaRequest request,
+    public ResponseEntity<ApiResponse<CalificacionParcial>> crear(
+            @RequestBody @Valid CalificacionParcialRequest request,
             HttpServletRequest httpRequest) {
 
-        Nota nota = notaService.crear(request);
+        CalificacionParcial calificacion = calificacionParcialService.crear(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<Nota>builder()
+                ApiResponse.<CalificacionParcial>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(nota))
+                        .data(List.of(calificacion))
                         .build()
         );
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Nota>> listar(
-            @RequestParam(required = false) Long examenId,
+    public ResponseEntity<ApiResponse<CalificacionParcial>> listar(
+            @RequestParam(required = false) Long cursadaId,
             HttpServletRequest httpRequest) {
-        List<Nota> notas = notaService.listar(examenId);
+        List<CalificacionParcial> calificaciones = calificacionParcialService.listar(cursadaId);
         return ResponseEntity.ok(
-                ApiResponse.<Nota>builder()
+                ApiResponse.<CalificacionParcial>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(notas)
+                        .data(calificaciones)
                         .build()
         );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Nota>> actualizar(
+    public ResponseEntity<ApiResponse<CalificacionParcial>> actualizar(
             @PathVariable Long id,
-            @RequestBody @Valid NotaRequest request,
+            @RequestBody @Valid CalificacionParcialRequest request,
             HttpServletRequest httpRequest) {
 
-        Nota actualizada = notaService.actualizar(id, request);
+        CalificacionParcial actualizada = calificacionParcialService.actualizar(id, request);
         return ResponseEntity.ok(
-                ApiResponse.<Nota>builder()
+                ApiResponse.<CalificacionParcial>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
                         .data(List.of(actualizada))
                         .build()
@@ -78,11 +78,11 @@ public class NotaController {
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
-        notaService.eliminar(id);
+        calificacionParcialService.eliminar(id);
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of("Nota eliminada correctamente"))
+                        .data(List.of("Calificación parcial eliminada correctamente"))
                         .build()
         );
     }

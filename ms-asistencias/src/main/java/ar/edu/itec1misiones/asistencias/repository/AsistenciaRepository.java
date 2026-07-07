@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
 
-    @Query("SELECT a FROM Asistencia a WHERE (:comisionId IS NULL OR a.comisionId = :comisionId) AND (CAST(:fecha AS date) IS NULL OR a.fecha = :fecha)")
-    List<Asistencia> buscarPorFiltros(@Param("comisionId") Long comisionId, @Param("fecha") LocalDate fecha);
+    @Query("SELECT a FROM Asistencia a WHERE (:cursadaId IS NULL OR a.cursadaId = :cursadaId) AND (CAST(:fecha AS date) IS NULL OR a.fecha = :fecha)")
+    List<Asistencia> buscarPorFiltros(@Param("cursadaId") Long cursadaId, @Param("fecha") LocalDate fecha);
 }

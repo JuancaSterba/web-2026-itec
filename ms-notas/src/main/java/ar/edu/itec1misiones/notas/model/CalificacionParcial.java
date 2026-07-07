@@ -16,17 +16,20 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Examen {
+public class CalificacionParcial {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "El ID de la comision es obligatorio")
-    private Long comisionId;
+    @NotNull(message = "El ID de la cursada es obligatorio")
+    private Long cursadaId;
 
-    @NotBlank(message = "El nombre del examen es obligatorio")
-    private String nombre;
+    @NotBlank(message = "La instancia es obligatoria")
+    private String instancia;
+
+    @NotNull(message = "La nota es obligatoria")
+    private Double nota;
 
     @NotNull(message = "La fecha es obligatoria")
     private LocalDate fecha;
