@@ -14,16 +14,25 @@ function formatLabel(segment: string) {
     .join(" ")
 }
 
+// Segmentos de URL puramente estructurales, sin page.tsx propio
+// (ej: /ciclos/[id]/periodos/ no existe, solo /periodos/[periodoId]/comisiones).
+// Clickearlos da 404, asi que no se renderizan como Link.
+const SEGMENTOS_NO_NAVEGABLES = new Set(["periodos", "planes"])
+
 export default function Breadcrumbs() {
   const pathname = usePathname()
   const segments = pathname.split("/").filter(Boolean)
 
   if (segments.length === 0) return null
 
-  const crumbs = segments.map((segment, index) => ({
-    label: formatLabel(segment),
-    href: "/" + segments.slice(0, index + 1).join("/"),
-  }))
+  const crumbs = segments.map((segment, index) => {
+    const anterior = segments[index - 1]
+    return {
+      label: formatLabel(segment),
+      href: "/" + segments.slice(0, index + 1).join("/"),
+      navegable: !SEGMENTOS_NO_NAVEGABLES.has(segment) && anterior !== "periodos",
+    }
+  })
 
   return (
     <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 px-6 pt-4 text-sm text-muted-foreground">
@@ -32,8 +41,8 @@ export default function Breadcrumbs() {
         return (
           <span key={crumb.href} className="flex items-center gap-1.5">
             {index > 0 && <ChevronRight className="size-3.5 shrink-0" />}
-            {isLast ? (
-              <span className={cn("font-medium text-foreground")}>{crumb.label}</span>
+            {isLast || !crumb.navegable ? (
+              <span className={cn(isLast && "font-medium text-foreground")}>{crumb.label}</span>
             ) : (
               <Link href={crumb.href} className="transition-colors hover:text-foreground">
                 {crumb.label}
