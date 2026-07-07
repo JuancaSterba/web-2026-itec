@@ -11,11 +11,10 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CuatrimestreResponse {
+public class PeriodoAcademicoResponse {
     private Long id;
-    private Integer anio;
-    private Integer numero;
+    private String nombre;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private boolean actual;
+    private Long cicloLectivoId;
 }

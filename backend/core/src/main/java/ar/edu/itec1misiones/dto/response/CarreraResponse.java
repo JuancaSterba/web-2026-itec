@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class CarreraResponse {
     private Long id;
     private String nombre;
-    private String descripcion;
-    private String resolucion;
+    private String resolucionMinisterial;
     private boolean activa;
 }

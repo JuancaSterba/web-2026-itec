@@ -9,13 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlumnoCarreraResponse {
+public class MateriaPlanResponse {
     private Long id;
-    private Long alumnoId;
-    private String alumnoNombreCompleto;
-    private Long carreraId;
-    private String carreraNombre;
     private Long planEstudioId;
-    private String planEstudioResolucion;
-    private Integer anioIngreso;
+    private Long materiaId;
+    private String materiaNombre;
+    private Integer cuatrimestreDictado;
+    private Integer cargaHoraria;
 }

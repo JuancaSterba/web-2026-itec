@@ -9,14 +9,12 @@ import java.time.LocalDate;
 @Data
 public class PlanEstudioRequest {
 
-    @NotBlank(message = "La validez es obligatoria")
-    private String validez;
+    @NotBlank(message = "El cohorte es obligatorio")
+    private String cohorte;
 
     private String resolucion;
 
-    private LocalDate fechaInicio;
-
-    private LocalDate fechaFin;
+    private LocalDate fechaImplementacion;
 
     @NotNull(message = "El ID de la carrera es obligatorio")
     private Long carreraId;

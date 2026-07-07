@@ -6,10 +6,10 @@ import ar.edu.itec1misiones.dto.response.ModuloHorarioResponse;
 import ar.edu.itec1misiones.exception.ComisionNotFoundException;
 import ar.edu.itec1misiones.exception.HorarioClaseNotFoundException;
 import ar.edu.itec1misiones.exception.ModuloHorarioNotFoundException;
-import ar.edu.itec1misiones.model.ComisionMateria;
+import ar.edu.itec1misiones.model.Comision;
 import ar.edu.itec1misiones.model.HorarioClase;
 import ar.edu.itec1misiones.model.ModuloHorario;
-import ar.edu.itec1misiones.repository.ComisionMateriaRepository;
+import ar.edu.itec1misiones.repository.ComisionRepository;
 import ar.edu.itec1misiones.repository.HorarioClaseRepository;
 import ar.edu.itec1misiones.repository.ModuloHorarioRepository;
 import ar.edu.itec1misiones.service.HorarioClaseService;
@@ -25,7 +25,7 @@ import java.util.List;
 public class HorarioClaseServiceImpl implements HorarioClaseService {
 
     private final HorarioClaseRepository horarioClaseRepository;
-    private final ComisionMateriaRepository comisionMateriaRepository;
+    private final ComisionRepository comisionRepository;
     private final ModuloHorarioRepository moduloHorarioRepository;
 
     @Override
@@ -69,7 +69,7 @@ public class HorarioClaseServiceImpl implements HorarioClaseService {
     @Override
     @Transactional(readOnly = true)
     public List<HorarioClaseResponse> getByComisionId(Long comisionId) {
-        if (!comisionMateriaRepository.existsById(comisionId)) {
+        if (!comisionRepository.existsById(comisionId)) {
             throw new ComisionNotFoundException(comisionId);
         }
         return horarioClaseRepository.findByComisionId(comisionId).stream()
@@ -78,7 +78,7 @@ public class HorarioClaseServiceImpl implements HorarioClaseService {
     }
 
     private void mapFromRequest(HorarioClase horario, HorarioClaseRequest request) {
-        ComisionMateria comision = comisionMateriaRepository.findById(request.getComisionId())
+        Comision comision = comisionRepository.findById(request.getComisionId())
                 .orElseThrow(() -> new ComisionNotFoundException(request.getComisionId()));
 
         List<ModuloHorario> modulos = request.getModulosIds().stream()
@@ -105,7 +105,7 @@ public class HorarioClaseServiceImpl implements HorarioClaseService {
                 .id(horario.getId())
                 .diaSemana(horario.getDiaSemana())
                 .comisionId(horario.getComision().getId())
-                .materiaNombre(horario.getComision().getMateria().getNombre())
+                .materiaNombre(horario.getComision().getMateriaPlan().getMateria().getNombre())
                 .modulos(modulosResponse)
                 .build();
     }

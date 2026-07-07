@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/materias")
-@Tag(name = "Materias", description = "Gestión de materias y sus correlativas")
+@Tag(name = "Materias", description = "Gestión del catálogo maestro de materias")
 public class MateriaController {
 
     private final MateriaService materiaService;
@@ -48,22 +48,6 @@ public class MateriaController {
     @Operation(summary = "Listar todas las materias activas")
     public ResponseEntity<ApiResponse<MateriaResponse>> listar(HttpServletRequest httpRequest) {
         List<MateriaResponse> materias = materiaService.listarActivas();
-        return ResponseEntity.ok(
-                ApiResponse.<MateriaResponse>builder()
-                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(materias)
-                        .build()
-        );
-    }
-
-    @GetMapping("/plan/{planId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Listar materias activas de un plan de estudio")
-    public ResponseEntity<ApiResponse<MateriaResponse>> listarPorPlan(
-            @PathVariable Long planId,
-            HttpServletRequest httpRequest) {
-
-        List<MateriaResponse> materias = materiaService.listarActivasPorPlan(planId);
         return ResponseEntity.ok(
                 ApiResponse.<MateriaResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
@@ -117,40 +101,6 @@ public class MateriaController {
                 ApiResponse.<String>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
                         .data(List.of("Materia desactivada correctamente"))
-                        .build()
-        );
-    }
-
-    @PostMapping("/{id}/correlativas")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Asignar correlativas a una materia")
-    public ResponseEntity<ApiResponse<MateriaResponse>> asignarCorrelativas(
-            @PathVariable Long id,
-            @RequestBody List<Long> correlativasIds,
-            HttpServletRequest httpRequest) {
-
-        MateriaResponse materia = materiaService.asignarCorrelativas(id, correlativasIds);
-        return ResponseEntity.ok(
-                ApiResponse.<MateriaResponse>builder()
-                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(materia))
-                        .build()
-        );
-    }
-
-    @DeleteMapping("/{id}/correlativas/{correlativaId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Eliminar una correlativa de una materia")
-    public ResponseEntity<ApiResponse<MateriaResponse>> eliminarCorrelativa(
-            @PathVariable Long id,
-            @PathVariable Long correlativaId,
-            HttpServletRequest httpRequest) {
-
-        MateriaResponse materia = materiaService.eliminarCorrelativa(id, correlativaId);
-        return ResponseEntity.ok(
-                ApiResponse.<MateriaResponse>builder()
-                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(materia))
                         .build()
         );
     }

@@ -1,10 +1,10 @@
 package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
-import ar.edu.itec1misiones.dto.request.ComisionRequest;
-import ar.edu.itec1misiones.dto.response.ComisionResponse;
+import ar.edu.itec1misiones.dto.request.CicloLectivoRequest;
+import ar.edu.itec1misiones.dto.response.CicloLectivoResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
-import ar.edu.itec1misiones.service.ComisionService;
+import ar.edu.itec1misiones.service.CicloLectivoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,54 +18,54 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comisiones")
+@RequestMapping("/api/ciclos-lectivos")
 @RequiredArgsConstructor
-@Tag(name = "Comisiones", description = "Gestión de comisiones por periodo académico y materia de plan")
-public class ComisionController {
+@Tag(name = "Ciclos Lectivos", description = "Gestión de años lectivos")
+public class CicloLectivoController {
 
-    private final ComisionService comisionService;
+    private final CicloLectivoService cicloLectivoService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Crear una nueva comisión")
-    public ResponseEntity<ApiResponse<ComisionResponse>> guardar(
-            @RequestBody @Valid ComisionRequest request,
+    @Operation(summary = "Crear un nuevo ciclo lectivo")
+    public ResponseEntity<ApiResponse<CicloLectivoResponse>> guardar(
+            @RequestBody @Valid CicloLectivoRequest request,
             HttpServletRequest httpRequest) {
 
-        ComisionResponse comision = comisionService.guardar(request);
+        CicloLectivoResponse ciclo = cicloLectivoService.guardar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<ComisionResponse>builder()
+                ApiResponse.<CicloLectivoResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(comision))
+                        .data(List.of(ciclo))
                         .build()
         );
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Listar todas las comisiones")
-    public ResponseEntity<ApiResponse<ComisionResponse>> buscarTodos(HttpServletRequest httpRequest) {
-        List<ComisionResponse> comisiones = comisionService.buscarTodos();
+    @Operation(summary = "Listar todos los ciclos lectivos")
+    public ResponseEntity<ApiResponse<CicloLectivoResponse>> buscarTodos(HttpServletRequest httpRequest) {
+        List<CicloLectivoResponse> ciclos = cicloLectivoService.buscarTodos();
         return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
+                ApiResponse.<CicloLectivoResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(comisiones)
+                        .data(ciclos)
                         .build()
         );
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Obtener una comisión por ID")
-    public ResponseEntity<ApiResponse<ComisionResponse>> buscarPorId(
+    @Operation(summary = "Obtener un ciclo lectivo por ID")
+    public ResponseEntity<ApiResponse<CicloLectivoResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
-        ComisionResponse comision = comisionService.buscarPorId(id);
+        CicloLectivoResponse ciclo = cicloLectivoService.buscarPorId(id);
         return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
+                ApiResponse.<CicloLectivoResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(comision))
+                        .data(List.of(ciclo))
                         .build()
         );
     }

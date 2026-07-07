@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MateriaResponse {
+public class CicloLectivoResponse {
     private Long id;
-    private String nombre;
-    private String codigoInterno;
-    private String descripcion;
-    private boolean activa;
+    private Integer anio;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
+    private boolean activo;
 }

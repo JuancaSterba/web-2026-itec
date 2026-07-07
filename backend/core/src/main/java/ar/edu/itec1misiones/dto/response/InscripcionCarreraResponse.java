@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MateriaResponse {
+public class InscripcionCarreraResponse {
     private Long id;
-    private String nombre;
-    private String codigoInterno;
-    private String descripcion;
-    private boolean activa;
+    private Long alumnoId;
+    private Long planEstudioId;
+    private LocalDate fechaInscripcion;
+    private String estado;
 }

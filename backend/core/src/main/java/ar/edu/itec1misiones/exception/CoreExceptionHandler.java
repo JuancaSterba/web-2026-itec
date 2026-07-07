@@ -77,12 +77,68 @@ public class CoreExceptionHandler {
         );
     }
 
-    @ExceptionHandler(CuatrimestreNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleCuatrimestreNotFound(
-            CuatrimestreNotFoundException ex,
+    @ExceptionHandler(CicloLectivoNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCicloLectivoNotFound(
+            CicloLectivoNotFoundException ex,
             HttpServletRequest request) {
 
-        ErrorDto error = new ErrorDto("CUATRIMESTRE_NOT_FOUND", ex.getMessage());
+        ErrorDto error = new ErrorDto("CICLO_LECTIVO_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(PeriodoAcademicoNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handlePeriodoAcademicoNotFound(
+            PeriodoAcademicoNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("PERIODO_ACADEMICO_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(InscripcionCarreraNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInscripcionCarreraNotFound(
+            InscripcionCarreraNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("INSCRIPCION_CARRERA_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(CursadaNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCursadaNotFound(
+            CursadaNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("CURSADA_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MateriaPlanNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMateriaPlanNotFound(
+            MateriaPlanNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("MATERIA_PLAN_NOT_FOUND", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ApiResponse.builder()
                         .meta(MetaBuilderHelper.buildMeta(request))
@@ -161,59 +217,4 @@ public class CoreExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AlumnoInscriptoNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleAlumnoInscriptoNotFound(
-            AlumnoInscriptoNotFoundException ex,
-            HttpServletRequest request) {
-
-        ErrorDto error = new ErrorDto("ALUMNO_INSCRIPTO_NOT_FOUND", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                ApiResponse.builder()
-                        .meta(MetaBuilderHelper.buildMeta(request))
-                        .errors(List.of(error))
-                        .build()
-        );
-    }
-
-    @ExceptionHandler(AlumnoYaInscriptoEnMateriaException.class)
-    public ResponseEntity<ApiResponse<Object>> handleAlumnoYaInscriptoEnMateria(
-            AlumnoYaInscriptoEnMateriaException ex,
-            HttpServletRequest request) {
-
-        ErrorDto error = new ErrorDto("ALUMNO_YA_INSCRIPTO_EN_MATERIA", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                ApiResponse.builder()
-                        .meta(MetaBuilderHelper.buildMeta(request))
-                        .errors(List.of(error))
-                        .build()
-        );
-    }
-
-    @ExceptionHandler(ComisionInactivaException.class)
-    public ResponseEntity<ApiResponse<Object>> handleComisionInactiva(
-            ComisionInactivaException ex,
-            HttpServletRequest request) {
-
-        ErrorDto error = new ErrorDto("COMISION_INACTIVA", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ApiResponse.builder()
-                        .meta(MetaBuilderHelper.buildMeta(request))
-                        .errors(List.of(error))
-                        .build()
-        );
-    }
-
-    @ExceptionHandler(CupoComisionLlenoException.class)
-    public ResponseEntity<ApiResponse<Object>> handleCupoComisionLleno(
-            CupoComisionLlenoException ex,
-            HttpServletRequest request) {
-
-        ErrorDto error = new ErrorDto("CUPO_COMISION_LLENO", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                ApiResponse.builder()
-                        .meta(MetaBuilderHelper.buildMeta(request))
-                        .errors(List.of(error))
-                        .build()
-        );
-    }
 }

@@ -8,21 +8,16 @@ import lombok.Data;
 @Data
 public class ComisionRequest {
 
-    @NotBlank(message = "El nombre es obligatorio")
-    private String nombre;
+    @NotBlank(message = "El nombre de la comisión es obligatorio")
+    private String nombreComision;
 
-    @NotNull(message = "El cupo es obligatorio")
-    @Min(value = 1, message = "El cupo debe ser mayor a 0")
-    private Integer cupo;
+    @NotNull(message = "El cupo máximo es obligatorio")
+    @Min(value = 1, message = "El cupo máximo debe ser mayor a 0")
+    private Integer cupoMaximo;
 
-    @NotNull(message = "El ID de la materia es obligatorio")
-    private Long materiaId;
+    @NotNull(message = "El ID del periodo académico es obligatorio")
+    private Long periodoAcademicoId;
 
-    @NotNull(message = "El ID del cuatrimestre es obligatorio")
-    private Long cuatrimestreId;
-
-    @NotNull(message = "El ID del profesor es obligatorio")
-    private Long profesorId;
-
-    private boolean activa = true;
+    @NotNull(message = "El ID de la materia de plan es obligatorio")
+    private Long materiaPlanId;
 }

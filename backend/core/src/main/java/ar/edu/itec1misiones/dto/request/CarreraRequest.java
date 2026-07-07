@@ -9,7 +9,5 @@ public class CarreraRequest {
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
-    private String descripcion;
-
-    private String resolucion;
+    private String resolucionMinisterial;
 }

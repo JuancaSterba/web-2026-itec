@@ -1,10 +1,10 @@
 package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
-import ar.edu.itec1misiones.dto.request.ComisionRequest;
-import ar.edu.itec1misiones.dto.response.ComisionResponse;
+import ar.edu.itec1misiones.dto.request.MateriaPlanRequest;
+import ar.edu.itec1misiones.dto.response.MateriaPlanResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
-import ar.edu.itec1misiones.service.ComisionService;
+import ar.edu.itec1misiones.service.MateriaPlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,54 +18,54 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comisiones")
+@RequestMapping("/api/materias-plan")
 @RequiredArgsConstructor
-@Tag(name = "Comisiones", description = "Gestión de comisiones por periodo académico y materia de plan")
-public class ComisionController {
+@Tag(name = "Estructura Curricular", description = "Gestión de materias dictadas dentro de un plan de estudio")
+public class MateriaPlanController {
 
-    private final ComisionService comisionService;
+    private final MateriaPlanService materiaPlanService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Crear una nueva comisión")
-    public ResponseEntity<ApiResponse<ComisionResponse>> guardar(
-            @RequestBody @Valid ComisionRequest request,
+    @Operation(summary = "Agregar una materia a un plan de estudio")
+    public ResponseEntity<ApiResponse<MateriaPlanResponse>> guardar(
+            @RequestBody @Valid MateriaPlanRequest request,
             HttpServletRequest httpRequest) {
 
-        ComisionResponse comision = comisionService.guardar(request);
+        MateriaPlanResponse materiaPlan = materiaPlanService.guardar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<ComisionResponse>builder()
+                ApiResponse.<MateriaPlanResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(comision))
+                        .data(List.of(materiaPlan))
                         .build()
         );
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Listar todas las comisiones")
-    public ResponseEntity<ApiResponse<ComisionResponse>> buscarTodos(HttpServletRequest httpRequest) {
-        List<ComisionResponse> comisiones = comisionService.buscarTodos();
+    @Operation(summary = "Listar toda la estructura curricular")
+    public ResponseEntity<ApiResponse<MateriaPlanResponse>> buscarTodos(HttpServletRequest httpRequest) {
+        List<MateriaPlanResponse> materiasPlan = materiaPlanService.buscarTodos();
         return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
+                ApiResponse.<MateriaPlanResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(comisiones)
+                        .data(materiasPlan)
                         .build()
         );
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    @Operation(summary = "Obtener una comisión por ID")
-    public ResponseEntity<ApiResponse<ComisionResponse>> buscarPorId(
+    @Operation(summary = "Obtener una materia de plan por ID")
+    public ResponseEntity<ApiResponse<MateriaPlanResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
-        ComisionResponse comision = comisionService.buscarPorId(id);
+        MateriaPlanResponse materiaPlan = materiaPlanService.buscarPorId(id);
         return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
+                ApiResponse.<MateriaPlanResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(List.of(comision))
+                        .data(List.of(materiaPlan))
                         .build()
         );
     }
