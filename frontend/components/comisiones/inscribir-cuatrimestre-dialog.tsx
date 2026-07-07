@@ -85,22 +85,28 @@ export default function InscribirCuatrimestreDialog({
           <DialogTitle>Matricular Alumno en Todo el Cuatrimestre</DialogTitle>
         </DialogHeader>
         <form ref={formRef} action={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="alumnoId">Alumno</Label>
-            <select
-              id="alumnoId"
-              name="alumnoId"
-              required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Seleccioná un alumno</option>
-              {alumnosDisponibles.map((alumno) => (
-                <option key={alumno.id} value={alumno.id}>
-                  {alumno.nombre} {alumno.apellido} — DNI {alumno.dni}
-                </option>
-              ))}
-            </select>
-          </div>
+          {alumnosDisponibles.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No hay alumnos inscriptos a la carrera de este período que falten matricular.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor="alumnoId">Alumno</Label>
+              <select
+                id="alumnoId"
+                name="alumnoId"
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="">Seleccioná un alumno</option>
+                {alumnosDisponibles.map((alumno) => (
+                  <option key={alumno.id} value={alumno.id}>
+                    {alumno.nombre} {alumno.apellido} — DNI {alumno.dni}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">
             Se creará una matriculación en cada una de las {comisionesDelPeriodo.length} comisiones de este
             período (las que el alumno ya tenga se omiten).
