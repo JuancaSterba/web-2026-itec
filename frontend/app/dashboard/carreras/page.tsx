@@ -2,6 +2,9 @@ import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import NuevaCarreraDialog from "@/components/carreras/nueva-carrera-dialog"
+import EditarCarreraDialog from "@/components/carreras/editar-carrera-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteCarrera } from "@/app/actions/carrera-actions"
 
 interface CarreraResponse {
   id: number
@@ -32,9 +35,18 @@ export default async function CarrerasPage() {
           {carreras.map((carrera) => (
             <Link key={carrera.id} href={`/dashboard/carreras/${carrera.id}`}>
               <Card className="h-full transition-colors hover:bg-accent">
-                <CardHeader>
-                  <CardTitle className="text-base">{carrera.nombre}</CardTitle>
-                  <CardDescription>Resolución {carrera.resolucionMinisterial}</CardDescription>
+                <CardHeader className="flex flex-row items-start justify-between space-y-0">
+                  <div>
+                    <CardTitle className="text-base">{carrera.nombre}</CardTitle>
+                    <CardDescription>Resolución {carrera.resolucionMinisterial}</CardDescription>
+                  </div>
+                  <div className="flex gap-1">
+                    <EditarCarreraDialog carrera={carrera} />
+                    <EliminarBoton
+                      accion={deleteCarrera.bind(null, carrera.id)}
+                      entidadLabel={carrera.nombre}
+                    />
+                  </div>
                 </CardHeader>
               </Card>
             </Link>
