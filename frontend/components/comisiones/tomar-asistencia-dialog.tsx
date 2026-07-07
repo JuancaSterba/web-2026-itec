@@ -1,0 +1,100 @@
+"use client"
+
+import { useRef, useState } from "react"
+import { useFormStatus } from "react-dom"
+import { ClipboardCheck } from "lucide-react"
+import { saveAsistenciasMasivas } from "@/app/actions/asistencia-actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+interface CursadaParaAsistencia {
+  id: number
+  alumnoNombre: string
+}
+
+const ESTADOS = ["PRESENTE", "AUSENTE", "TARDANZA"]
+
+function BotonGuardar() {
+  const { pending } = useFormStatus()
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? "Guardando..." : "Guardar Asistencia"}
+    </Button>
+  )
+}
+
+export default function TomarAsistenciaDialog({ cursadas }: { cursadas: CursadaParaAsistencia[] }) {
+  const [open, setOpen] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const hoy = new Date().toISOString().slice(0, 10)
+
+  async function handleSubmit(formData: FormData) {
+    const fecha = formData.get("fecha") as string
+    const registros = cursadas.map((cursada) => ({
+      cursadaId: cursada.id,
+      estado: (formData.get(`estado_${cursada.id}`) as string) ?? "PRESENTE",
+    }))
+
+    await saveAsistenciasMasivas(fecha, registros)
+    formRef.current?.reset()
+    setOpen(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <ClipboardCheck className="size-4" />
+          Tomar Asistencia
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Tomar Asistencia</DialogTitle>
+        </DialogHeader>
+        <form ref={formRef} action={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="fecha">Fecha</Label>
+            <Input id="fecha" name="fecha" type="date" defaultValue={hoy} required />
+          </div>
+
+          {cursadas.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No hay alumnos inscritos en esta comisión.</p>
+          ) : (
+            <div className="space-y-2">
+              {cursadas.map((cursada) => (
+                <div key={cursada.id} className="flex items-center justify-between gap-4">
+                  <span className="text-sm text-foreground">{cursada.alumnoNombre}</span>
+                  <select
+                    name={`estado_${cursada.id}`}
+                    defaultValue="PRESENTE"
+                    className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    {ESTADOS.map((estado) => (
+                      <option key={estado} value={estado}>
+                        {estado}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <DialogFooter>
+            <BotonGuardar />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
