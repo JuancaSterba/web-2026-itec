@@ -6,6 +6,11 @@ import AgregarAlumnoDialog from "@/components/comisiones/agregar-alumno-dialog"
 import EditableNotaCell from "@/components/comisiones/editable-nota-cell"
 import TomarAsistenciaDialog from "@/components/comisiones/tomar-asistencia-dialog"
 import AsignarProfesorDialog from "@/components/comisiones/asignar-profesor-dialog"
+import EditarCursadaDialog from "@/components/comisiones/editar-cursada-dialog"
+import EditarProfesorAsignadoDialog from "@/components/comisiones/editar-profesor-asignado-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteCursada } from "@/app/actions/cursada-actions"
+import { deleteComisionProfesor } from "@/app/actions/comision-profesor-actions"
 
 interface ComisionResponse {
   id: number
@@ -192,6 +197,7 @@ export default async function ComisionDetallePage({
                   <TableHead>Alumno</TableHead>
                   <TableHead>Condición Final</TableHead>
                   <TableHead>Nota de Cierre</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -204,6 +210,13 @@ export default async function ComisionDetallePage({
                       </TableCell>
                       <TableCell>{cursada.condicionFinal}</TableCell>
                       <TableCell>{cursada.notaCierre ?? "—"}</TableCell>
+                      <TableCell className="flex justify-end gap-1">
+                        <EditarCursadaDialog cursada={cursada} />
+                        <EliminarBoton
+                          accion={deleteCursada.bind(null, cursada.id)}
+                          entidadLabel={alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}
+                        />
+                      </TableCell>
                     </TableRow>
                   )
                 })}
@@ -226,6 +239,7 @@ export default async function ComisionDetallePage({
                 <TableRow>
                   <TableHead>Profesor</TableHead>
                   <TableHead>Rol</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -237,6 +251,13 @@ export default async function ComisionDetallePage({
                         {profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
                       </TableCell>
                       <TableCell>{cp.rol || "—"}</TableCell>
+                      <TableCell className="flex justify-end gap-1">
+                        <EditarProfesorAsignadoDialog asignacion={cp} profesoresDisponibles={profesores ?? []} />
+                        <EliminarBoton
+                          accion={deleteComisionProfesor.bind(null, cp.id)}
+                          entidadLabel={profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
+                        />
+                      </TableCell>
                     </TableRow>
                   )
                 })}

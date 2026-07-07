@@ -2,6 +2,10 @@ import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import NuevaComisionDialog from "@/components/comisiones/nueva-comision-dialog"
+import EditarComisionDialog from "@/components/comisiones/editar-comision-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteComision } from "@/app/actions/comision-actions"
+import { Badge } from "@/components/ui/badge"
 
 interface ComisionResponse {
   id: number
@@ -64,11 +68,13 @@ export default async function OfertaAcademicaPage({
                 <TableHead>Comisión</TableHead>
                 <TableHead>Materia</TableHead>
                 <TableHead>Cupo Máximo</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {comisionesDelPeriodo.map((comision) => (
-                <TableRow key={comision.id} className="cursor-pointer">
+                <TableRow key={comision.id}>
                   <TableCell>
                     <Link href={`/dashboard/comisiones/${comision.id}`} className="font-medium hover:underline">
                       {comision.nombreComision}
@@ -76,6 +82,22 @@ export default async function OfertaAcademicaPage({
                   </TableCell>
                   <TableCell>{materiaNombrePorId.get(comision.materiaPlanId) ?? "—"}</TableCell>
                   <TableCell>{comision.cupoMaximo}</TableCell>
+                  <TableCell>
+                    <Badge variant={comision.activa ? "default" : "secondary"}>
+                      {comision.activa ? "Activa" : "Inactiva"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="flex justify-end gap-1">
+                    <EditarComisionDialog
+                      comision={comision}
+                      periodoId={Number(periodoId)}
+                      materiasPlanDisponibles={materiasPlanDisponibles}
+                    />
+                    <EliminarBoton
+                      accion={deleteComision.bind(null, comision.id)}
+                      entidadLabel={comision.nombreComision}
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

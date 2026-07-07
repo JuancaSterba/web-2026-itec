@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import NuevoPeriodoDialog from "@/components/periodos/nuevo-periodo-dialog"
+import EditarPeriodoDialog from "@/components/periodos/editar-periodo-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deletePeriodo } from "@/app/actions/periodo-actions"
 
 interface CicloLectivoResponse {
   id: number
@@ -52,13 +55,24 @@ export default async function CicloDetallePage({
       ) : (
         <div className="space-y-2">
           {periodosDelCiclo.map((periodo) => (
-            <Link
+            <div
               key={periodo.id}
-              href={`/dashboard/ciclos/${cicloId}/periodos/${periodo.id}/comisiones`}
-              className="block rounded-lg border border-border bg-card p-4 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent"
+              className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm transition-colors hover:bg-accent"
             >
-              {periodo.nombre}
-            </Link>
+              <Link
+                href={`/dashboard/ciclos/${cicloId}/periodos/${periodo.id}/comisiones`}
+                className="flex-1 text-sm font-medium text-foreground"
+              >
+                {periodo.nombre}
+              </Link>
+              <div className="flex gap-1">
+                <EditarPeriodoDialog periodo={periodo} cicloId={Number(cicloId)} />
+                <EliminarBoton
+                  accion={deletePeriodo.bind(null, periodo.id)}
+                  entidadLabel={periodo.nombre}
+                />
+              </div>
+            </div>
           ))}
         </div>
       )}

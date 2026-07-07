@@ -33,3 +33,48 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
 
   revalidatePath("/dashboard/carreras/[id]/planes/[planId]", "page")
 }
+
+export async function updateMateriaPlan(formData: FormData, materiaPlanId: number, planId: number) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const payload = {
+    planEstudioId: planId,
+    materiaId: Number(formData.get("materiaId")),
+    cuatrimestreDictado: Number(formData.get("cuatrimestreDictado")),
+    cargaHoraria: Number(formData.get("cargaHoraria")),
+  }
+
+  const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan/${materiaPlanId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error("No se pudo actualizar la materia del plan")
+  }
+
+  revalidatePath("/dashboard/carreras/[id]/planes/[planId]", "page")
+}
+
+export async function deleteMateriaPlan(materiaPlanId: number) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan/${materiaPlanId}`, {
+    method: "DELETE",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("No se pudo quitar la materia del plan")
+  }
+
+  revalidatePath("/dashboard/carreras/[id]/planes/[planId]", "page")
+}

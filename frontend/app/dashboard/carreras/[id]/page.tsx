@@ -3,8 +3,12 @@ import { fetchCore } from "@/lib/api-server"
 import NuevoPlanDialog from "@/components/planes/nuevo-plan-dialog"
 import InscribirAlumnoDialog from "@/components/carreras/inscribir-alumno-dialog"
 import EditarPlanDialog from "@/components/planes/editar-plan-dialog"
+import EditarInscripcionDialog from "@/components/carreras/editar-inscripcion-dialog"
 import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deletePlan } from "@/app/actions/plan-actions"
+import { deleteInscripcionCarrera } from "@/app/actions/inscripcion-carrera-actions"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 
 interface CarreraResponse {
   id: number
@@ -30,6 +34,14 @@ interface PlanEstudioResponse {
   carreraNombre: string
 }
 
+interface InscripcionCarreraResponse {
+  id: number
+  alumnoId: number
+  planEstudioId: number
+  fechaInscripcion: string
+  estado: string
+}
+
 export default async function CarreraDetallePage({
   params,
 }: {
@@ -37,15 +49,19 @@ export default async function CarreraDetallePage({
 }) {
   const { id } = await params
 
-  const [carreras, planes, alumnos] = await Promise.all([
+  const [carreras, planes, alumnos, inscripciones] = await Promise.all([
     fetchCore<CarreraResponse>(`/carreras/${id}`),
     fetchCore<PlanEstudioResponse>(`/planes-estudio/carrera/${id}`),
     fetchCore<AlumnoResponse>("/alumnos"),
+    fetchCore<InscripcionCarreraResponse>("/inscripciones-carreras"),
   ])
 
   const carrera = carreras?.[0] ?? null
   const planesVigentes = (planes ?? []).filter((p) => p.activo)
   const planesParaInscripcion = planesVigentes.length > 0 ? planesVigentes : planes ?? []
+  const planIds = new Set((planes ?? []).map((p) => p.id))
+  const inscripcionesDeLaCarrera = inscripciones?.filter((i) => planIds.has(i.planEstudioId)) ?? null
+  const alumnoPorId = new Map((alumnos ?? []).map((a) => [a.id, a]))
 
   return (
     <div className="space-y-6">
@@ -89,6 +105,53 @@ export default async function CarreraDetallePage({
           ))}
         </div>
       )}
+
+      <div>
+        <h2 className="mb-2 text-lg font-semibold text-foreground">Alumnos Inscriptos</h2>
+        {inscripcionesDeLaCarrera === null ? (
+          <p className="text-sm text-destructive">No se pudo obtener las inscripciones. Intentá nuevamente más tarde.</p>
+        ) : inscripcionesDeLaCarrera.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No hay alumnos inscriptos en esta carrera.</p>
+        ) : (
+          <div className="rounded-lg border border-border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Alumno</TableHead>
+                  <TableHead>Fecha de Inscripción</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {inscripcionesDeLaCarrera.map((inscripcion) => {
+                  const alumno = alumnoPorId.get(inscripcion.alumnoId)
+                  return (
+                    <TableRow key={inscripcion.id}>
+                      <TableCell>
+                        {alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${inscripcion.alumnoId}`}
+                      </TableCell>
+                      <TableCell>{inscripcion.fechaInscripcion ?? "—"}</TableCell>
+                      <TableCell>
+                        <Badge variant={inscripcion.estado === "BAJA" ? "secondary" : "default"}>
+                          {inscripcion.estado}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="flex justify-end gap-1">
+                        <EditarInscripcionDialog inscripcion={inscripcion} />
+                        <EliminarBoton
+                          accion={deleteInscripcionCarrera.bind(null, inscripcion.id)}
+                          entidadLabel={alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${inscripcion.alumnoId}`}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
