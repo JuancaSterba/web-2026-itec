@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Pencil, Trash2, GraduationCap, BookOpen } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, GraduationCap, BookOpen, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -164,6 +165,11 @@ export default function AlumnosPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" asChild aria-label="Ver Ficha">
+                        <Link href={`/dashboard/alumnos/${alumno.id}`}>
+                          <FileText className="size-4" />
+                        </Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
