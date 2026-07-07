@@ -1,11 +1,16 @@
 package ar.edu.itec1misiones.config;
 
+import ar.edu.itec1misiones.model.*;
 import ar.edu.itec1misiones.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -16,101 +21,174 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final CarreraRepository carreraRepository;
     private final PlanEstudioRepository planEstudioRepository;
     private final MateriaRepository materiaRepository;
-    private final ProfesorRepository profesorRepository;
+    private final MateriaPlanRepository materiaPlanRepository;
     private final AlumnoRepository alumnoRepository;
     private final ComisionRepository comisionRepository;
     private final CicloLectivoRepository cicloLectivoRepository;
+    private final PeriodoAcademicoRepository periodoAcademicoRepository;
+    private final InscripcionCarreraRepository inscripcionCarreraRepository;
+    private final CursadaRepository cursadaRepository;
     private final CoreUserRepository userRepository;
 
     @Override
     public void run(String... args) {
-        log.info("[Seeder] Deshabilitado temporalmente tras el refactor a Bounded Contexts. Pendiente de reescritura.");
+        if (carreraRepository.count() > 0) {
+            log.info("[Seeder] Base de datos ya inicializada, omitiendo seed.");
+            return;
+        }
 
-        // if (carreraRepository.count() > 0) {
-        //     log.info("[Seeder] Base de datos ya inicializada, omitiendo seed.");
-        //     return;
-        // }
-        //
-        // log.info("[Seeder] Inicializando datos de desarrollo...");
-        //
-        // // --- Carrera ---
-        // Carrera carrera = new Carrera();
-        // carrera.setNombre("Desarrollo de Software");
-        // carrera.setDescripcion("Tecnicatura Superior en Desarrollo de Software");
-        // carrera.setResolucion("RES-001/2024");
-        // carrera.setActiva(true);
-        // carrera = carreraRepository.save(carrera);
-        //
-        // // --- Plan de Estudio ---
-        // PlanEstudio plan = new PlanEstudio();
-        // plan.setValidez("2024-2030");
-        // plan.setResolucion("PLAN-001/2024");
-        // plan.setFechaInicio(LocalDate.of(2024, 3, 1));
-        // plan.setFechaFin(LocalDate.of(2030, 12, 31));
-        // plan.setActivo(true);
-        // plan.setCarrera(carrera);
-        // plan = planEstudioRepository.save(plan);
-        //
-        // // --- Materias ---
-        // Materia prog1 = new Materia();
-        // prog1.setNombre("Programación 1");
-        // prog1.setCargaHoraria(96);
-        // prog1.setAnio(1);
-        // prog1.setCuatrimestre(1);
-        // prog1.setActiva(true);
-        // prog1.setPlanEstudio(plan);
-        // materiaRepository.save(prog1);
-        //
-        // Materia baseDatos = new Materia();
-        // baseDatos.setNombre("Base de Datos");
-        // baseDatos.setCargaHoraria(80);
-        // baseDatos.setAnio(1);
-        // baseDatos.setCuatrimestre(2);
-        // baseDatos.setActiva(true);
-        // baseDatos.setPlanEstudio(plan);
-        // baseDatos = materiaRepository.save(baseDatos);
-        //
-        // // --- User Profesor ---
-        // User userProfesor = new User();
-        // userProfesor.setUsername("profesor.dev");
-        // userProfesor.setPassword("{noop}dev1234");
-        // userProfesor.setNombre("Carlos");
-        // userProfesor.setApellido("García");
-        // userProfesor.setDni("30000001");
-        // userProfesor.setEmail("carlos.garcia@itec.edu.ar");
-        // userProfesor.setTelefono("3764000001");
-        // userProfesor.setTelefonoSecundario("3764000001");
-        // userProfesor.setRoles(Set.of(Rol.PROFESOR));
-        // userProfesor.setLegajo("2024-30000001");
-        // userProfesor = userRepository.save(userProfesor);
-        //
-        // // --- Profesor ---
-        // Profesor profesor = new Profesor();
-        // profesor.setUser(userProfesor);
-        // profesor.setTitulo("Lic. en Sistemas");
-        // profesor.setActivo(true);
-        // profesor = profesorRepository.save(profesor);
-        //
-        // // --- User Alumno ---
-        // User userAlumno = new User();
-        // userAlumno.setUsername("alumno.dev");
-        // userAlumno.setPassword("{noop}dev1234");
-        // userAlumno.setNombre("Ana");
-        // userAlumno.setApellido("López");
-        // userAlumno.setDni("40000001");
-        // userAlumno.setEmail("ana.lopez@itec.edu.ar");
-        // userAlumno.setTelefono("3764000002");
-        // userAlumno.setRoles(Set.of(Rol.ALUMNO));
-        // userAlumno.setLegajo("2024-40000001");
-        // userAlumno = userRepository.save(userAlumno);
-        //
-        // // --- Alumno ---
-        // Alumno alumno = new Alumno();
-        // alumno.setUser(userAlumno);
-        // alumno.setActivo(true);
-        // alumnoRepository.save(alumno);
-        //
-        // // --- Cuatrimestre / Comisión ---
-        // TODO: reescribir seed con CicloLectivo, PeriodoAcademico, MateriaPlan y Comision.
+        log.info("[Seeder] Inicializando datos de desarrollo...");
+
+        // --- Catálogo de Materias ---
+        Materia prog1 = materiaRepository.save(
+                Materia.builder().nombre("Programación I").codigoInterno("PRG1").activa(true).build());
+        Materia logica = materiaRepository.save(
+                Materia.builder().nombre("Lógica y Algoritmos").codigoInterno("LOG").activa(true).build());
+        Materia bd1 = materiaRepository.save(
+                Materia.builder().nombre("Bases de Datos I").codigoInterno("BD1").activa(true).build());
+
+        // --- Estructura Institucional ---
+        Carrera carrera = carreraRepository.save(
+                Carrera.builder()
+                        .nombre("Tecnicatura Superior en Desarrollo de Software")
+                        .resolucionMinisterial("123/2026")
+                        .activa(true)
+                        .build());
+
+        PlanEstudio plan = planEstudioRepository.save(
+                PlanEstudio.builder()
+                        .cohorte("2026")
+                        .carrera(carrera)
+                        .fechaImplementacion(LocalDate.now())
+                        .activo(true)
+                        .build());
+
+        // --- Malla Curricular ---
+        MateriaPlan mpProg1 = materiaPlanRepository.save(
+                MateriaPlan.builder()
+                        .planEstudio(plan)
+                        .materia(prog1)
+                        .cuatrimestreDictado(1)
+                        .cargaHoraria(6)
+                        .build());
+
+        MateriaPlan mpLogica = materiaPlanRepository.save(
+                MateriaPlan.builder()
+                        .planEstudio(plan)
+                        .materia(logica)
+                        .cuatrimestreDictado(1)
+                        .cargaHoraria(4)
+                        .build());
+
+        MateriaPlan mpBd1 = materiaPlanRepository.save(
+                MateriaPlan.builder()
+                        .planEstudio(plan)
+                        .materia(bd1)
+                        .cuatrimestreDictado(2)
+                        .cargaHoraria(6)
+                        .build());
+
+        mpBd1.setCorrelativas(new java.util.ArrayList<>(List.of(mpProg1)));
+        mpBd1 = materiaPlanRepository.save(mpBd1);
+
+        // --- Gestión Temporal ---
+        CicloLectivo ciclo2026 = cicloLectivoRepository.save(
+                CicloLectivo.builder()
+                        .anio(2026)
+                        .fechaInicio(LocalDate.of(2026, 3, 1))
+                        .fechaFin(LocalDate.of(2026, 12, 20))
+                        .activo(true)
+                        .build());
+
+        PeriodoAcademico periodo1 = periodoAcademicoRepository.save(
+                PeriodoAcademico.builder()
+                        .nombre("Primer Cuatrimestre")
+                        .cicloLectivo(ciclo2026)
+                        .fechaInicio(LocalDate.of(2026, 3, 1))
+                        .fechaFin(LocalDate.of(2026, 7, 10))
+                        .build());
+
+        periodoAcademicoRepository.save(
+                PeriodoAcademico.builder()
+                        .nombre("Segundo Cuatrimestre")
+                        .cicloLectivo(ciclo2026)
+                        .fechaInicio(LocalDate.of(2026, 8, 1))
+                        .fechaFin(LocalDate.of(2026, 12, 20))
+                        .build());
+
+        // --- Oferta Académica ---
+        Comision comisionProg1 = comisionRepository.save(
+                Comision.builder()
+                        .nombreComision("Comisión A - Prog I")
+                        .cupoMaximo(30)
+                        .periodoAcademico(periodo1)
+                        .materiaPlan(mpProg1)
+                        .activa(true)
+                        .build());
+
+        Comision comisionLogica = comisionRepository.save(
+                Comision.builder()
+                        .nombreComision("Comisión A - Lógica")
+                        .cupoMaximo(30)
+                        .periodoAcademico(periodo1)
+                        .materiaPlan(mpLogica)
+                        .activa(true)
+                        .build());
+
+        // --- Estudiantes ---
+        Alumno juan = crearAlumno("Juan", "Pérez", "40111222", "juan.perez");
+        Alumno ana = crearAlumno("Ana", "Gómez", "40222333", "ana.gomez");
+        Alumno carlos = crearAlumno("Carlos", "Ruiz", "40333444", "carlos.ruiz");
+        List<Alumno> alumnos = List.of(juan, ana, carlos);
+
+        // --- Trazabilidad Académica ---
+        for (Alumno alumno : alumnos) {
+            inscripcionCarreraRepository.save(
+                    InscripcionCarrera.builder()
+                            .alumno(alumno)
+                            .planEstudio(plan)
+                            .fechaInscripcion(LocalDate.now())
+                            .estado("REGULAR")
+                            .build());
+
+            cursadaRepository.save(
+                    Cursada.builder()
+                            .alumno(alumno)
+                            .comision(comisionProg1)
+                            .fechaInscripcion(LocalDate.now())
+                            .condicionFinal("REGULAR")
+                            .build());
+
+            cursadaRepository.save(
+                    Cursada.builder()
+                            .alumno(alumno)
+                            .comision(comisionLogica)
+                            .fechaInscripcion(LocalDate.now())
+                            .condicionFinal("LIBRE")
+                            .build());
+        }
+
+        log.info("[Seeder] Datos de desarrollo insertados correctamente.");
+    }
+
+    private Alumno crearAlumno(String nombre, String apellido, String dni, String username) {
+        User user = new User();
+        user.setUsername(username);
+        // Nota: {noop} indica al DelegatingPasswordEncoder que la contraseña
+        // está en texto plano, sin costo de hashear en dev/tests descartables.
+        user.setPassword("{noop}dev1234");
+        user.setNombre(nombre);
+        user.setApellido(apellido);
+        user.setDni(dni);
+        user.setEmail(username + "@itec.edu.ar");
+        user.setTelefono("3764000000");
+        user.setRoles(Set.of(Rol.ALUMNO));
+        user.setLegajo("2026-" + dni);
+        user = userRepository.save(user);
+
+        Alumno alumno = new Alumno();
+        alumno.setUser(user);
+        alumno.setActivo(true);
+        return alumnoRepository.save(alumno);
     }
 }
