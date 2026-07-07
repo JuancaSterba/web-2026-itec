@@ -34,6 +34,5 @@ public class ProfesorRegistroDTO {
     @NotBlank(message = "El título es obligatorio")
     private String titulo;
 
-    @NotBlank(message = "El teléfono secundario es obligatorio")
     private String telefonoSecundario;
 }
