@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import NuevaComisionDialog from "@/components/comisiones/nueva-comision-dialog"
 
 interface ComisionResponse {
   id: number
@@ -34,14 +35,21 @@ export default async function OfertaAcademicaPage({
 
   const comisionesDelPeriodo = comisiones?.filter((c) => String(c.periodoAcademicoId) === periodoId) ?? null
   const materiaNombrePorId = new Map((materiasPlan ?? []).map((mp) => [mp.id, mp.materiaNombre]))
+  const materiasPlanDisponibles = (materiasPlan ?? []).map((mp) => ({
+    id: mp.id,
+    etiqueta: `${mp.materiaNombre} (${mp.cuatrimestreDictado}º Cuatrimestre)`,
+  }))
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Oferta Académica</h1>
-        <p className="text-sm text-muted-foreground">
-          Ciclo {cicloId} · Período {periodoId}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Oferta Académica</h1>
+          <p className="text-sm text-muted-foreground">
+            Ciclo {cicloId} · Período {periodoId}
+          </p>
+        </div>
+        <NuevaComisionDialog periodoId={Number(periodoId)} materiasPlanDisponibles={materiasPlanDisponibles} />
       </div>
 
       {comisionesDelPeriodo === null ? (
