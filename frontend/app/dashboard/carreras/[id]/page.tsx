@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
+import NuevoPlanDialog from "@/components/planes/nuevo-plan-dialog"
 
 interface CarreraResponse {
   id: number
@@ -34,13 +35,16 @@ export default async function CarreraDetallePage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">
-          Dashboard de la Carrera {carrera?.nombre ?? id}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {carrera ? `Resolución ${carrera.resolucionMinisterial}` : "Planes de estudio asociados a esta carrera"}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">
+            Dashboard de la Carrera {carrera?.nombre ?? id}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {carrera ? `Resolución ${carrera.resolucionMinisterial}` : "Planes de estudio asociados a esta carrera"}
+          </p>
+        </div>
+        <NuevoPlanDialog carreraId={Number(id)} />
       </div>
 
       {planes === null ? (
