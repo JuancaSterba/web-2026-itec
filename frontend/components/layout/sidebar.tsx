@@ -47,7 +47,7 @@ export const navigation = [
     group: "Personas",
     items: [
       { name: "Estudiantes", href: "/dashboard/alumnos", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
-      { name: "Profesores", href: "/dashboard/profesores", icon: Users, roles: ["ADMIN"] },
+      { name: "Profesores", href: "/dashboard/profesores", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
       { name: "Administradores", href: "/dashboard/administradores", icon: ShieldCheck, roles: ["ADMIN"] },
     ],
   },
