@@ -21,6 +21,12 @@ interface CursadaParaAsistencia {
   alumnoNombre: string
 }
 
+interface AsistenciaExistente {
+  cursadaId: number
+  fecha: string
+  id: number
+}
+
 const ESTADOS = ["PRESENTE", "AUSENTE", "TARDANZA"]
 
 function BotonGuardar() {
@@ -32,17 +38,29 @@ function BotonGuardar() {
   )
 }
 
-export default function TomarAsistenciaDialog({ cursadas }: { cursadas: CursadaParaAsistencia[] }) {
+export default function TomarAsistenciaDialog({
+  cursadas,
+  asistenciasExistentes,
+}: {
+  cursadas: CursadaParaAsistencia[]
+  asistenciasExistentes: AsistenciaExistente[]
+}) {
   const [open, setOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const hoy = new Date().toISOString().slice(0, 10)
 
   async function handleSubmit(formData: FormData) {
     const fecha = formData.get("fecha") as string
-    const registros = cursadas.map((cursada) => ({
-      cursadaId: cursada.id,
-      estado: (formData.get(`estado_${cursada.id}`) as string) ?? "PRESENTE",
-    }))
+    const registros = cursadas.map((cursada) => {
+      const existente = asistenciasExistentes.find(
+        (a) => a.cursadaId === cursada.id && a.fecha === fecha
+      )
+      return {
+        cursadaId: cursada.id,
+        estado: (formData.get(`estado_${cursada.id}`) as string) ?? "PRESENTE",
+        asistenciaId: existente?.id,
+      }
+    })
 
     await saveAsistenciasMasivas(fecha, registros)
     formRef.current?.reset()

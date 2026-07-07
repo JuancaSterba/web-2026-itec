@@ -42,3 +42,31 @@ export async function saveCalificacion(
 
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
 }
+
+export async function saveCalificacionesMasivas(
+  instancia: string,
+  registros: { cursadaId: number; nota: number }[]
+) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+  const fecha = new Date().toISOString().split("T")[0]
+
+  const respuestas = await Promise.all(
+    registros.map((registro) =>
+      fetch(`${getApiBaseUrl()}/api/calificaciones-parciales`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({ cursadaId: registro.cursadaId, instancia, nota: registro.nota, fecha }),
+      })
+    )
+  )
+
+  if (respuestas.some((response) => !response.ok)) {
+    throw new Error("No se pudo guardar la instancia de evaluación completa")
+  }
+
+  revalidatePath("/dashboard/comisiones/[comisionId]", "page")
+}
