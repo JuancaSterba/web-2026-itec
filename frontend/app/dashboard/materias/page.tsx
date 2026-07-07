@@ -1,5 +1,6 @@
 import { fetchCore } from "@/lib/api-server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import NuevaMateriaDialog from "@/components/materias/nueva-materia-dialog"
 
 interface MateriaResponse {
   id: number
@@ -14,9 +15,12 @@ export default async function MateriasPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Catálogo de Materias</h1>
-        <p className="text-sm text-muted-foreground">Materias activas registradas en el sistema</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Catálogo de Materias</h1>
+          <p className="text-sm text-muted-foreground">Materias activas registradas en el sistema</p>
+        </div>
+        <NuevaMateriaDialog />
       </div>
 
       {materias === null ? (

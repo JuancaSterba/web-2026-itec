@@ -84,6 +84,9 @@ services:
       # aceptacion del plan de frontend. Esta variable tiene precedencia sobre
       # frontend/.env.local dentro del contenedor (Next.js no pisa un
       # process.env ya seteado), asi que es la fuente real cuando se corre con Docker.
+      # API_URL es la URL interna usada por los Server Components / Server Actions de Next.js
+      # para conectarse con el API Gateway dentro de la red de Docker.
+      - API_URL=http://api-gateway:8080
       - NEXT_PUBLIC_API_URL=http://localhost:8080
     depends_on:
       - api-gateway

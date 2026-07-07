@@ -3,7 +3,11 @@
 // que no existe en el servidor), inyectado como Bearer contra el API Gateway.
 import { cookies } from "next/headers"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+// Si estamos en el servidor (Node.js en Docker), debemos apuntar al servicio interno.
+// Resolucion dinamica en runtime para evitar que Next.js inyecte "localhost" en build time.
+function getApiBaseUrl() {
+  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+}
 
 // Fetch generico contra el gateway: usalo para rutas que NO viven bajo /api/core
 // (ms-notas y ms-asistencias se montan directo en /api/calificaciones-parciales y
@@ -13,7 +17,7 @@ export async function fetchGateway<T>(path: string): Promise<T[] | null> {
     const cookieStore = await cookies()
     const token = cookieStore.get("auth-token")?.value
 
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${getApiBaseUrl()}${path}`, {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
