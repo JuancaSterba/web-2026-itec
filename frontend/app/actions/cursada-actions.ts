@@ -34,6 +34,31 @@ export async function createCursada(formData: FormData, comisionId: number) {
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
 }
 
+export async function createCursadasMasivas(alumnoId: number, comisionIds: number[]) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+  const fechaInscripcion = new Date().toISOString().slice(0, 10)
+
+  const respuestas = await Promise.all(
+    comisionIds.map((comisionId) =>
+      fetch(`${getApiBaseUrl()}/api/core/cursadas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({ alumnoId, comisionId, fechaInscripcion, condicionFinal: "REGULAR" }),
+      })
+    )
+  )
+
+  if (respuestas.some((response) => !response.ok)) {
+    throw new Error("No se pudo matricular al alumno en todas las comisiones del cuatrimestre")
+  }
+
+  revalidatePath("/dashboard/ciclos/[cicloId]/periodos/[periodoId]/comisiones", "page")
+}
+
 export async function updateCursada(formData: FormData, cursadaId: number, alumnoId: number, comisionId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
