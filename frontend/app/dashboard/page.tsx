@@ -1,6 +1,6 @@
 // import DashboardStats from "@/components/dashboard/dashboard-stats" // oculto: KPIs mockeados, PENDIENTES.md Prioridad 1
-import RecentActivity from "@/components/dashboard/recent-activity"
-import AcademicChart from "@/components/dashboard/academic-chart"
+// import RecentActivity from "@/components/dashboard/recent-activity" // oculto: datos mockeados, PENDIENTES.md Prioridad 1
+// import AcademicChart from "@/components/dashboard/academic-chart" // oculto: datos mockeados, PENDIENTES.md Prioridad 1
 
 export default function DashboardPage() {
   return (
@@ -11,11 +11,7 @@ export default function DashboardPage() {
       </div>
 
       {/* <DashboardStats /> oculto: KPIs mockeados, PENDIENTES.md Prioridad 1 */}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <AcademicChart />
-        <RecentActivity />
-      </div>
+      {/* <AcademicChart /> / <RecentActivity /> ocultos: datos mockeados, PENDIENTES.md Prioridad 1 */}
     </div>
   )
 }
