@@ -133,6 +133,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ComisionProfesorNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleComisionProfesorNotFound(
+            ComisionProfesorNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("COMISION_PROFESOR_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(MateriaPlanNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleMateriaPlanNotFound(
             MateriaPlanNotFoundException ex,
