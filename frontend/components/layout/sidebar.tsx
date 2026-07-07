@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
+  ShieldCheck,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
@@ -47,6 +48,7 @@ export const navigation = [
     items: [
       { name: "Estudiantes", href: "/dashboard/alumnos", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
       { name: "Profesores", href: "/dashboard/profesores", icon: Users, roles: ["ADMIN"] },
+      { name: "Administradores", href: "/dashboard/administradores", icon: ShieldCheck, roles: ["ADMIN"] },
     ],
   },
 ]
