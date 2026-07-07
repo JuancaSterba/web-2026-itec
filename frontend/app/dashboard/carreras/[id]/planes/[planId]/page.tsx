@@ -65,7 +65,7 @@ export default async function PlanDetallePage({
                 {porCuatrimestre![cuatrimestre].map((mp) => (
                   <li key={mp.id} className="flex items-center justify-between">
                     <span>
-                      {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs)</span>
+                      {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs/semana)</span>
                     </span>
                     <div className="flex gap-1">
                       <EditarMateriaPlanDialog
