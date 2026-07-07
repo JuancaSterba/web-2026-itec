@@ -6,6 +6,7 @@ import EditarComisionDialog from "@/components/comisiones/editar-comision-dialog
 import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteComision } from "@/app/actions/comision-actions"
 import { Badge } from "@/components/ui/badge"
+import InscribirCuatrimestreDialog from "@/components/comisiones/inscribir-cuatrimestre-dialog"
 
 interface ComisionResponse {
   id: number
@@ -25,6 +26,19 @@ interface MateriaPlanResponse {
   cargaHoraria: number
 }
 
+interface AlumnoResponse {
+  id: number
+  nombre: string
+  apellido: string
+  dni: string
+}
+
+interface CursadaResponse {
+  id: number
+  alumnoId: number
+  comisionId: number
+}
+
 export default async function OfertaAcademicaPage({
   params,
 }: {
@@ -32,9 +46,11 @@ export default async function OfertaAcademicaPage({
 }) {
   const { cicloId, periodoId } = await params
 
-  const [comisiones, materiasPlan] = await Promise.all([
+  const [comisiones, materiasPlan, alumnos, cursadas] = await Promise.all([
     fetchCore<ComisionResponse>("/comisiones"),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
+    fetchCore<AlumnoResponse>("/alumnos"),
+    fetchCore<CursadaResponse>("/cursadas"),
   ])
 
   const comisionesDelPeriodo = comisiones?.filter((c) => String(c.periodoAcademicoId) === periodoId) ?? null
@@ -43,6 +59,14 @@ export default async function OfertaAcademicaPage({
     id: mp.id,
     etiqueta: `${mp.materiaNombre} (${mp.cuatrimestreDictado}º Cuatrimestre)`,
   }))
+  const comisionesParaInscripcion = (comisionesDelPeriodo ?? []).map((c) => ({
+    id: c.id,
+    etiqueta: `${c.nombreComision} - ${materiaNombrePorId.get(c.materiaPlanId) ?? "—"}`,
+  }))
+  const comisionIdsDelPeriodo = new Set((comisionesDelPeriodo ?? []).map((c) => c.id))
+  const cursadasExistentes = (cursadas ?? [])
+    .filter((cu) => comisionIdsDelPeriodo.has(cu.comisionId))
+    .map((cu) => ({ alumnoId: cu.alumnoId, comisionId: cu.comisionId }))
 
   return (
     <div className="space-y-6">
@@ -53,7 +77,14 @@ export default async function OfertaAcademicaPage({
             Ciclo {cicloId} · Período {periodoId}
           </p>
         </div>
-        <NuevaComisionDialog periodoId={Number(periodoId)} materiasPlanDisponibles={materiasPlanDisponibles} />
+        <div className="flex gap-2">
+          <InscribirCuatrimestreDialog
+            comisionesDelPeriodo={comisionesParaInscripcion}
+            alumnosDisponibles={alumnos ?? []}
+            cursadasExistentes={cursadasExistentes}
+          />
+          <NuevaComisionDialog periodoId={Number(periodoId)} materiasPlanDisponibles={materiasPlanDisponibles} />
+        </div>
       </div>
 
       {comisionesDelPeriodo === null ? (
