@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import AgregarAlumnoDialog from "@/components/comisiones/agregar-alumno-dialog"
 import EditableNotaCell from "@/components/comisiones/editable-nota-cell"
 import TomarAsistenciaDialog from "@/components/comisiones/tomar-asistencia-dialog"
+import AsignarProfesorDialog from "@/components/comisiones/asignar-profesor-dialog"
 
 interface ComisionResponse {
   id: number
@@ -57,6 +58,20 @@ interface AsistenciaResponse {
   estado: string
 }
 
+interface ProfesorResponse {
+  id: number
+  nombre: string
+  apellido: string
+  dni: string
+}
+
+interface ComisionProfesorResponse {
+  id: number
+  comisionId: number
+  profesorId: number
+  rol: string
+}
+
 export default async function ComisionDetallePage({
   params,
 }: {
@@ -64,17 +79,22 @@ export default async function ComisionDetallePage({
 }) {
   const { comisionId } = await params
 
-  const [comisiones, materiasPlan, cursadas, alumnos] = await Promise.all([
+  const [comisiones, materiasPlan, cursadas, alumnos, profesores, comisionesProfesores] = await Promise.all([
     fetchCore<ComisionResponse>(`/comisiones/${comisionId}`),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
     fetchCore<CursadaResponse>("/cursadas"),
     fetchCore<AlumnoResponse>("/alumnos"),
+    fetchCore<ProfesorResponse>("/profesores"),
+    fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
   ])
 
   const comision = comisiones?.[0] ?? null
   const materiaNombre = materiasPlan?.find((mp) => mp.id === comision?.materiaPlanId)?.materiaNombre
   const cursadasDeLaComision = cursadas?.filter((c) => String(c.comisionId) === comisionId) ?? null
   const alumnoPorId = new Map((alumnos ?? []).map((a) => [a.id, a]))
+  const profesorPorId = new Map((profesores ?? []).map((p) => [p.id, p]))
+  const docentesDeLaComision = comisionesProfesores?.filter((cp) => String(cp.comisionId) === comisionId) ?? null
+
   const cursadasParaAsistencia = (cursadasDeLaComision ?? []).map((cursada) => {
     const alumno = alumnoPorId.get(cursada.alumnoId)
     return {
@@ -140,6 +160,7 @@ export default async function ComisionDetallePage({
         <TabsList>
           <TabsTrigger value="general">Información General</TabsTrigger>
           <TabsTrigger value="alumnos">Alumnos Inscritos</TabsTrigger>
+          <TabsTrigger value="docentes">Docentes</TabsTrigger>
           <TabsTrigger value="asistencias">Asistencias</TabsTrigger>
           <TabsTrigger value="calificaciones">Calificaciones</TabsTrigger>
         </TabsList>
@@ -183,6 +204,39 @@ export default async function ComisionDetallePage({
                       </TableCell>
                       <TableCell>{cursada.condicionFinal}</TableCell>
                       <TableCell>{cursada.notaCierre ?? "—"}</TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </TabsContent>
+
+        <TabsContent value="docentes" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+          <div className="flex justify-end">
+            <AsignarProfesorDialog comisionId={Number(comisionId)} profesoresDisponibles={profesores ?? []} />
+          </div>
+          {docentesDeLaComision === null ? (
+            <p className="text-destructive">No se pudo obtener los docentes asignados.</p>
+          ) : docentesDeLaComision.length === 0 ? (
+            <p className="text-muted-foreground">No hay profesores asignados a esta comisión.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Profesor</TableHead>
+                  <TableHead>Rol</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {docentesDeLaComision.map((cp) => {
+                  const profesor = profesorPorId.get(cp.profesorId)
+                  return (
+                    <TableRow key={cp.id}>
+                      <TableCell>
+                        {profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
+                      </TableCell>
+                      <TableCell>{cp.rol || "—"}</TableCell>
                     </TableRow>
                   )
                 })}
