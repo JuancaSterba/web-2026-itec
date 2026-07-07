@@ -2,6 +2,7 @@ import { fetchCore, fetchGateway } from "@/lib/api-server"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import AgregarAlumnoDialog from "@/components/comisiones/agregar-alumno-dialog"
 
 interface ComisionResponse {
   id: number
@@ -36,6 +37,7 @@ interface AlumnoResponse {
   activo: boolean
   nombre: string
   apellido: string
+  dni: string
 }
 
 interface CalificacionParcialResponse {
@@ -145,7 +147,10 @@ export default async function ComisionDetallePage({
           )}
         </TabsContent>
 
-        <TabsContent value="alumnos" className="rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+        <TabsContent value="alumnos" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+          <div className="flex justify-end">
+            <AgregarAlumnoDialog comisionId={Number(comisionId)} alumnosDisponibles={alumnos ?? []} />
+          </div>
           {cursadasDeLaComision === null ? (
             <p className="text-destructive">No se pudo obtener los alumnos inscritos.</p>
           ) : cursadasDeLaComision.length === 0 ? (
