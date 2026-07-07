@@ -33,3 +33,48 @@ export async function createPlan(formData: FormData, carreraId: number) {
 
   revalidatePath("/dashboard/carreras/[id]", "page")
 }
+
+export async function updatePlan(formData: FormData, planId: number, carreraId: number) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const payload = {
+    cohorte: formData.get("cohorte"),
+    resolucion: formData.get("resolucion"),
+    fechaImplementacion: formData.get("fechaImplementacion"),
+    carreraId,
+  }
+
+  const response = await fetch(`${getApiBaseUrl()}/api/core/planes-estudio/${planId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error("No se pudo actualizar el plan de estudio")
+  }
+
+  revalidatePath("/dashboard/carreras/[id]", "page")
+}
+
+export async function deletePlan(planId: number) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const response = await fetch(`${getApiBaseUrl()}/api/core/planes-estudio/${planId}`, {
+    method: "DELETE",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("No se pudo dar de baja el plan de estudio")
+  }
+
+  revalidatePath("/dashboard/carreras/[id]", "page")
+}

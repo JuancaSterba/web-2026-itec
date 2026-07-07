@@ -1,6 +1,9 @@
 import { fetchCore } from "@/lib/api-server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import NuevaMateriaDialog from "@/components/materias/nueva-materia-dialog"
+import EditarMateriaDialog from "@/components/materias/editar-materia-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteMateria } from "@/app/actions/materia-actions"
 
 interface MateriaResponse {
   id: number
@@ -37,6 +40,7 @@ export default async function MateriasPage() {
                 <TableHead>ID</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Código Interno</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -45,6 +49,13 @@ export default async function MateriasPage() {
                   <TableCell>{materia.id}</TableCell>
                   <TableCell>{materia.nombre}</TableCell>
                   <TableCell>{materia.codigoInterno}</TableCell>
+                  <TableCell className="flex justify-end gap-1">
+                    <EditarMateriaDialog materia={materia} />
+                    <EliminarBoton
+                      accion={deleteMateria.bind(null, materia.id)}
+                      entidadLabel={materia.nombre}
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

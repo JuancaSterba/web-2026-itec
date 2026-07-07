@@ -2,6 +2,9 @@ import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import NuevoPlanDialog from "@/components/planes/nuevo-plan-dialog"
 import InscribirAlumnoDialog from "@/components/carreras/inscribir-alumno-dialog"
+import EditarPlanDialog from "@/components/planes/editar-plan-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deletePlan } from "@/app/actions/plan-actions"
 
 interface CarreraResponse {
   id: number
@@ -68,13 +71,21 @@ export default async function CarreraDetallePage({
       ) : (
         <div className="space-y-2">
           {planes.map((plan) => (
-            <Link
+            <div
               key={plan.id}
-              href={`/dashboard/carreras/${id}/planes/${plan.id}`}
-              className="block rounded-lg border border-border bg-card p-4 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent"
+              className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm transition-colors hover:bg-accent"
             >
-              Plan {plan.cohorte} — Resolución {plan.resolucion}
-            </Link>
+              <Link href={`/dashboard/carreras/${id}/planes/${plan.id}`} className="flex-1 text-sm font-medium text-foreground">
+                Plan {plan.cohorte} — Resolución {plan.resolucion}
+              </Link>
+              <div className="flex gap-1">
+                <EditarPlanDialog plan={plan} carreraId={Number(id)} />
+                <EliminarBoton
+                  accion={deletePlan.bind(null, plan.id)}
+                  entidadLabel={`Plan ${plan.cohorte}`}
+                />
+              </div>
+            </div>
           ))}
         </div>
       )}
