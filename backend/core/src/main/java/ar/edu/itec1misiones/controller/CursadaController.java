@@ -69,4 +69,37 @@ public class CursadaController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar la condición final o nota de cierre de una cursada")
+    public ResponseEntity<ApiResponse<CursadaResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid CursadaRequest request,
+            HttpServletRequest httpRequest) {
+
+        CursadaResponse cursada = cursadaService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<CursadaResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(cursada))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Dar de baja una cursada (desinscribir al alumno de la comisión)")
+    public ResponseEntity<ApiResponse<String>> eliminar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        cursadaService.eliminar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Cursada eliminada correctamente"))
+                        .build()
+        );
+    }
 }

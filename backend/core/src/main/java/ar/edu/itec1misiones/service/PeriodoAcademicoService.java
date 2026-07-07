@@ -9,4 +9,6 @@ public interface PeriodoAcademicoService {
     PeriodoAcademicoResponse guardar(PeriodoAcademicoRequest request);
     List<PeriodoAcademicoResponse> buscarTodos();
     PeriodoAcademicoResponse buscarPorId(Long id);
+    PeriodoAcademicoResponse actualizar(Long id, PeriodoAcademicoRequest request);
+    void eliminar(Long id);
 }

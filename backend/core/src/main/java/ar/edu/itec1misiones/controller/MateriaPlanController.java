@@ -69,4 +69,37 @@ public class MateriaPlanController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar una materia de plan existente")
+    public ResponseEntity<ApiResponse<MateriaPlanResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid MateriaPlanRequest request,
+            HttpServletRequest httpRequest) {
+
+        MateriaPlanResponse materiaPlan = materiaPlanService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<MateriaPlanResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(materiaPlan))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Quitar una materia del plan de estudio")
+    public ResponseEntity<ApiResponse<String>> eliminar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        materiaPlanService.eliminar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Materia de plan eliminada correctamente"))
+                        .build()
+        );
+    }
 }

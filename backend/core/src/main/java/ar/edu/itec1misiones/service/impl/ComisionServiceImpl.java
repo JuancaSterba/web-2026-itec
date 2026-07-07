@@ -59,6 +59,31 @@ public class ComisionServiceImpl implements ComisionService {
                 .orElseThrow(() -> new ComisionNotFoundException(id)));
     }
 
+    @Override
+    public ComisionResponse actualizar(Long id, ComisionRequest request) {
+        Comision comision = comisionRepository.findById(id)
+                .orElseThrow(() -> new ComisionNotFoundException(id));
+        PeriodoAcademico periodo = periodoAcademicoRepository.findById(request.getPeriodoAcademicoId())
+                .orElseThrow(() -> new PeriodoAcademicoNotFoundException(request.getPeriodoAcademicoId()));
+        MateriaPlan materiaPlan = materiaPlanRepository.findById(request.getMateriaPlanId())
+                .orElseThrow(() -> new MateriaPlanNotFoundException(request.getMateriaPlanId()));
+
+        comision.setNombreComision(request.getNombreComision());
+        comision.setCupoMaximo(request.getCupoMaximo());
+        comision.setPeriodoAcademico(periodo);
+        comision.setMateriaPlan(materiaPlan);
+
+        return toResponse(comisionRepository.save(comision));
+    }
+
+    @Override
+    public void desactivar(Long id) {
+        Comision comision = comisionRepository.findById(id)
+                .orElseThrow(() -> new ComisionNotFoundException(id));
+        comision.setActiva(false);
+        comisionRepository.save(comision);
+    }
+
     private ComisionResponse toResponse(Comision comision) {
         return ComisionResponse.builder()
                 .id(comision.getId())

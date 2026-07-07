@@ -69,4 +69,37 @@ public class ComisionController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar una comisión existente")
+    public ResponseEntity<ApiResponse<ComisionResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid ComisionRequest request,
+            HttpServletRequest httpRequest) {
+
+        ComisionResponse comision = comisionService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<ComisionResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(comision))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar una comisión (baja lógica)")
+    public ResponseEntity<ApiResponse<String>> desactivar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        comisionService.desactivar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Comisión desactivada correctamente"))
+                        .build()
+        );
+    }
 }

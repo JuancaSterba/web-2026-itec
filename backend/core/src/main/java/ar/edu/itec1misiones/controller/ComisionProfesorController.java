@@ -69,4 +69,37 @@ public class ComisionProfesorController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar una asignación docente existente")
+    public ResponseEntity<ApiResponse<ComisionProfesorResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid ComisionProfesorRequest request,
+            HttpServletRequest httpRequest) {
+
+        ComisionProfesorResponse comisionProfesor = comisionProfesorService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<ComisionProfesorResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(comisionProfesor))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Quitar la asignación de un profesor a una comisión")
+    public ResponseEntity<ApiResponse<String>> eliminar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        comisionProfesorService.eliminar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Asignación docente eliminada correctamente"))
+                        .build()
+        );
+    }
 }

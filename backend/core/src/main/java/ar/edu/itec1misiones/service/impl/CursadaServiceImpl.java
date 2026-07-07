@@ -59,6 +59,25 @@ public class CursadaServiceImpl implements CursadaService {
                 .orElseThrow(() -> new CursadaNotFoundException(id)));
     }
 
+    @Override
+    public CursadaResponse actualizar(Long id, CursadaRequest request) {
+        Cursada cursada = cursadaRepository.findById(id)
+                .orElseThrow(() -> new CursadaNotFoundException(id));
+
+        cursada.setFechaInscripcion(request.getFechaInscripcion());
+        cursada.setCondicionFinal(request.getCondicionFinal());
+        cursada.setNotaCierre(request.getNotaCierre());
+
+        return toResponse(cursadaRepository.save(cursada));
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        Cursada cursada = cursadaRepository.findById(id)
+                .orElseThrow(() -> new CursadaNotFoundException(id));
+        cursadaRepository.delete(cursada);
+    }
+
     private CursadaResponse toResponse(Cursada cursada) {
         return CursadaResponse.builder()
                 .id(cursada.getId())

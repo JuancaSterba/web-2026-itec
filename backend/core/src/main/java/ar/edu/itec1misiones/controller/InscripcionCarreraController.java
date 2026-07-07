@@ -69,4 +69,37 @@ public class InscripcionCarreraController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar una inscripción a carrera existente")
+    public ResponseEntity<ApiResponse<InscripcionCarreraResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid InscripcionCarreraRequest request,
+            HttpServletRequest httpRequest) {
+
+        InscripcionCarreraResponse inscripcion = inscripcionCarreraService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<InscripcionCarreraResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(inscripcion))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Dar de baja una inscripción a carrera")
+    public ResponseEntity<ApiResponse<String>> darDeBaja(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        inscripcionCarreraService.darDeBaja(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Inscripción dada de baja correctamente"))
+                        .build()
+        );
+    }
 }

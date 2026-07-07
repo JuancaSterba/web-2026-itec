@@ -9,4 +9,6 @@ public interface ComisionService {
     ComisionResponse guardar(ComisionRequest request);
     List<ComisionResponse> buscarTodos();
     ComisionResponse buscarPorId(Long id);
+    ComisionResponse actualizar(Long id, ComisionRequest request);
+    void desactivar(Long id);
 }
