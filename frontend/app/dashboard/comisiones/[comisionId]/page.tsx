@@ -11,6 +11,7 @@ import EditarProfesorAsignadoDialog from "@/components/comisiones/editar-profeso
 import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteCursada } from "@/app/actions/cursada-actions"
 import { deleteComisionProfesor } from "@/app/actions/comision-profesor-actions"
+import NuevaInstanciaDialog from "@/components/comisiones/nueva-instancia-dialog"
 
 interface ComisionResponse {
   id: number
@@ -143,6 +144,11 @@ export default async function ComisionDetallePage({
     new Set(Array.from(asistenciasPorCursada?.values() ?? []).flat().map((a) => a.fecha))
   ).sort()
 
+  const asistenciasExistentes = Array.from(asistenciasPorCursada?.entries() ?? []).flatMap(
+    ([cursadaId, asistenciasDeCursada]) =>
+      asistenciasDeCursada.map((a) => ({ cursadaId, fecha: a.fecha, id: a.id }))
+  )
+
   function badgeParaEstado(estado: string) {
     const normalizado = estado.toLowerCase()
     if (normalizado.includes("presente")) {
@@ -268,7 +274,7 @@ export default async function ComisionDetallePage({
 
         <TabsContent value="asistencias" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
-            <TomarAsistenciaDialog cursadas={cursadasParaAsistencia} />
+            <TomarAsistenciaDialog cursadas={cursadasParaAsistencia} asistenciasExistentes={asistenciasExistentes} />
           </div>
           {cursadasDeLaComision === null || asistenciasPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las asistencias. Intentá nuevamente más tarde.</p>
@@ -307,7 +313,10 @@ export default async function ComisionDetallePage({
           )}
         </TabsContent>
 
-        <TabsContent value="calificaciones" className="rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+        <TabsContent value="calificaciones" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+          <div className="flex justify-end">
+            <NuevaInstanciaDialog cursadas={cursadasParaAsistencia} />
+          </div>
           {cursadasDeLaComision === null || calificacionesPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las calificaciones. Intentá nuevamente más tarde.</p>
           ) : instancias.length === 0 ? (

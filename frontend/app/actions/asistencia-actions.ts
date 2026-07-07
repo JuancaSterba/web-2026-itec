@@ -9,22 +9,25 @@ function getApiBaseUrl() {
 
 export async function saveAsistenciasMasivas(
   fecha: string,
-  registros: { cursadaId: number; estado: string }[]
+  registros: { cursadaId: number; estado: string; asistenciaId?: number }[]
 ) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
   const respuestas = await Promise.all(
-    registros.map((registro) =>
-      fetch(`${getApiBaseUrl()}/api/asistencias`, {
-        method: "POST",
+    registros.map((registro) => {
+      const url = registro.asistenciaId
+        ? `${getApiBaseUrl()}/api/asistencias/${registro.asistenciaId}`
+        : `${getApiBaseUrl()}/api/asistencias`
+      return fetch(url, {
+        method: registro.asistenciaId ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify({ cursadaId: registro.cursadaId, fecha, estado: registro.estado }),
       })
-    )
+    })
   )
 
   if (respuestas.some((response) => !response.ok)) {
