@@ -3,6 +3,9 @@ import { fetchCore } from "@/lib/api-server"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import NuevoCicloDialog from "@/components/ciclos/nuevo-ciclo-dialog"
+import EditarCicloDialog from "@/components/ciclos/editar-ciclo-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteCiclo } from "@/app/actions/ciclo-actions"
 
 interface CicloLectivoResponse {
   id: number
@@ -36,9 +39,16 @@ export default async function CiclosPage() {
               <Card className="h-full transition-colors hover:bg-accent">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-base">Ciclo Lectivo {ciclo.anio}</CardTitle>
-                  <Badge variant={ciclo.activo ? "default" : "secondary"}>
-                    {ciclo.activo ? "Activo" : "Inactivo"}
-                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Badge variant={ciclo.activo ? "default" : "secondary"}>
+                      {ciclo.activo ? "Activo" : "Inactivo"}
+                    </Badge>
+                    <EditarCicloDialog ciclo={ciclo} />
+                    <EliminarBoton
+                      accion={deleteCiclo.bind(null, ciclo.id)}
+                      entidadLabel={`Ciclo Lectivo ${ciclo.anio}`}
+                    />
+                  </div>
                 </CardHeader>
               </Card>
             </Link>

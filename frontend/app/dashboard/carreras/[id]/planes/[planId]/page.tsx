@@ -1,5 +1,8 @@
 import { fetchCore } from "@/lib/api-server"
 import AgregarMateriaDialog from "@/components/planes/agregar-materia-dialog"
+import EditarMateriaPlanDialog from "@/components/planes/editar-materia-plan-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteMateriaPlan } from "@/app/actions/materia-plan-actions"
 
 interface MateriaPlanResponse {
   id: number
@@ -60,8 +63,21 @@ export default async function PlanDetallePage({
               <h2 className="mb-2 text-sm font-semibold text-foreground">{cuatrimestre}º Cuatrimestre</h2>
               <ul className="space-y-1 text-sm text-muted-foreground">
                 {porCuatrimestre![cuatrimestre].map((mp) => (
-                  <li key={mp.id}>
-                    {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs)</span>
+                  <li key={mp.id} className="flex items-center justify-between">
+                    <span>
+                      {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs)</span>
+                    </span>
+                    <div className="flex gap-1">
+                      <EditarMateriaPlanDialog
+                        materiaPlan={mp}
+                        planId={Number(planId)}
+                        materiasDisponibles={materias ?? []}
+                      />
+                      <EliminarBoton
+                        accion={deleteMateriaPlan.bind(null, mp.id)}
+                        entidadLabel={mp.materiaNombre}
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>
