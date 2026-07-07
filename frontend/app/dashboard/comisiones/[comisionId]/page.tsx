@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import AgregarAlumnoDialog from "@/components/comisiones/agregar-alumno-dialog"
+import EditableNotaCell from "@/components/comisiones/editable-nota-cell"
 
 interface ComisionResponse {
   id: number
@@ -244,7 +245,16 @@ export default async function ComisionDetallePage({
                       <TableCell>{alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}</TableCell>
                       {instancias.map((instancia) => {
                         const calificacion = calificaciones.find((c) => c.instancia === instancia)
-                        return <TableCell key={instancia}>{calificacion?.nota ?? "—"}</TableCell>
+                        return (
+                          <TableCell key={instancia}>
+                            <EditableNotaCell
+                              cursadaId={cursada.id}
+                              instancia={instancia}
+                              initialNota={calificacion?.nota ?? null}
+                              calificacionId={calificacion?.id}
+                            />
+                          </TableCell>
+                        )
                       })}
                     </TableRow>
                   )
