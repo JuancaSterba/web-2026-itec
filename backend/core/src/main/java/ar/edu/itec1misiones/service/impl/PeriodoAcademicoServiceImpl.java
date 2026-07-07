@@ -52,6 +52,28 @@ public class PeriodoAcademicoServiceImpl implements PeriodoAcademicoService {
                 .orElseThrow(() -> new PeriodoAcademicoNotFoundException(id)));
     }
 
+    @Override
+    public PeriodoAcademicoResponse actualizar(Long id, PeriodoAcademicoRequest request) {
+        PeriodoAcademico periodo = periodoAcademicoRepository.findById(id)
+                .orElseThrow(() -> new PeriodoAcademicoNotFoundException(id));
+        CicloLectivo ciclo = cicloLectivoRepository.findById(request.getCicloLectivoId())
+                .orElseThrow(() -> new CicloLectivoNotFoundException(request.getCicloLectivoId()));
+
+        periodo.setNombre(request.getNombre());
+        periodo.setFechaInicio(request.getFechaInicio());
+        periodo.setFechaFin(request.getFechaFin());
+        periodo.setCicloLectivo(ciclo);
+
+        return toResponse(periodoAcademicoRepository.save(periodo));
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        PeriodoAcademico periodo = periodoAcademicoRepository.findById(id)
+                .orElseThrow(() -> new PeriodoAcademicoNotFoundException(id));
+        periodoAcademicoRepository.delete(periodo);
+    }
+
     private PeriodoAcademicoResponse toResponse(PeriodoAcademico periodo) {
         return PeriodoAcademicoResponse.builder()
                 .id(periodo.getId())

@@ -9,4 +9,6 @@ public interface CursadaService {
     CursadaResponse guardar(CursadaRequest request);
     List<CursadaResponse> buscarTodos();
     CursadaResponse buscarPorId(Long id);
+    CursadaResponse actualizar(Long id, CursadaRequest request);
+    void eliminar(Long id);
 }

@@ -61,6 +61,29 @@ public class ComisionProfesorServiceImpl implements ComisionProfesorService {
                 .orElseThrow(() -> new ComisionProfesorNotFoundException(id)));
     }
 
+    @Override
+    public ComisionProfesorResponse actualizar(Long id, ComisionProfesorRequest request) {
+        ComisionProfesor comisionProfesor = comisionProfesorRepository.findById(id)
+                .orElseThrow(() -> new ComisionProfesorNotFoundException(id));
+        Comision comision = comisionRepository.findById(request.getComisionId())
+                .orElseThrow(() -> new ComisionNotFoundException(request.getComisionId()));
+        Profesor profesor = profesorRepository.findById(request.getProfesorId())
+                .orElseThrow(() -> new ProfesorNotFoundException(request.getProfesorId()));
+
+        comisionProfesor.setComision(comision);
+        comisionProfesor.setProfesor(profesor);
+        comisionProfesor.setRol(request.getRol());
+
+        return toResponse(comisionProfesorRepository.save(comisionProfesor));
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        ComisionProfesor comisionProfesor = comisionProfesorRepository.findById(id)
+                .orElseThrow(() -> new ComisionProfesorNotFoundException(id));
+        comisionProfesorRepository.delete(comisionProfesor);
+    }
+
     private ComisionProfesorResponse toResponse(ComisionProfesor comisionProfesor) {
         return ComisionProfesorResponse.builder()
                 .id(comisionProfesor.getId())

@@ -9,4 +9,6 @@ public interface CicloLectivoService {
     CicloLectivoResponse guardar(CicloLectivoRequest request);
     List<CicloLectivoResponse> buscarTodos();
     CicloLectivoResponse buscarPorId(Long id);
+    CicloLectivoResponse actualizar(Long id, CicloLectivoRequest request);
+    void desactivar(Long id);
 }

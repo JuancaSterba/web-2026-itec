@@ -9,4 +9,6 @@ public interface InscripcionCarreraService {
     InscripcionCarreraResponse guardar(InscripcionCarreraRequest request);
     List<InscripcionCarreraResponse> buscarTodos();
     InscripcionCarreraResponse buscarPorId(Long id);
+    InscripcionCarreraResponse actualizar(Long id, InscripcionCarreraRequest request);
+    void darDeBaja(Long id);
 }

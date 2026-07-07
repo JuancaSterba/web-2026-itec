@@ -58,6 +58,30 @@ public class MateriaPlanServiceImpl implements MateriaPlanService {
                 .orElseThrow(() -> new MateriaPlanNotFoundException(id)));
     }
 
+    @Override
+    public MateriaPlanResponse actualizar(Long id, MateriaPlanRequest request) {
+        MateriaPlan materiaPlan = materiaPlanRepository.findById(id)
+                .orElseThrow(() -> new MateriaPlanNotFoundException(id));
+        PlanEstudio planEstudio = planEstudioRepository.findById(request.getPlanEstudioId())
+                .orElseThrow(() -> new PlanEstudioNotFoundException(request.getPlanEstudioId()));
+        Materia materia = materiaRepository.findById(request.getMateriaId())
+                .orElseThrow(() -> new MateriaNotFoundException(request.getMateriaId()));
+
+        materiaPlan.setPlanEstudio(planEstudio);
+        materiaPlan.setMateria(materia);
+        materiaPlan.setCuatrimestreDictado(request.getCuatrimestreDictado());
+        materiaPlan.setCargaHoraria(request.getCargaHoraria());
+
+        return toResponse(materiaPlanRepository.save(materiaPlan));
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        MateriaPlan materiaPlan = materiaPlanRepository.findById(id)
+                .orElseThrow(() -> new MateriaPlanNotFoundException(id));
+        materiaPlanRepository.delete(materiaPlan);
+    }
+
     private MateriaPlanResponse toResponse(MateriaPlan materiaPlan) {
         return MateriaPlanResponse.builder()
                 .id(materiaPlan.getId())

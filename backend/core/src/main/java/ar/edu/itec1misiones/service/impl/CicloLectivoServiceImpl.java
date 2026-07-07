@@ -45,6 +45,26 @@ public class CicloLectivoServiceImpl implements CicloLectivoService {
                 .orElseThrow(() -> new CicloLectivoNotFoundException(id)));
     }
 
+    @Override
+    public CicloLectivoResponse actualizar(Long id, CicloLectivoRequest request) {
+        CicloLectivo ciclo = cicloLectivoRepository.findById(id)
+                .orElseThrow(() -> new CicloLectivoNotFoundException(id));
+
+        ciclo.setAnio(request.getAnio());
+        ciclo.setFechaInicio(request.getFechaInicio());
+        ciclo.setFechaFin(request.getFechaFin());
+
+        return toResponse(cicloLectivoRepository.save(ciclo));
+    }
+
+    @Override
+    public void desactivar(Long id) {
+        CicloLectivo ciclo = cicloLectivoRepository.findById(id)
+                .orElseThrow(() -> new CicloLectivoNotFoundException(id));
+        ciclo.setActivo(false);
+        cicloLectivoRepository.save(ciclo);
+    }
+
     private CicloLectivoResponse toResponse(CicloLectivo ciclo) {
         return CicloLectivoResponse.builder()
                 .id(ciclo.getId())

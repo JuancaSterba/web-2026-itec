@@ -69,4 +69,37 @@ public class PeriodoAcademicoController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar un periodo académico existente")
+    public ResponseEntity<ApiResponse<PeriodoAcademicoResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid PeriodoAcademicoRequest request,
+            HttpServletRequest httpRequest) {
+
+        PeriodoAcademicoResponse periodo = periodoAcademicoService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<PeriodoAcademicoResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(periodo))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Eliminar un periodo académico")
+    public ResponseEntity<ApiResponse<String>> eliminar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        periodoAcademicoService.eliminar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Periodo académico eliminado correctamente"))
+                        .build()
+        );
+    }
 }

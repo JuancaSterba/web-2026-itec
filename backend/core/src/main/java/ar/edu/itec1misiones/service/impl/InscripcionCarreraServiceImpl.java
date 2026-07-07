@@ -58,6 +58,25 @@ public class InscripcionCarreraServiceImpl implements InscripcionCarreraService 
                 .orElseThrow(() -> new InscripcionCarreraNotFoundException(id)));
     }
 
+    @Override
+    public InscripcionCarreraResponse actualizar(Long id, InscripcionCarreraRequest request) {
+        InscripcionCarrera inscripcion = inscripcionCarreraRepository.findById(id)
+                .orElseThrow(() -> new InscripcionCarreraNotFoundException(id));
+
+        inscripcion.setFechaInscripcion(request.getFechaInscripcion());
+        inscripcion.setEstado(request.getEstado());
+
+        return toResponse(inscripcionCarreraRepository.save(inscripcion));
+    }
+
+    @Override
+    public void darDeBaja(Long id) {
+        InscripcionCarrera inscripcion = inscripcionCarreraRepository.findById(id)
+                .orElseThrow(() -> new InscripcionCarreraNotFoundException(id));
+        inscripcion.setEstado("BAJA");
+        inscripcionCarreraRepository.save(inscripcion);
+    }
+
     private InscripcionCarreraResponse toResponse(InscripcionCarrera inscripcion) {
         return InscripcionCarreraResponse.builder()
                 .id(inscripcion.getId())

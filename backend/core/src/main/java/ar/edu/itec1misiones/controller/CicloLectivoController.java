@@ -69,4 +69,37 @@ public class CicloLectivoController {
                         .build()
         );
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar un ciclo lectivo existente")
+    public ResponseEntity<ApiResponse<CicloLectivoResponse>> actualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid CicloLectivoRequest request,
+            HttpServletRequest httpRequest) {
+
+        CicloLectivoResponse ciclo = cicloLectivoService.actualizar(id, request);
+        return ResponseEntity.ok(
+                ApiResponse.<CicloLectivoResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(ciclo))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar un ciclo lectivo (baja lógica)")
+    public ResponseEntity<ApiResponse<String>> desactivar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        cicloLectivoService.desactivar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of("Ciclo lectivo desactivado correctamente"))
+                        .build()
+        );
+    }
 }

@@ -9,4 +9,6 @@ public interface MateriaPlanService {
     MateriaPlanResponse guardar(MateriaPlanRequest request);
     List<MateriaPlanResponse> buscarTodos();
     MateriaPlanResponse buscarPorId(Long id);
+    MateriaPlanResponse actualizar(Long id, MateriaPlanRequest request);
+    void eliminar(Long id);
 }
