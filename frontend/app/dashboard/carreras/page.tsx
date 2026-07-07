@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import NuevaCarreraDialog from "@/components/carreras/nueva-carrera-dialog"
 
 interface CarreraResponse {
   id: number
@@ -14,9 +15,12 @@ export default async function CarrerasPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Carreras</h1>
-        <p className="text-sm text-muted-foreground">Seleccioná una carrera para ver sus planes de estudio</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Carreras</h1>
+          <p className="text-sm text-muted-foreground">Seleccioná una carrera para ver sus planes de estudio</p>
+        </div>
+        <NuevaCarreraDialog />
       </div>
 
       {carreras === null ? (
