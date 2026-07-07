@@ -15,9 +15,13 @@ function formatLabel(segment: string) {
 }
 
 // Segmentos de URL puramente estructurales, sin page.tsx propio
-// (ej: /ciclos/[id]/periodos/ no existe, solo /periodos/[periodoId]/comisiones).
-// Clickearlos da 404, asi que no se renderizan como Link.
-const SEGMENTOS_NO_NAVEGABLES = new Set(["periodos", "planes"])
+// (ej: /ciclos/[id]/periodos/ no existe, solo /periodos/[periodoId]/comisiones;
+// /dashboard/comisiones tampoco existe, solo /comisiones/[comisionId]).
+// Clickearlos da 404, asi que no se renderizan como Link. Cuando "comisiones"
+// es el ultimo segmento (ej ".../periodos/2/comisiones", que si es pagina
+// real) ya se renderiza como texto por ser el crumb final, asi que agregarlo
+// aca no rompe ese caso.
+const SEGMENTOS_NO_NAVEGABLES = new Set(["periodos", "planes", "comisiones"])
 
 export default function Breadcrumbs() {
   const pathname = usePathname()
