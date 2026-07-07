@@ -1,4 +1,5 @@
 import { fetchCore } from "@/lib/api-server"
+import AgregarMateriaDialog from "@/components/planes/agregar-materia-dialog"
 
 interface MateriaPlanResponse {
   id: number
@@ -9,6 +10,14 @@ interface MateriaPlanResponse {
   cargaHoraria: number
 }
 
+interface MateriaResponse {
+  id: number
+  nombre: string
+  codigoInterno: string
+  descripcion: string
+  activa: boolean
+}
+
 export default async function PlanDetallePage({
   params,
 }: {
@@ -16,7 +25,10 @@ export default async function PlanDetallePage({
 }) {
   const { id, planId } = await params
 
-  const materiasPlan = await fetchCore<MateriaPlanResponse>("/materias-plan")
+  const [materiasPlan, materias] = await Promise.all([
+    fetchCore<MateriaPlanResponse>("/materias-plan"),
+    fetchCore<MateriaResponse>("/materias"),
+  ])
   const delPlan = materiasPlan?.filter((mp) => String(mp.planEstudioId) === planId) ?? null
 
   const porCuatrimestre = delPlan?.reduce<Record<number, MateriaPlanResponse[]>>((acc, mp) => {
@@ -29,9 +41,12 @@ export default async function PlanDetallePage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Malla Curricular - Plan {planId}</h1>
-        <p className="text-sm text-muted-foreground">Carrera {id}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Malla Curricular - Plan {planId}</h1>
+          <p className="text-sm text-muted-foreground">Carrera {id}</p>
+        </div>
+        <AgregarMateriaDialog planId={Number(planId)} materiasDisponibles={materias ?? []} />
       </div>
 
       {delPlan === null ? (
