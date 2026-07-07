@@ -1,0 +1,126 @@
+# Arquitectura Funcional: Dominio del ERP Académico
+
+El sistema se divide en cuatro grandes "Contextos Delimitados" (Bounded Contexts) que interactúan entre sí. Este diseño define de manera estricta qué es cada entidad, de qué es responsable y qué cosas NO debe manejar, evitando acoplamientos innecesarios.
+
+> **Objetivo de Diseño:** El usuario no navega hacia entidades aisladas. El flujo sigue una lógica jerárquica natural: Institución -> Carrera -> Plan -> Cuatrimestre.
+
+---
+
+## 1. Dominio: CATÁLOGO ACADÉMICO (La Estructura)
+*Responsabilidad: Mantener el registro histórico e inmutable de la estructura educativa de la institución.*
+
+### Entidad: `Materia` (Catálogo Maestro)
+* **Responsabilidad:** Identificar la esencia de una asignatura, independientemente de qué carrera la use.
+* **Administra:** Nombre (ej. "Inglés"), Código Interno, Descripción, Contenidos mínimos.
+* **No le pertenece:** Cuándo se dicta, la carga horaria o las notas de los alumnos. (Si "Inglés" está en 3 carreras, la Materia es 1 sola).
+* **Jerarquía:** Raíz / Independiente.
+
+### Entidad: `Carrera`
+* **Responsabilidad:** Agrupar la oferta de títulos de la institución.
+* **Administra:** Nombre (ej. "Desarrollo de Software"), Resolución Ministerial, Título otorgado.
+* **Jerarquía:** Raíz.
+
+### Entidad: `Plan de Estudio`
+* **Responsabilidad:** Controlar las reglas académicas vigentes para una carrera en un momento de la historia.
+* **Administra:** Año de inicio (Cohorte), Estado (Vigente / Obsoleto), Duración teórica.
+* **Relación:** Pertenece a una `Carrera` (1 Carrera tiene N Planes).
+
+### Entidad: `Materia en Plan` (Estructura Curricular)
+* **Responsabilidad:** Contextualizar una Materia maestra dentro de un Plan específico.
+* **Administra:** Cuatrimestre/Año en el que se dicta, Carga horaria, Régimen (Cuatrimestral/Anual).
+* **Relaciones:** 
+  * Pertenece a 1 `Plan de Estudio`.
+  * Referencia a 1 `Materia` (Catálogo).
+  * Referencia a N `Materias en Plan` (como Correlativas Previas).
+* **No le pertenece:** Las aulas, los profesores o los alumnos que la cursan actualmente.
+
+---
+
+## 2. Dominio: GESTIÓN ACADÉMICA (La Operación Temporal)
+*Responsabilidad: Orquestar el día a día. Todo en este dominio tiene una "Fecha de Inicio" y "Fecha de Fin".*
+
+### Entidad: `Ciclo Lectivo`
+* **Responsabilidad:** Delimitar el año de trabajo.
+* **Administra:** Año (ej. 2026), Fechas extremas de inicio y fin institucionales.
+* **Jerarquía:** Raíz Temporal.
+
+### Entidad: `Período Académico`
+* **Responsabilidad:** Subdividir el Ciclo en bloques operativos.
+* **Administra:** Nombre ("Primer Cuatrimestre"), Fechas de inicio/fin de clases.
+* **Relación:** Pertenece a 1 `Ciclo Lectivo`.
+
+### Entidad: `Comisión` (El núcleo de la operación)
+* **Responsabilidad:** Es la instancia real donde ocurren las clases.
+* **Administra:** Nombre (ej. "1º Año A - Turno Noche"), Cupo máximo.
+* **Relaciones:**
+  * Se dicta en 1 `Período Académico`.
+  * Instancia a 1 `Materia en Plan`.
+  * Tiene N `Profesores` asignados (Titular, Ayudante).
+* **No le pertenece:** El programa analítico de la materia (eso es del Plan de Estudio).
+
+### Entidad: `Clase / Horario`
+* **Responsabilidad:** Posicionar la comisión en el espacio y el tiempo.
+* **Administra:** Día de la semana, Hora inicio, Hora fin, Aula (física o virtual).
+* **Relación:** Pertenece a 1 `Comisión`.
+
+---
+
+## 3. Dominio: IDENTIDAD Y PERSONAS
+*Responsabilidad: Administrar a los actores físicos del sistema.*
+
+### Entidad: `Persona` (Usuario)
+* **Responsabilidad:** Centralizar los datos de contacto y acceso.
+* **Administra:** DNI, Nombre completo, Email, Teléfono, Contraseña.
+* **Roles:** Alumno, Profesor, Administrador (Una misma Persona puede ser Alumno en una carrera y Profesor en otra).
+
+---
+
+## 4. Dominio: TRAZABILIDAD ACADÉMICA (El Puente / Los Registros)
+*Responsabilidad: Unir a las `Personas` con la `Estructura` mediante la `Operación`. Todo aquí es transaccional.*
+
+### Entidad: `Inscripción a Carrera`
+* **Responsabilidad:** Vincular al alumno formalmente con la institución a largo plazo.
+* **Administra:** Fecha de ingreso, Estado (Regular, Graduado, Baja).
+* **Relaciones:** 1 `Persona` (Alumno) + 1 `Plan de Estudio`.
+
+### Entidad: `Cursada` (Inscripción a Comisión)
+* **Responsabilidad:** Registrar que un alumno está tomando clases este cuatrimestre.
+* **Administra:** Condición final (Libre, Regular, Promocionado), Nota de cierre de cursado.
+* **Relaciones:** 1 `Alumno` + 1 `Comisión`.
+
+### Entidad: `Calificación Parcial`
+* **Responsabilidad:** Registrar las notas durante el dictado.
+* **Administra:** Instancia (ej. "1º Parcial"), Nota, Fecha.
+* **Relaciones:** Pertenece a 1 `Cursada` de un Alumno.
+
+### Entidad: `Asistencia`
+* **Responsabilidad:** Registrar el presentismo en el aula.
+* **Administra:** Estado (Presente, Ausente, Tarde), Fecha.
+* **Relaciones:** Pertenece a 1 `Cursada` de un Alumno.
+
+---
+
+## 🗺️ La Jerarquía Mental del Sistema (Cómo lo piensa el Usuario)
+
+Cuando un directivo entra al sistema, la navegación visual y mental seguirá estrictamente este árbol de responsabilidades:
+
+**Flujo A: Diseñar la Institución (Rara vez se toca)**
+* `Catálogo de Materias` (CRUD Básico global)
+* `Carreras` ➡️ `Plan 2026` ➡️ `Primer Cuatrimestre` ➡️ `Materia en Plan: Programación I` (Aquí asigna que la correlativa es Lógica).
+
+**Flujo B: Operar el Día a Día (Uso continuo)**
+* `Ciclo 2026` ➡️ `Primer Cuatrimestre` ➡️ `Oferta: Desarrollo de Software` ➡️ `Comisión A (Programación I)` ➡️ (Aquí asigna profesor, aula y ve los alumnos).
+
+**Flujo C: Vida del Alumno**
+* `Alumnos` ➡️ `Juan Pérez` ➡️ `Plan: Desarrollo 2026` ➡️ `Avance Académico` (El sistema calcula su avance cruzando las `Cursadas` que Juan aprobó contra las `Materias en Plan` de su carrera).
+
+---
+
+### Beneficios críticos de este diseño:
+1. **No hay acoplamiento duro:** Si el año que viene el gobierno cambia la currícula de una materia, se hace un `Plan 2027`. El `Plan 2026` queda intacto y los alumnos de 2º año no se ven afectados.
+2. **Escalabilidad temporal:** Las notas de un alumno en 2024 están atadas a la `Comisión` de 2024. No importa si en 2026 cambiaron al profesor, el registro histórico es inmutable.
+3. **Reusabilidad real:** Una materia como "Metodología de la Investigación" se carga 1 sola vez en el Catálogo, pero se puede instanciar en 5 Carreras diferentes.
+
+---
+
+> **Lectura Siguiente Recomendada:** [Arquitectura_Navegacion.md](./Arquitectura_Navegacion.md) (Define cómo estas entidades se reflejan en la interfaz de usuario y las rutas del sistema).

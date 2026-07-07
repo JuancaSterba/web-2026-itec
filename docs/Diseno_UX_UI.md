@@ -1,0 +1,69 @@
+# Diseño de Experiencia de Usuario (UX/UI) y Patrones de Interfaz
+
+> **Lectura Previa Recomendada:** [Plan_Refactorizacion.md](./Plan_Refactorizacion.md)
+
+Para migrar hacia una experiencia de tipo ERP moderno (estilo Odoo, SAP Fiori o Microsoft Dynamics), debemos abandonar el paradigma de "formularios sueltos" e implementar un modelo de **Navegación Contextual y Vistas Maestro-Detalle**.
+
+El objetivo principal es que el usuario *sienta* el peso de la jerarquía académica: siempre sabrá dónde está, de dónde viene, y qué acciones son válidas en ese punto exacto.
+
+---
+
+## 1. El "App Shell" (Estructura Base de la Pantalla)
+
+Toda la aplicación estará envuelta en un *Layout* consistente dividido en tres zonas inmutables:
+
+* **Menú Lateral (Sidebar):** 
+  * Actúa como el mapa global. Solo contiene los "Contextos Delimitados" (Institución, Catálogo, Gestión, Personas). 
+  * Es colapsable (para dejar más espacio al contenido) pero siempre resalta en qué módulo principal estamos parados.
+* **Barra Superior (Top Bar):**
+  * Contiene el perfil del usuario, selector de "Sede" o "Modo" si aplicara, y notificaciones.
+  * *Crucial:* Aquí no hay menús de navegación de datos.
+* **Área de Contenido (Main Content):**
+  * Es el lienzo dinámico. Su primera fila **siempre** estará ocupada por el componente de *Breadcrumbs*.
+
+---
+
+## 2. Patrones de Diseño Centrales
+
+### A. El Ancla de Contexto: Breadcrumbs (Migas de Pan)
+No son un adorno, son la herramienta principal de navegación de retroceso.
+* *Ejemplo Visual:* `🏠 Inicio / Catálogo / Desarrollo de Software / Plan 2026 / Programación I`
+* *Comportamiento:* Habilitan saltar de la materia directamente a la carrera con un clic. El texto del último nodo (donde estamos parados) se renderiza más grande y actúa como el **Título de la Pantalla**.
+
+### B. Vistas Maestro-Detalle
+En lugar de ir a otra pantalla vacía, al seleccionar un elemento de una lista, el usuario "entra" al objeto.
+* **El Maestro (Lista):** Una tabla o grilla de tarjetas (ej. Listado de Carreras).
+* **El Detalle (Dashboard del Objeto):** Al hacer clic, entramos al *Dashboard* de esa Carrera. Este dashboard tiene una cabecera con información resumida (Cards con métricas: "3 Planes", "450 Alumnos Activos", Estado: "Vigente") y debajo, contenido anidado.
+
+### C. Barra de Acciones Contextuales (Action Bar)
+Los botones de acción (`Guardar`, `Editar`, `Aprobar`, `Nueva Comisión`) no flotan aleatoriamente. Se agrupan en la esquina superior derecha del área de contenido, alineados con el título del *Breadcrumb*.
+* Si el usuario está viendo el "Plan 2026", el botón dirá `+ Añadir Materia al Plan`. Las acciones responden al contexto actual, no a entidades globales.
+
+### D. Sub-navegación por Pestañas (Tabs)
+Se utilizan cuando llegamos a un "Nodo Final" complejo, como una **Comisión** o el **Legajo de un Alumno**.
+* Para evitar que el usuario se pierda saltando de pantalla en pantalla, el contexto superior se congela (ej. Título: "Comisión A - Prog. I").
+* Debajo del título, aparecen las pestañas: `[Información General]` `[Alumnos Inscritos]` `[Asistencias]` `[Calificaciones]`.
+* *Beneficio:* Cambiar de pestaña es instantáneo y no recarga el contexto.
+
+---
+
+## 3. Ejemplo Práctico del Viaje del Usuario (User Journey)
+
+### Escenario: El Bedel gestiona una Comisión.
+1. **Nivel 1 (Entrada):** Hace clic en "Ciclos Lectivos" en el menú lateral. Ve tarjetas grandes de años (2025, 2026).
+2. **Nivel 2 (Períodos):** Entra al `2026`. La pantalla muta. El breadcrumb dice `Ciclos / 2026`. Ve una barra de progreso general del ciclo y dos grandes secciones: "1º Cuatrimestre" y "2º Cuatrimestre".
+3. **Nivel 3 (Oferta):** Entra al `1º Cuatrimestre`. Ve un listado de las Carreras activas (agrupadores visuales tipo *Acordeón* o *DataGrid* agrupada). Despliega "Desarrollo de Software" y ve las Comisiones.
+4. **Nivel 4 (Nodo Final - La Comisión):** Hace clic en "Comisión A - Matemáticas".
+   * El sistema oculta toda la "basura" visual innecesaria.
+   * **Cabecera:** `Ciclos / 2026 / 1º Cuat. / Desarrollo de Soft. / Matemáticas - Com. A`
+   * **Tarjetas de Resumen (KPIs):** `Cupo: 35/40` | `Profesor: Juan Pérez` | `Estado: En Curso`.
+   * **Cuerpo:** Por defecto, abre la pestaña de `[Alumnos]`. El Bedel ve la lista. Con un clic en la pestaña `[Asistencias]`, la tabla inferior cambia a la vista de calendario para tildar presentes, **sin perder de vista en qué materia y comisión está.**
+
+---
+
+## 4. Biblioteca de Componentes UI (Consistencia Visual)
+Para lograr el aspecto de un ERP de alta gama, estandarizaremos:
+1. **DataGrids Avanzadas:** Tablas con capacidad nativa de búsqueda, filtrado por columnas, ordenamiento y paginación. Ninguna lista larga debe romper el layout.
+2. **Status Badges (Píldoras de estado):** Elementos visuales clave para lectura rápida (ej. Verde: "Vigente", Rojo: "Inactivo", Amarillo: "Pendiente").
+3. **Drawers (Paneles Deslizables):** Para formularios de edición simples (ej. cambiar el aula de una comisión), no lo llevamos a otra página. Se desliza un panel desde la derecha sobre la pantalla actual, manteniendo el contexto de fondo oscurecido.
+4. **Skeleton Loaders:** Para las transiciones pesadas de datos, en lugar de un *spinner* global que bloquea la pantalla, usar esqueletos grises para mantener la percepción de velocidad.

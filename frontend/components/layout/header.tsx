@@ -15,11 +15,13 @@ import { LogOut, User, ChevronRight, Repeat } from "lucide-react"
 import { navigation } from "@/components/layout/sidebar"
 import { useAuth } from "@/hooks/use-auth"
 
+const flatNavigation = navigation.flatMap((section) => section.items)
+
 function getSectionLabel(pathname: string) {
-  const exact = navigation.find((item) => item.href === pathname)
+  const exact = flatNavigation.find((item) => item.href === pathname)
   if (exact) return exact.name
 
-  const parent = navigation
+  const parent = flatNavigation
     .filter((item) => item.href !== "/dashboard" && pathname.startsWith(item.href))
     .sort((a, b) => b.href.length - a.href.length)[0]
 
