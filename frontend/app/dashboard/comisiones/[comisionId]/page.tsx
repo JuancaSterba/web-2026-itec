@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import AgregarAlumnoDialog from "@/components/comisiones/agregar-alumno-dialog"
 import EditableNotaCell from "@/components/comisiones/editable-nota-cell"
+import TomarAsistenciaDialog from "@/components/comisiones/tomar-asistencia-dialog"
 
 interface ComisionResponse {
   id: number
@@ -74,6 +75,13 @@ export default async function ComisionDetallePage({
   const materiaNombre = materiasPlan?.find((mp) => mp.id === comision?.materiaPlanId)?.materiaNombre
   const cursadasDeLaComision = cursadas?.filter((c) => String(c.comisionId) === comisionId) ?? null
   const alumnoPorId = new Map((alumnos ?? []).map((a) => [a.id, a]))
+  const cursadasParaAsistencia = (cursadasDeLaComision ?? []).map((cursada) => {
+    const alumno = alumnoPorId.get(cursada.alumnoId)
+    return {
+      id: cursada.id,
+      alumnoNombre: alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`,
+    }
+  })
 
   const titulo = comision
     ? `${comision.nombreComision}${materiaNombre ? ` - ${materiaNombre}` : ""}`
@@ -183,7 +191,10 @@ export default async function ComisionDetallePage({
           )}
         </TabsContent>
 
-        <TabsContent value="asistencias" className="rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+        <TabsContent value="asistencias" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+          <div className="flex justify-end">
+            <TomarAsistenciaDialog cursadas={cursadasParaAsistencia} />
+          </div>
           {cursadasDeLaComision === null || asistenciasPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las asistencias. Intentá nuevamente más tarde.</p>
           ) : fechasAsistencia.length === 0 ? (
