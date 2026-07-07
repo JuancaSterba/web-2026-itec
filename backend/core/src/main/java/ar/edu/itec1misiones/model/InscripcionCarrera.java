@@ -4,24 +4,30 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Carrera {
+public class InscripcionCarrera {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-    private String resolucionMinisterial;
+    @ManyToOne
+    private Alumno alumno;
 
-    @Builder.Default
-    private boolean activa = true;
+    @ManyToOne
+    private PlanEstudio planEstudio;
+
+    private LocalDate fechaInscripcion;
+    private String estado;
 }

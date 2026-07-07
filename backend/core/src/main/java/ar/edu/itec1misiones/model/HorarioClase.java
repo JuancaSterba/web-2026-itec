@@ -18,7 +18,7 @@ public class HorarioClase {
     private DayOfWeek diaSemana;
 
     @ManyToOne
-    private ComisionMateria comision;
+    private Comision comision;
 
     @ManyToMany
     @JoinTable(

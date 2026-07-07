@@ -9,19 +9,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Carrera {
+public class CicloLectivo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-    private String resolucionMinisterial;
+    private Integer anio;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
 
     @Builder.Default
-    private boolean activa = true;
+    private boolean activo = true;
 }
