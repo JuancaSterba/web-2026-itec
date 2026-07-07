@@ -2,6 +2,7 @@ import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import NuevoCicloDialog from "@/components/ciclos/nuevo-ciclo-dialog"
 
 interface CicloLectivoResponse {
   id: number
@@ -16,9 +17,12 @@ export default async function CiclosPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Ciclos Lectivos</h1>
-        <p className="text-sm text-muted-foreground">Seleccioná un ciclo para ver sus períodos académicos</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Ciclos Lectivos</h1>
+          <p className="text-sm text-muted-foreground">Seleccioná un ciclo para ver sus períodos académicos</p>
+        </div>
+        <NuevoCicloDialog />
       </div>
 
       {ciclos === null ? (

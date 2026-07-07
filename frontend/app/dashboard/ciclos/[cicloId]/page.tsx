@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
+import NuevoPeriodoDialog from "@/components/periodos/nuevo-periodo-dialog"
 
 interface CicloLectivoResponse {
   id: number
@@ -34,11 +35,14 @@ export default async function CicloDetallePage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">
-          Dashboard del Ciclo {ciclo?.anio ?? cicloId}
-        </h1>
-        <p className="text-sm text-muted-foreground">Períodos académicos de este ciclo lectivo</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">
+            Dashboard del Ciclo {ciclo?.anio ?? cicloId}
+          </h1>
+          <p className="text-sm text-muted-foreground">Períodos académicos de este ciclo lectivo</p>
+        </div>
+        <NuevoPeriodoDialog cicloId={Number(cicloId)} />
       </div>
 
       {periodosDelCiclo === null ? (
