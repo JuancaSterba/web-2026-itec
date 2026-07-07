@@ -93,12 +93,13 @@ export default function EditarMateriaPlanDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cargaHoraria">Carga Horaria</Label>
+            <Label htmlFor="cargaHoraria">Carga Horaria Semanal</Label>
             <Input
               id="cargaHoraria"
               name="cargaHoraria"
               type="number"
               min={1}
+              placeholder="Horas por semana"
               defaultValue={materiaPlan.cargaHoraria}
               required
             />

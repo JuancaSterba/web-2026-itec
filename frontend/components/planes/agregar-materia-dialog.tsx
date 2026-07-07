@@ -80,8 +80,8 @@ export default function AgregarMateriaDialog({
             <Input id="cuatrimestreDictado" name="cuatrimestreDictado" type="number" min={1} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cargaHoraria">Carga Horaria</Label>
-            <Input id="cargaHoraria" name="cargaHoraria" type="number" min={1} required />
+            <Label htmlFor="cargaHoraria">Carga Horaria Semanal</Label>
+            <Input id="cargaHoraria" name="cargaHoraria" type="number" min={1} placeholder="Horas por semana" required />
           </div>
           <DialogFooter>
             <BotonGuardar />
