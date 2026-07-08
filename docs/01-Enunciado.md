@@ -1,89 +1,89 @@
 # ? PROYECTO FINAL
 
-# BACKOFFICE ACADÉMICO – ITEC N°1
+# BACKOFFICE ACADÃ‰MICO â€“ ITEC NÂ°1
 
-# 1?? Introducción
+# 1?? IntroducciÃ³n
 
-El Instituto Tecnológico N°1 (ITEC N°1) requiere el desarrollo de un sistema de gestión académica centralizado que permita modernizar sus procesos administrativos y académicos.
+El Instituto TecnolÃ³gico NÂ°1 (ITEC NÂ°1) requiere el desarrollo de un sistema de gestiÃ³n acadÃ©mica centralizado que permita modernizar sus procesos administrativos y acadÃ©micos.
 
-Actualmente, gran parte de la información se gestiona de manera manual o mediante herramientas dispersas, lo que genera ineficiencias y dificultades en el seguimiento académico.
+Actualmente, gran parte de la informaciÃ³n se gestiona de manera manual o mediante herramientas dispersas, lo que genera ineficiencias y dificultades en el seguimiento acadÃ©mico.
 
 El presente documento describe el escenario general del proyecto.
 
 # 2?? Objetivo del Sistema
 
-Desarrollar un sistema de gestión académica que permita:
+Desarrollar un sistema de gestiÃ³n acadÃ©mica que permita:
 
-* Centralizar la información institucional
+* Centralizar la informaciÃ³n institucional
 * Gestionar alumnos, profesores y materias
 * Registrar asistencias y calificaciones
-* Aplicar reglas académicas (regularidad y correlativas)
-* Generar reportes académicos
-* Garantizar acceso seguro mediante autenticación
+* Aplicar reglas acadÃ©micas (regularidad y correlativas)
+* Generar reportes acadÃ©micos
+* Garantizar acceso seguro mediante autenticaciÃ³n
 
 El sistema debe desarrollarse en **Java**, utilizando arquitectura **en capas (MVC)**.
 
-El proyecto es **agnóstico a plataforma**:
+El proyecto es **agnÃ³stico a plataforma**:
 
-* Puede implementarse como aplicación Web.
-* Puede implementarse como aplicación Desktop.
+* Puede implementarse como aplicaciÃ³n Web.
+* Puede implementarse como aplicaciÃ³n Desktop.
 * Puede ser API + Cliente.
 * Debe ser arquitectura en capas.
 
 # 3?? Alcance Funcional
 
-El sistema deberá incluir:
+El sistema deberÃ¡ incluir:
 
-## 3.1 Gestión de Acceso
+## 3.1 GestiÃ³n de Acceso
 
-* Login mediante usuario y contraseña.
+* Login mediante usuario y contraseÃ±a.
 * Roles diferenciados: Docente y Administrativo, Alumno, Administrador.
 * Control de permisos por rol.
 
-## 3.2 Gestión Académica
+## 3.2 GestiÃ³n AcadÃ©mica
 
-* Gestión de alumnos.
-* Gestión de profesores.
-* Gestión de materias.
-* Gestión de asistencias.
-* Gestión de calificaciones.
-* Validación de correlativas.
-* Cálculo de regularidad (mínimo 70% de asistencia).
-* Generación de reportes académicos.
+* GestiÃ³n de alumnos.
+* GestiÃ³n de profesores.
+* GestiÃ³n de materias.
+* GestiÃ³n de asistencias.
+* GestiÃ³n de calificaciones.
+* ValidaciÃ³n de correlativas.
+* CÃ¡lculo de regularidad (mÃ­nimo 70% de asistencia).
+* GeneraciÃ³n de reportes acadÃ©micos.
 
-# 4?? Requisitos Técnicos
+# 4?? Requisitos TÃ©cnicos
 
 * Lenguaje: Java
 * Arquitectura: capas MVC
 * Persistencia: Base de datos relacional/no Relacional
 * Script SQL obligatorio
 * Uso de Git y GitHub
-* Aplicación de Git Flow
-* Documentación en carpeta /document
+* AplicaciÃ³n de Git Flow
+* DocumentaciÃ³n en carpeta /document
 
 # 5?? Diagramas Obligatorios
 
 * Diagrama de Arquitectura
 * Diagrama de clases
 * Diagrama de secuencia
-* Diagrama de estados (estado académico del alumno)
+* Diagrama de estados (estado acadÃ©mico del alumno)
 * Modelo de datos
 
 # 6?? Entregables
 
 * Repositorio GitHub completo
-* README descripción del proyecto y con integrantes
+* README descripciÃ³n del proyecto y con integrantes
 * Script SQL
 * Proyecto ejecutable con instrucciones en docker
 * Diagramas
 
-# 7?? Modalidad de Evaluación
+# 7?? Modalidad de EvaluaciÃ³n
 
-Cada integrante deberá:
+Cada integrante deberÃ¡:
 
 * Explicar una parte del sistema
-* Defender decisiones técnicas
-* Responder preguntas teóricas sobre:
+* Defender decisiones tÃ©cnicas
+* Responder preguntas teÃ³ricas sobre:
   + MVC
   + POO
   + Persistencia

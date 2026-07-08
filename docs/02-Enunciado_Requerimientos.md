@@ -1,6 +1,6 @@
 # **? PROYECTO FINAL**
 
-# **BACKOFFICE ACAD…MICO ñ ITEC N∞1**
+# **BACKOFFICE ACAD√âMICO ‚Äì ITEC N¬∞1**
 
 ? **BACKLOG DE USER STORIES**
 
@@ -10,294 +10,294 @@
   + ADM = Administrativo
   + ALU = Alumno
   + DOC = Docente
-  + SYS = Sistema (autom·tico)
+  + SYS = Sistema (autom√°tico)
 * Estados sugeridos: ACTIVO / INACTIVO; REGULAR / NO REGULAR; APROBADO / DESAPROBADO.
-* Criterios de aceptaciÛn: formato Gherkin.
+* Criterios de aceptaci√≥n: formato Gherkin.
 * Casos de test: ID + pasos + resultado esperado.
 
 ##
 
-## **? US-AUTH-01 ó Iniciar sesiÛn (EPIC-AUTH)**
+## **? US-AUTH-01 ‚Äî Iniciar sesi√≥n (EPIC-AUTH)**
 
-| **User Story: EPIC-AUTH ó GestiÛn de Acceso** |  |
+| **User Story: EPIC-AUTH ‚Äî Gesti√≥n de Acceso** |  |
 | --- | --- |
-| **Como** usuario autorizado (ADM - DOC- ALU)  **Quiero** iniciar sesiÛn con usuario y contraseÒa  **Para** acceder a las funciones habilitadas seg˙n mi rol | |
-| **Precondiciones**  ï Existe un usuario registrado con rol v·lido.  ï El usuario est· ACTIVO. | |
-| **Reglas / Validaciones**  ï ContraseÒas almacenadas de forma segura (hash/cript).  ï Validar campos obligatorios no vacÌos.  ï Bloquear acceso si usuario INACTIVO.  ï Aplicar permisos seg˙n rol. | |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario 1 ó Login exitoso**  DADO QUE el usuario ingresa credenciales v·lidas  CUANDO confirma el inicio de sesiÛn  ENTONCES el sistema autentica  Y habilita funcionalidades seg˙n rol    **Escenario 2 ó Credenciales inv·lidas**  DADO QUE el usuario ingresa datos incorrectos  CUANDO confirma el inicio de sesiÛn  ENTONCES el sistema rechaza el acceso  Y muestra un mensaje de error claro    **Escenario 3 ó Usuario inactivo**  DADO QUE el usuario est· INACTIVO  CUANDO intenta iniciar sesiÛn  ENTONCES el sistema rechaza el acceso  Y muestra ìUsuario inactivo o sin permisosî | |
-| **Casos de Test**  TC-AUTH-01: Login ADM v·lido ? Acceso y men˙ administrativo.  TC-AUTH-02: Login ALU v·lido ? Acceso y men˙ alumno.  TC-AUTH-03: Login DOC v·lido ? Acceso y men˙ docente.  TC-AUTH-04: Password incorrecto ? Error, no acceso.  TC-AUTH-05: Usuario inexistente ? Error, no acceso.  TC-AUTH-06: Usuario INACTIVO ? Acceso denegado. | |
+| **Como** usuario autorizado (ADM - DOC- ALU)  **Quiero** iniciar sesi√≥n con usuario y contrase√±a  **Para** acceder a las funciones habilitadas seg√∫n mi rol | |
+| **Precondiciones**  ‚Ä¢ Existe un usuario registrado con rol v√°lido.  ‚Ä¢ El usuario est√° ACTIVO. | |
+| **Reglas / Validaciones**  ‚Ä¢ Contrase√±as almacenadas de forma segura (hash/cript).  ‚Ä¢ Validar campos obligatorios no vac√≠os.  ‚Ä¢ Bloquear acceso si usuario INACTIVO.  ‚Ä¢ Aplicar permisos seg√∫n rol. | |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario 1 ‚Äî Login exitoso**  DADO QUE el usuario ingresa credenciales v√°lidas  CUANDO confirma el inicio de sesi√≥n  ENTONCES el sistema autentica  Y habilita funcionalidades seg√∫n rol    **Escenario 2 ‚Äî Credenciales inv√°lidas**  DADO QUE el usuario ingresa datos incorrectos  CUANDO confirma el inicio de sesi√≥n  ENTONCES el sistema rechaza el acceso  Y muestra un mensaje de error claro    **Escenario 3 ‚Äî Usuario inactivo**  DADO QUE el usuario est√° INACTIVO  CUANDO intenta iniciar sesi√≥n  ENTONCES el sistema rechaza el acceso  Y muestra ‚ÄúUsuario inactivo o sin permisos‚Äù | |
+| **Casos de Test**  TC-AUTH-01: Login ADM v√°lido ? Acceso y men√∫ administrativo.  TC-AUTH-02: Login ALU v√°lido ? Acceso y men√∫ alumno.  TC-AUTH-03: Login DOC v√°lido ? Acceso y men√∫ docente.  TC-AUTH-04: Password incorrecto ? Error, no acceso.  TC-AUTH-05: Usuario inexistente ? Error, no acceso.  TC-AUTH-06: Usuario INACTIVO ? Acceso denegado. | |
 | **Contrato (opcional si API)**  POST /api/v1/auth/login ? 200 / 401 / 403 | |
 | **Resultado Esperado**  El usuario accede solo a funciones permitidas por su rol. | |
 
-**??? EPIC-ALU ó GestiÛn de Alumnos**
+**??? EPIC-ALU ‚Äî Gesti√≥n de Alumnos**
 
-| **User Story: US-ALU-01 ó Crear alumno** |
+| **User Story: US-ALU-01 ‚Äî Crear alumno** |
 | --- |
-| **Como** Administrativo  **Quiero** registrar un alumno  **Para** incorporarlo al sistema acadÈmico |
+| **Como** Administrativo  **Quiero** registrar un alumno  **Para** incorporarlo al sistema acad√©mico |
 | **Prioridad:** Alta |
 | **Dependencia:** US-AUTH-01 (login) |
-| **Precondiciones**  ï ADM autenticado.  ï MÛdulo Alumnos disponible. |
-| **Reglas / Validaciones**  ï DNI ˙nico (no duplicado).  ï Email con formato v·lido.  ï TelÈfono con formato v·lido (regla simple).  ï Estado inicial del alumno: ACTIVO.  ï Campos obligatorios: Nombre, Apellido, DNI, Email, TelÈfono. |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario 1 ó Alta exitosa**  DADO QUE el ADM ingresa datos v·lidos  CUANDO confirma el alta  ENTONCES el sistema crea el alumno ACTIVO  Y queda disponible para inscripciones y reportes    **Escenario 2 ó DNI duplicado**  DADO QUE ya existe un alumno con el DNI ingresado  CUANDO confirma el alta  ENTONCES el sistema rechaza la operaciÛn  Y muestra ìDNI ya registradoî    **Escenario 3 ó Datos inv·lidos**  DADO QUE el ADM ingresa un email inv·lido o campos vacÌos  CUANDO confirma el alta  ENTONCES el sistema rechaza la operaciÛn  Y muestra los motivos de validaciÛn |
-| **Casos de Test**  TC-ALU-01: Alta OK ? alumno ACTIVO persistido.  TC-ALU-02: DNI duplicado ? error y no se crea.  TC-ALU-03: Email inv·lido ? error.  TC-ALU-04: Campo obligatorio vacÌo ? error. |
+| **Precondiciones**  ‚Ä¢ ADM autenticado.  ‚Ä¢ M√≥dulo Alumnos disponible. |
+| **Reglas / Validaciones**  ‚Ä¢ DNI √∫nico (no duplicado).  ‚Ä¢ Email con formato v√°lido.  ‚Ä¢ Tel√©fono con formato v√°lido (regla simple).  ‚Ä¢ Estado inicial del alumno: ACTIVO.  ‚Ä¢ Campos obligatorios: Nombre, Apellido, DNI, Email, Tel√©fono. |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario 1 ‚Äî Alta exitosa**  DADO QUE el ADM ingresa datos v√°lidos  CUANDO confirma el alta  ENTONCES el sistema crea el alumno ACTIVO  Y queda disponible para inscripciones y reportes    **Escenario 2 ‚Äî DNI duplicado**  DADO QUE ya existe un alumno con el DNI ingresado  CUANDO confirma el alta  ENTONCES el sistema rechaza la operaci√≥n  Y muestra ‚ÄúDNI ya registrado‚Äù    **Escenario 3 ‚Äî Datos inv√°lidos**  DADO QUE el ADM ingresa un email inv√°lido o campos vac√≠os  CUANDO confirma el alta  ENTONCES el sistema rechaza la operaci√≥n  Y muestra los motivos de validaci√≥n |
+| **Casos de Test**  TC-ALU-01: Alta OK ? alumno ACTIVO persistido.  TC-ALU-02: DNI duplicado ? error y no se crea.  TC-ALU-03: Email inv√°lido ? error.  TC-ALU-04: Campo obligatorio vac√≠o ? error. |
 | **Contrato (opcional si API)**  POST /api/v1/alumnos ? 201 / 400 / 409 |
 | **Resultado Esperado**  Alumno registrado y visible en consultas/listados. |
 
-## **US-ALU-02 ó Consultar alumno por DNI**
+## **US-ALU-02 ‚Äî Consultar alumno por DNI**
 
-| **User Story: US-ALU-02 ó Consultar alumno** |
+| **User Story: US-ALU-02 ‚Äî Consultar alumno** |
 | --- |
-| **Como** Administrativo  **Quiero** buscar un alumno por DNI  **Para** visualizar su informaciÛn y estado acadÈmico |
+| **Como** Administrativo  **Quiero** buscar un alumno por DNI  **Para** visualizar su informaci√≥n y estado acad√©mico |
 | **Prioridad:** Alta |
 | **Dependencia:** US-AUTH-01, US-ALU-01 |
-| **Precondiciones**  ï ADM autenticado. |
-| **Reglas / Validaciones**  ï Si no existe el DNI ? informar ìno encontradoî. |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario 1 ó Consulta exitosa**  DADO QUE existe un alumno con DNI X  CUANDO el ADM lo consulta  ENTONCES el sistema muestra datos personales y estado    **Escenario 2 ó No existe**  DADO QUE no existe alumno con DNI X  CUANDO el ADM consulta  ENTONCES el sistema muestra ìAlumno no encontradoî |
-| **Casos de Test**  TC-ALU-05: DNI existente ? muestra datos.  TC-ALU-06: DNI inexistente ? ìno encontradoî. |
+| **Precondiciones**  ‚Ä¢ ADM autenticado. |
+| **Reglas / Validaciones**  ‚Ä¢ Si no existe el DNI ? informar ‚Äúno encontrado‚Äù. |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario 1 ‚Äî Consulta exitosa**  DADO QUE existe un alumno con DNI X  CUANDO el ADM lo consulta  ENTONCES el sistema muestra datos personales y estado    **Escenario 2 ‚Äî No existe**  DADO QUE no existe alumno con DNI X  CUANDO el ADM consulta  ENTONCES el sistema muestra ‚ÄúAlumno no encontrado‚Äù |
+| **Casos de Test**  TC-ALU-05: DNI existente ? muestra datos.  TC-ALU-06: DNI inexistente ? ‚Äúno encontrado‚Äù. |
 | **Contrato (opcional si API)**  GET /api/v1/alumnos/{dni} ? 200 / 404 |
-| **Resultado Esperado**  Consulta clara, completa y sin ambig¸edades. |
+| **Resultado Esperado**  Consulta clara, completa y sin ambig√ºedades. |
 
-## **US-ALU-03 ó Modificar alumno**
+## **US-ALU-03 ‚Äî Modificar alumno**
 
-| **User Story: US-ALU-03 ó Modificar alumno** | **ESTIMACI”N** |
+| **User Story: US-ALU-03 ‚Äî Modificar alumno** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** modificar datos de un alumno  **Para** mantener informaciÛn actualizada |  |
+| **Como** Administrativo  **Quiero** modificar datos de un alumno  **Para** mantener informaci√≥n actualizada |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-AUTH-01, US-ALU-01 |  |
-| **Precondiciones**  ï ADM autenticado.  ï Alumno existente. |  |
-| **Reglas / Validaciones**  ï Validar email/telÈfono.  ï (Recomendado) DNI no editable; si se permite, debe seguir siendo ˙nico. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó ModificaciÛn exitosa**  DADO QUE el alumno existe  CUANDO el ADM guarda datos v·lidos  ENTONCES el sistema actualiza la informaciÛn  Y registra fecha de ˙ltima modificaciÛn    **Escenario ó Alumno inexistente**  DADO QUE no existe el alumno  CUANDO el ADM intenta modificar  ENTONCES el sistema informa ìno encontradoî |  |
-| **Casos de Test**  TC-ALU-07: Update OK.  TC-ALU-08: Email inv·lido ? error.  TC-ALU-09: Alumno inexistente ? no encontrado. |  |
+| **Precondiciones**  ‚Ä¢ ADM autenticado.  ‚Ä¢ Alumno existente. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Validar email/tel√©fono.  ‚Ä¢ (Recomendado) DNI no editable; si se permite, debe seguir siendo √∫nico. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Modificaci√≥n exitosa**  DADO QUE el alumno existe  CUANDO el ADM guarda datos v√°lidos  ENTONCES el sistema actualiza la informaci√≥n  Y registra fecha de √∫ltima modificaci√≥n    **Escenario ‚Äî Alumno inexistente**  DADO QUE no existe el alumno  CUANDO el ADM intenta modificar  ENTONCES el sistema informa ‚Äúno encontrado‚Äù |  |
+| **Casos de Test**  TC-ALU-07: Update OK.  TC-ALU-08: Email inv√°lido ? error.  TC-ALU-09: Alumno inexistente ? no encontrado. |  |
 | **Contrato (opcional si API)**  PUT /api/v1/alumnos/{dni} ? 200 / 400 / 404 |  |
 | **Resultado Esperado**  Datos del alumno actualizados correctamente. |  |
 
-## **US-ALU-04 ó Baja lÛgica alumno**
+## **US-ALU-04 ‚Äî Baja l√≥gica alumno**
 
-| **User Story: US-ALU-04 ó Baja lÛgica alumno** | **ESTIMACI”N** |
+| **User Story: US-ALU-04 ‚Äî Baja l√≥gica alumno** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** dar de baja lÛgica a un alumno  **Para** impedir nuevas inscripciones sin perder historial |  |
+| **Como** Administrativo  **Quiero** dar de baja l√≥gica a un alumno  **Para** impedir nuevas inscripciones sin perder historial |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-AUTH-01, US-ALU-01 |  |
-| **Precondiciones**  ï ADM autenticado.  ï Alumno existente ACTIVO. |  |
-| **Reglas / Validaciones**  ï Baja lÛgica: estado pasa a INACTIVO.  ï No se elimina historial acadÈmico (asistencias/notas/inscripciones).  ï Alumno INACTIVO no puede inscribirse a nuevas materias. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Baja lÛgica exitosa**  DADO alumno ACTIVO  CUANDO el ADM confirma la baja  ENTONCES el alumno pasa a INACTIVO  Y el sistema bloquea nuevas inscripciones    **Escenario ó Alumno inexistente**  DADO alumno inexistente  CUANDO el ADM intenta dar de baja  ENTONCES el sistema informa ìno encontradoî |  |
-| **Casos de Test**  TC-ALU-10: Baja OK ? INACTIVO.  TC-ALU-11: Inexistente ? no encontrado.  TC-ALU-12: Intento de inscripciÛn de INACTIVO ? bloqueado. |  |
+| **Precondiciones**  ‚Ä¢ ADM autenticado.  ‚Ä¢ Alumno existente ACTIVO. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Baja l√≥gica: estado pasa a INACTIVO.  ‚Ä¢ No se elimina historial acad√©mico (asistencias/notas/inscripciones).  ‚Ä¢ Alumno INACTIVO no puede inscribirse a nuevas materias. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Baja l√≥gica exitosa**  DADO alumno ACTIVO  CUANDO el ADM confirma la baja  ENTONCES el alumno pasa a INACTIVO  Y el sistema bloquea nuevas inscripciones    **Escenario ‚Äî Alumno inexistente**  DADO alumno inexistente  CUANDO el ADM intenta dar de baja  ENTONCES el sistema informa ‚Äúno encontrado‚Äù |  |
+| **Casos de Test**  TC-ALU-10: Baja OK ? INACTIVO.  TC-ALU-11: Inexistente ? no encontrado.  TC-ALU-12: Intento de inscripci√≥n de INACTIVO ? bloqueado. |  |
 | **Contrato (opcional si API)**  DELETE /api/v1/alumnos/{dni} ? 204 / 404 |  |
 | **Resultado Esperado**  Alumno desactivado conservando historial y trazabilidad. |  |
 
-# **??? EPIC-PROF ó GestiÛn de Profesores**
+# **??? EPIC-PROF ‚Äî Gesti√≥n de Profesores**
 
-## **US-PROF-01 ó Crear profesor**
+## **US-PROF-01 ‚Äî Crear profesor**
 
-| **User Story: US-PROF-01 ó Crear profesor** | **ESTIMACI”N** |
+| **User Story: US-PROF-01 ‚Äî Crear profesor** | **ESTIMACI√ìN** |
 | --- | --- |
 | **Como** Administrativo  **Quiero** registrar un profesor  **Para** asignarlo a materias |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-AUTH-01 |  |
-| **Precondiciones**  ï ADM autenticado. |  |
-| **Reglas / Validaciones**  ï DNI ˙nico.  ï Email v·lido.  ï Estado inicial ACTIVO. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Alta exitosa**  DADO datos v·lidos  CUANDO confirmo el alta  ENTONCES se crea profesor ACTIVO    **Escenario ó DNI duplicado**  DADO DNI ya registrado  CUANDO confirmo el alta  ENTONCES se rechaza con mensaje ìDNI ya registradoî |  |
-| **Casos de Test**  TC-PROF-01: Alta OK.  TC-PROF-02: DNI duplicado ? error.  TC-PROF-03: Email inv·lido ? error. |  |
+| **Precondiciones**  ‚Ä¢ ADM autenticado. |  |
+| **Reglas / Validaciones**  ‚Ä¢ DNI √∫nico.  ‚Ä¢ Email v√°lido.  ‚Ä¢ Estado inicial ACTIVO. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Alta exitosa**  DADO datos v√°lidos  CUANDO confirmo el alta  ENTONCES se crea profesor ACTIVO    **Escenario ‚Äî DNI duplicado**  DADO DNI ya registrado  CUANDO confirmo el alta  ENTONCES se rechaza con mensaje ‚ÄúDNI ya registrado‚Äù |  |
+| **Casos de Test**  TC-PROF-01: Alta OK.  TC-PROF-02: DNI duplicado ? error.  TC-PROF-03: Email inv√°lido ? error. |  |
 | **Contrato (opcional si API)**  POST /api/v1/profesores ? 201 / 400 / 409 |  |
-| **Resultado Esperado**  Profesor creado y disponible para asignaciÛn. |  |
+| **Resultado Esperado**  Profesor creado y disponible para asignaci√≥n. |  |
 
-## **US-PROF-02 ó Modificar profesor**
+## **US-PROF-02 ‚Äî Modificar profesor**
 
-| **User Story: US-PROF-02 ó Modificar profesor** | **ESTIMACI”N** |
+| **User Story: US-PROF-02 ‚Äî Modificar profesor** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** modificar datos del profesor  **Para** mantener informaciÛn actualizada |  |
+| **Como** Administrativo  **Quiero** modificar datos del profesor  **Para** mantener informaci√≥n actualizada |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-AUTH-01, US-PROF-01 |  |
-| **Precondiciones**  ï ADM autenticado.  ï Profesor existente. |  |
-| **Reglas / Validaciones**  ï Email v·lido.  ï DNI no editable (recomendado). |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó ModificaciÛn exitosa**  DADO profesor existente  CUANDO guardo cambios v·lidos  ENTONCES se actualizan los datos    **Escenario ó No existe**  DADO profesor inexistente  CUANDO intento modificar  ENTONCES se informa ìno encontradoî |  |
+| **Precondiciones**  ‚Ä¢ ADM autenticado.  ‚Ä¢ Profesor existente. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Email v√°lido.  ‚Ä¢ DNI no editable (recomendado). |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Modificaci√≥n exitosa**  DADO profesor existente  CUANDO guardo cambios v√°lidos  ENTONCES se actualizan los datos    **Escenario ‚Äî No existe**  DADO profesor inexistente  CUANDO intento modificar  ENTONCES se informa ‚Äúno encontrado‚Äù |  |
 | **Casos de Test**  TC-PROF-04: Update OK.  TC-PROF-05: Inexistente ? no encontrado. |  |
 | **Contrato (opcional si API)**  PUT /api/v1/profesores/{id} ? 200 / 400 / 404 |  |
 | **Resultado Esperado**  Profesor actualizado sin afectar historial. |  |
 
-## **US-PROF-03 ó Baja lÛgica profesor**
+## **US-PROF-03 ‚Äî Baja l√≥gica profesor**
 
-| **User Story: US-PROF-03 ó Baja lÛgica profesor** | **ESTIMACI”N** |
+| **User Story: US-PROF-03 ‚Äî Baja l√≥gica profesor** | **ESTIMACI√ìN** |
 | --- | --- |
 | **Como** Administrativo  **Quiero** desactivar un profesor  **Para** impedir nuevas asignaciones sin borrar historial |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-AUTH-01, US-PROF-01 |  |
-| **Precondiciones**  ï Profesor existente ACTIVO. |  |
-| **Reglas / Validaciones**  ï Baja lÛgica: estado INACTIVO.  ï No se elimina historial.  ï Profesor INACTIVO no puede asignarse a nuevas materias. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Baja lÛgica exitosa**  DADO profesor ACTIVO  CUANDO confirmo la baja  ENTONCES pasa a INACTIVO  Y el sistema bloquea nuevas asignaciones |  |
+| **Precondiciones**  ‚Ä¢ Profesor existente ACTIVO. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Baja l√≥gica: estado INACTIVO.  ‚Ä¢ No se elimina historial.  ‚Ä¢ Profesor INACTIVO no puede asignarse a nuevas materias. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Baja l√≥gica exitosa**  DADO profesor ACTIVO  CUANDO confirmo la baja  ENTONCES pasa a INACTIVO  Y el sistema bloquea nuevas asignaciones |  |
 | **Casos de Test**  TC-PROF-06: Baja OK.  TC-PROF-07: Intento asignar INACTIVO ? bloqueado. |  |
 | **Contrato (opcional si API)**  DELETE /api/v1/profesores/{id} ? 204 / 404 |  |
 | **Resultado Esperado**  Profesor desactivado con integridad de datos. |  |
 
-## **US-PROF-04 ó Asignar profesor a materia**
+## **US-PROF-04 ‚Äî Asignar profesor a materia**
 
-| **User Story: US-PROF-04 ó Asignar profesor a materia** | **ESTIMACI”N** |
+| **User Story: US-PROF-04 ‚Äî Asignar profesor a materia** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** asignar un profesor a una materia  **Para** definir quiÈn la dicta |  |
+| **Como** Administrativo  **Quiero** asignar un profesor a una materia  **Para** definir qui√©n la dicta |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-PROF-01, US-MAT-01 |  |
-| **Precondiciones**  ï Profesor ACTIVO.  ï Materia ACTIVA. |  |
-| **Reglas / Validaciones**  ï No asignar profesor INACTIVO.  ï (Recomendado) Definir profesor ìresponsableî (1) y co-docentes (0..n). |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó AsignaciÛn exitosa**  DADO profesor ACTIVO y materia ACTIVA  CUANDO el ADM asigna el profesor  ENTONCES se registra la asignaciÛn  Y se visualiza en la ficha de la materia    **Escenario ó Profesor inactivo**  DADO profesor INACTIVO  CUANDO intento asignar  ENTONCES el sistema rechaza la operaciÛn |  |
-| **Casos de Test**  TC-PROF-08: AsignaciÛn OK.  TC-PROF-09: Profesor INACTIVO ? error.  TC-PROF-10: Materia INACTIVA ? error. |  |
+| **Precondiciones**  ‚Ä¢ Profesor ACTIVO.  ‚Ä¢ Materia ACTIVA. |  |
+| **Reglas / Validaciones**  ‚Ä¢ No asignar profesor INACTIVO.  ‚Ä¢ (Recomendado) Definir profesor ‚Äúresponsable‚Äù (1) y co-docentes (0..n). |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Asignaci√≥n exitosa**  DADO profesor ACTIVO y materia ACTIVA  CUANDO el ADM asigna el profesor  ENTONCES se registra la asignaci√≥n  Y se visualiza en la ficha de la materia    **Escenario ‚Äî Profesor inactivo**  DADO profesor INACTIVO  CUANDO intento asignar  ENTONCES el sistema rechaza la operaci√≥n |  |
+| **Casos de Test**  TC-PROF-08: Asignaci√≥n OK.  TC-PROF-09: Profesor INACTIVO ? error.  TC-PROF-10: Materia INACTIVA ? error. |  |
 | **Contrato (opcional si API)**  POST /api/v1/materias/{idMateria}/profesores/{idProfesor} ? 200 / 400 / 404 |  |
 | **Resultado Esperado**  Materia correctamente asociada a profesor(es). |  |
 
-# **? EPIC-MAT ó GestiÛn de Materias y Correlativas**
+# **? EPIC-MAT ‚Äî Gesti√≥n de Materias y Correlativas**
 
-## **US-MAT-01 ó Crear materia**
+## **US-MAT-01 ‚Äî Crear materia**
 
-| **User Story: US-MAT-01 ó Crear materia** | **ESTIMACI”N** |
+| **User Story: US-MAT-01 ‚Äî Crear materia** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** crear una materia  **Para** incorporarla a la oferta acadÈmica |  |
+| **Como** Administrativo  **Quiero** crear una materia  **Para** incorporarla a la oferta acad√©mica |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-AUTH-01 |  |
-| **Precondiciones**  ï ADM autenticado. |  |
-| **Reglas / Validaciones**  ï CÛdigo/Nombre obligatorio.  ï CÛdigo ˙nico (si se usa).  ï Estado inicial ACTIVO. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Alta exitosa**  DADO datos v·lidos  CUANDO creo la materia  ENTONCES la materia queda ACTIVA y disponible |  |
-| **Casos de Test**  TC-MAT-01: Alta OK.  TC-MAT-02: CÛdigo duplicado ? error. |  |
+| **Precondiciones**  ‚Ä¢ ADM autenticado. |  |
+| **Reglas / Validaciones**  ‚Ä¢ C√≥digo/Nombre obligatorio.  ‚Ä¢ C√≥digo √∫nico (si se usa).  ‚Ä¢ Estado inicial ACTIVO. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Alta exitosa**  DADO datos v√°lidos  CUANDO creo la materia  ENTONCES la materia queda ACTIVA y disponible |  |
+| **Casos de Test**  TC-MAT-01: Alta OK.  TC-MAT-02: C√≥digo duplicado ? error. |  |
 | **Contrato (opcional si API)**  POST /api/v1/materias ? 201 / 400 / 409 |  |
 | **Resultado Esperado**  Materia creada y visible. |  |
 
-## **US-MAT-02 ó Modificar materia**
+## **US-MAT-02 ‚Äî Modificar materia**
 
-| **User Story: US-MAT-02 ó Modificar materia** | **ESTIMACI”N** |
+| **User Story: US-MAT-02 ‚Äî Modificar materia** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** modificar una materia  **Para** corregir o actualizar informaciÛn |  |
+| **Como** Administrativo  **Quiero** modificar una materia  **Para** corregir o actualizar informaci√≥n |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-MAT-01 |  |
-| **Precondiciones**  ï Materia existente. |  |
-| **Reglas / Validaciones**  ï Campos obligatorios no vacÌos.  ï Si cambia cÛdigo, debe seguir siendo ˙nico. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó ModificaciÛn exitosa**  DADO materia existente  CUANDO guardo cambios v·lidos  ENTONCES se actualiza la materia |  |
+| **Precondiciones**  ‚Ä¢ Materia existente. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Campos obligatorios no vac√≠os.  ‚Ä¢ Si cambia c√≥digo, debe seguir siendo √∫nico. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Modificaci√≥n exitosa**  DADO materia existente  CUANDO guardo cambios v√°lidos  ENTONCES se actualiza la materia |  |
 | **Casos de Test**  TC-MAT-03: Update OK.  TC-MAT-04: Inexistente ? no encontrado. |  |
 | **Contrato (opcional si API)**  PUT /api/v1/materias/{id} ? 200 / 400 / 404 |  |
 | **Resultado Esperado**  Materia actualizada correctamente. |  |
 
-## **US-MAT-03 ó Baja lÛgica materia**
+## **US-MAT-03 ‚Äî Baja l√≥gica materia**
 
-| **User Story: US-MAT-03 ó Baja lÛgica materia** | **ESTIMACI”N** |
+| **User Story: US-MAT-03 ‚Äî Baja l√≥gica materia** | **ESTIMACI√ìN** |
 | --- | --- |
 | **Como** Administrativo  **Quiero** desactivar una materia  **Para** impedir nuevas inscripciones conservando historial |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-MAT-01 |  |
-| **Precondiciones**  ï Materia existente ACTIVA. |  |
-| **Reglas / Validaciones**  ï Baja lÛgica: pasa a INACTIVA.  ï Materia INACTIVA no permite nuevas inscripciones. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Baja lÛgica exitosa**  DADO materia ACTIVA  CUANDO el ADM confirma la baja  ENTONCES la materia pasa a INACTIVA  Y se bloquean nuevas inscripciones |  |
-| **Casos de Test**  TC-MAT-05: Baja OK.  TC-MAT-06: InscripciÛn a INACTIVA ? bloqueado. |  |
+| **Precondiciones**  ‚Ä¢ Materia existente ACTIVA. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Baja l√≥gica: pasa a INACTIVA.  ‚Ä¢ Materia INACTIVA no permite nuevas inscripciones. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Baja l√≥gica exitosa**  DADO materia ACTIVA  CUANDO el ADM confirma la baja  ENTONCES la materia pasa a INACTIVA  Y se bloquean nuevas inscripciones |  |
+| **Casos de Test**  TC-MAT-05: Baja OK.  TC-MAT-06: Inscripci√≥n a INACTIVA ? bloqueado. |  |
 | **Contrato (opcional si API)**  DELETE /api/v1/materias/{id} ? 204 / 404 |  |
 | **Resultado Esperado**  Materia desactivada sin perder historial. |  |
 
-## **US-MAT-04 ó Definir correlativas**
+## **US-MAT-04 ‚Äî Definir correlativas**
 
-| **User Story: US-MAT-04 ó Definir correlativas** | **ESTIMACI”N** |
+| **User Story: US-MAT-04 ‚Äî Definir correlativas** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** definir correlativas para una materia  **Para** establecer prerrequisitos acadÈmicos |  |
+| **Como** Administrativo  **Quiero** definir correlativas para una materia  **Para** establecer prerrequisitos acad√©micos |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-MAT-01 |  |
-| **Precondiciones**  ï Materias involucradas existen. |  |
-| **Reglas / Validaciones**  ï Una materia puede tener m˙ltiples correlativas.  ï No se permite correlativa a sÌ misma.  ï No se permiten ciclos (A?B y B?A, o ciclos m·s largos). |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Correlativa v·lida**  DADO materias A y B existentes  CUANDO defino B como correlativa de A  ENTONCES el sistema registra el prerrequisito    **Escenario ó Ciclo**  DADO que la correlativa genera ciclo  CUANDO intento guardarla  ENTONCES el sistema rechaza e informa el motivo |  |
-| **Casos de Test**  TC-MAT-07: Correlativa OK.  TC-MAT-08: Correlativa a sÌ misma ? error.  TC-MAT-09: Ciclo detectado ? error. |  |
+| **Precondiciones**  ‚Ä¢ Materias involucradas existen. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Una materia puede tener m√∫ltiples correlativas.  ‚Ä¢ No se permite correlativa a s√≠ misma.  ‚Ä¢ No se permiten ciclos (A?B y B?A, o ciclos m√°s largos). |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Correlativa v√°lida**  DADO materias A y B existentes  CUANDO defino B como correlativa de A  ENTONCES el sistema registra el prerrequisito    **Escenario ‚Äî Ciclo**  DADO que la correlativa genera ciclo  CUANDO intento guardarla  ENTONCES el sistema rechaza e informa el motivo |  |
+| **Casos de Test**  TC-MAT-07: Correlativa OK.  TC-MAT-08: Correlativa a s√≠ misma ? error.  TC-MAT-09: Ciclo detectado ? error. |  |
 | **Contrato (opcional si API)**  POST /api/v1/materias/{id}/correlativas/{idCorrelativa} ? 200 / 400 |  |
 | **Resultado Esperado**  Correlativas persistidas y usadas en validaciones. |  |
 
-# **? EPIC-INS ó InscripciÛn a Materias**
+# **? EPIC-INS ‚Äî Inscripci√≥n a Materias**
 
-## **US-INS-01 ó Inscribir alumno a materia**
+## **US-INS-01 ‚Äî Inscribir alumno a materia**
 
-| **User Story: US-INS-01 ó Inscribir alumno** | **ESTIMACI”N** |
+| **User Story: US-INS-01 ‚Äî Inscribir alumno** | **ESTIMACI√ìN** |
 | --- | --- |
 | **Como** Administrativo  **Quiero** inscribir un alumno en una materia  **Para** registrar su cursada |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-ALU-01, US-MAT-01, US-MAT-04 |  |
-| **Precondiciones**  ï Alumno ACTIVO.  ï Materia ACTIVA. |  |
-| **Reglas / Validaciones**  ï No duplicar inscripciÛn.  ï Validar correlativas aprobadas (si existen). |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó InscripciÛn exitosa**  DADO alumno ACTIVO y materia ACTIVA  Y correlativas aprobadas  CUANDO el ADM inscribe  ENTONCES el sistema registra la inscripciÛn    **Escenario ó Correlativas faltantes**  DADO que faltan correlativas aprobadas  CUANDO intento inscribir  ENTONCES el sistema rechaza e informa cu·les faltan |  |
-| **Casos de Test**  TC-INS-01: InscripciÛn OK.  TC-INS-02: Duplicada ? error.  TC-INS-03: Correlativas faltantes ? error detallado.  TC-INS-04: Alumno INACTIVO ? bloqueado. |  |
+| **Precondiciones**  ‚Ä¢ Alumno ACTIVO.  ‚Ä¢ Materia ACTIVA. |  |
+| **Reglas / Validaciones**  ‚Ä¢ No duplicar inscripci√≥n.  ‚Ä¢ Validar correlativas aprobadas (si existen). |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Inscripci√≥n exitosa**  DADO alumno ACTIVO y materia ACTIVA  Y correlativas aprobadas  CUANDO el ADM inscribe  ENTONCES el sistema registra la inscripci√≥n    **Escenario ‚Äî Correlativas faltantes**  DADO que faltan correlativas aprobadas  CUANDO intento inscribir  ENTONCES el sistema rechaza e informa cu√°les faltan |  |
+| **Casos de Test**  TC-INS-01: Inscripci√≥n OK.  TC-INS-02: Duplicada ? error.  TC-INS-03: Correlativas faltantes ? error detallado.  TC-INS-04: Alumno INACTIVO ? bloqueado. |  |
 | **Contrato (opcional si API)**  POST /api/v1/inscripciones ? 201 / 400 / 409 |  |
-| **Resultado Esperado**  InscripciÛn creada con validaciones correctas. |  |
+| **Resultado Esperado**  Inscripci√≥n creada con validaciones correctas. |  |
 
-# **? EPIC-ASIS ó Asistencias y Regularidad**
+# **? EPIC-ASIS ‚Äî Asistencias y Regularidad**
 
-## **US-ASIS-01 ó Registrar asistencia**
+## **US-ASIS-01 ‚Äî Registrar asistencia**
 
-| **User Story: US-ASIS-01 ó Registrar asistencia** | **ESTIMACI”N** |
+| **User Story: US-ASIS-01 ‚Äî Registrar asistencia** | **ESTIMACI√ìN** |
 | --- | --- |
 | **Como** Docente  **Quiero** registrar asistencia por clase  **Para** controlar regularidad del alumno |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-AUTH-01, US-PROF-04, US-INS-01 |  |
-| **Precondiciones**  ï DOC autenticado.  ï DOC asignado a la materia.  ï Alumnos inscriptos. |  |
-| **Reglas / Validaciones**  ï Registrar por clase/fecha y por alumno.  ï No permitir registrar asistencia si DOC no est· asignado. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Registro exitoso**  DADO una clase definida para la materia  CUANDO el DOC marca presentes/ausentes  ENTONCES el sistema guarda la asistencia por alumno    **Escenario ó Docente no asignado**  DADO DOC no asignado a la materia  CUANDO intenta registrar asistencia  ENTONCES el sistema deniega la acciÛn |  |
+| **Precondiciones**  ‚Ä¢ DOC autenticado.  ‚Ä¢ DOC asignado a la materia.  ‚Ä¢ Alumnos inscriptos. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Registrar por clase/fecha y por alumno.  ‚Ä¢ No permitir registrar asistencia si DOC no est√° asignado. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Registro exitoso**  DADO una clase definida para la materia  CUANDO el DOC marca presentes/ausentes  ENTONCES el sistema guarda la asistencia por alumno    **Escenario ‚Äî Docente no asignado**  DADO DOC no asignado a la materia  CUANDO intenta registrar asistencia  ENTONCES el sistema deniega la acci√≥n |  |
 | **Casos de Test**  TC-ASIS-01: Registro OK.  TC-ASIS-02: DOC no asignado ? denegado. |  |
 | **Contrato (opcional si API)**  POST /api/v1/asistencias ? 201 / 403 / 400 |  |
 | **Resultado Esperado**  Asistencias registradas y disponibles para reportes. |  |
 
-## **US-ASIS-02 ó Calcular regularidad autom·tica**
+## **US-ASIS-02 ‚Äî Calcular regularidad autom√°tica**
 
-| **User Story: US-ASIS-02 ó Calcular regularidad** | **ESTIMACI”N** |
+| **User Story: US-ASIS-02 ‚Äî Calcular regularidad** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Sistema  **Quiero** calcular porcentaje de asistencia  **Para** actualizar condiciÛn REGULAR/NO\_REGULAR |  |
+| **Como** Sistema  **Quiero** calcular porcentaje de asistencia  **Para** actualizar condici√≥n REGULAR/NO\_REGULAR |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-ASIS-01 |  |
-| **Precondiciones**  ï Existen asistencias registradas para la materia. |  |
-| **Reglas / Validaciones**  ï Regular si asistencia ? 70%.  ï Calcular sobre total de clases registradas. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Regular**  DADO alumno con asistencia 70% o m·s  CUANDO el sistema recalcula  ENTONCES estado pasa a REGULAR    **Escenario ó No regular**  DADO alumno con asistencia menor a 70%  CUANDO el sistema recalcula  ENTONCES estado pasa a NO\_REGULAR |  |
+| **Precondiciones**  ‚Ä¢ Existen asistencias registradas para la materia. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Regular si asistencia ? 70%.  ‚Ä¢ Calcular sobre total de clases registradas. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Regular**  DADO alumno con asistencia 70% o m√°s  CUANDO el sistema recalcula  ENTONCES estado pasa a REGULAR    **Escenario ‚Äî No regular**  DADO alumno con asistencia menor a 70%  CUANDO el sistema recalcula  ENTONCES estado pasa a NO\_REGULAR |  |
 | **Casos de Test**  TC-ASIS-03: 70% exacto ? REGULAR.  TC-ASIS-04: 69.9% ? NO\_REGULAR. |  |
 | **Resultado Esperado**  Estados de regularidad consistentes con la regla del 70%. |  |
 
-# **? EPIC-CAL ó Calificaciones**
+# **? EPIC-CAL ‚Äî Calificaciones**
 
-## **US-CAL-01 ó Registrar nota parcial**
+## **US-CAL-01 ‚Äî Registrar nota parcial**
 
-| **User Story: US-CAL-01 ó Registrar nota parcial** | **ESTIMACI”N** |
+| **User Story: US-CAL-01 ‚Äî Registrar nota parcial** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Docente  **Quiero** registrar notas parciales  **Para** evaluar el desempeÒo durante la cursada |  |
+| **Como** Docente  **Quiero** registrar notas parciales  **Para** evaluar el desempe√±o durante la cursada |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-AUTH-01, US-INS-01 |  |
-| **Precondiciones**  ï Alumno inscripto en materia.  ï DOC asignado a materia. |  |
-| **Reglas / Validaciones**  ï Nota dentro de rango (definir escala: 0..10). |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Carga exitosa**  DADO alumno inscripto  CUANDO el DOC registra una nota v·lida  ENTONCES el sistema guarda la calificaciÛn    **Escenario ó Nota inv·lida**  DADO una nota fuera de rango  CUANDO intento guardar  ENTONCES el sistema rechaza y explica el error |  |
+| **Precondiciones**  ‚Ä¢ Alumno inscripto en materia.  ‚Ä¢ DOC asignado a materia. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Nota dentro de rango (definir escala: 0..10). |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Carga exitosa**  DADO alumno inscripto  CUANDO el DOC registra una nota v√°lida  ENTONCES el sistema guarda la calificaci√≥n    **Escenario ‚Äî Nota inv√°lida**  DADO una nota fuera de rango  CUANDO intento guardar  ENTONCES el sistema rechaza y explica el error |  |
 | **Casos de Test**  TC-CAL-01: Parcial OK.  TC-CAL-02: Nota fuera de rango ? error. |  |
 | **Resultado Esperado**  Parciales guardados y consultables. |  |
 
-## **US-CAL-02 ó Registrar nota final**
+## **US-CAL-02 ‚Äî Registrar nota final**
 
-| **User Story: US-CAL-02 ó Registrar nota final** | **ESTIMACI”N** |
+| **User Story: US-CAL-02 ‚Äî Registrar nota final** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Docente  **Quiero** registrar la nota final  **Para** determinar aprobaciÛn de la materia |  |
+| **Como** Docente  **Quiero** registrar la nota final  **Para** determinar aprobaci√≥n de la materia |  |
 | **Prioridad:** Alta |  |
 | **Dependencia:** US-ASIS-02, US-MAT-04 |  |
-| **Precondiciones**  ï Alumno inscripto.  ï Alumno REGULAR (?70%).  ï Correlativas aprobadas (si aplica). |  |
-| **Reglas / Validaciones**  ï Nota final en escala 0..10.  ï Si nota final ? 6 ? APROBADO.  ï Si nota final < 6 ? DESAPROBADO.  ï Si NO\_REGULAR ? no permitir registrar final. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Final aprobado**  DADO alumno REGULAR y correlativas aprobadas  CUANDO registro nota final ? 6  ENTONCES el sistema marca APROBADO    **Escenario ó Final desaprobado**  DADO alumno REGULAR  CUANDO registro nota final < 6  ENTONCES el sistema marca DESAPROBADO    **Escenario ó Alumno no regular**  DADO alumno NO\_REGULAR  CUANDO intento registrar final  ENTONCES el sistema rechaza y muestra ìAlumno no regularî |  |
+| **Precondiciones**  ‚Ä¢ Alumno inscripto.  ‚Ä¢ Alumno REGULAR (?70%).  ‚Ä¢ Correlativas aprobadas (si aplica). |  |
+| **Reglas / Validaciones**  ‚Ä¢ Nota final en escala 0..10.  ‚Ä¢ Si nota final ? 6 ? APROBADO.  ‚Ä¢ Si nota final < 6 ? DESAPROBADO.  ‚Ä¢ Si NO\_REGULAR ? no permitir registrar final. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Final aprobado**  DADO alumno REGULAR y correlativas aprobadas  CUANDO registro nota final ? 6  ENTONCES el sistema marca APROBADO    **Escenario ‚Äî Final desaprobado**  DADO alumno REGULAR  CUANDO registro nota final < 6  ENTONCES el sistema marca DESAPROBADO    **Escenario ‚Äî Alumno no regular**  DADO alumno NO\_REGULAR  CUANDO intento registrar final  ENTONCES el sistema rechaza y muestra ‚ÄúAlumno no regular‚Äù |  |
 | **Casos de Test**  TC-CAL-03: Final 6 ? APROBADO.  TC-CAL-04: Final 5 ? DESAPROBADO.  TC-CAL-05: NO\_REGULAR ? rechazo. |  |
 | **Resultado Esperado**  Estado final consistente y validado. |  |
 
-# **? EPIC-REP ó Reportes e Indicadores**
+# **? EPIC-REP ‚Äî Reportes e Indicadores**
 
-## **US-REP-01 ó Reporte de asistencia por materia**
+## **US-REP-01 ‚Äî Reporte de asistencia por materia**
 
-| **User Story: US-REP-01 ó Reporte de asistencia** | **ESTIMACI”N** |
+| **User Story: US-REP-01 ‚Äî Reporte de asistencia** | **ESTIMACI√ìN** |
 | --- | --- |
 | **Como** Administrativo  **Quiero** generar reporte de asistencia por materia  **Para** detectar alumnos en riesgo de perder regularidad |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-ASIS-01, US-ASIS-02 |  |
-| **Precondiciones**  ï Existen asistencias registradas o se debe informar ìsin datosî. |  |
-| **Reglas / Validaciones**  ï Mostrar % por alumno y estado REGULAR/NO\_REGULAR. |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Con datos**  DADO materia con asistencias  CUANDO genero el reporte  ENTONCES el sistema lista alumnos con porcentaje y estado    **Escenario ó Sin datos**  DADO materia sin asistencias  CUANDO genero el reporte  ENTONCES el sistema informa ìSin registrosî |  |
-| **Casos de Test**  TC-REP-01: Reporte con datos OK.  TC-REP-02: Reporte sin datos ? ìSin registrosî. |  |
+| **Precondiciones**  ‚Ä¢ Existen asistencias registradas o se debe informar ‚Äúsin datos‚Äù. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Mostrar % por alumno y estado REGULAR/NO\_REGULAR. |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Con datos**  DADO materia con asistencias  CUANDO genero el reporte  ENTONCES el sistema lista alumnos con porcentaje y estado    **Escenario ‚Äî Sin datos**  DADO materia sin asistencias  CUANDO genero el reporte  ENTONCES el sistema informa ‚ÄúSin registros‚Äù |  |
+| **Casos de Test**  TC-REP-01: Reporte con datos OK.  TC-REP-02: Reporte sin datos ? ‚ÄúSin registros‚Äù. |  |
 | **Resultado Esperado**  Reporte claro para toma de decisiones. |  |
 
-## **US-REP-02 ó Reporte de rendimiento por alumno**
+## **US-REP-02 ‚Äî Reporte de rendimiento por alumno**
 
-| **User Story: US-REP-02 ó Reporte de rendimiento** | **ESTIMACI”N** |
+| **User Story: US-REP-02 ‚Äî Reporte de rendimiento** | **ESTIMACI√ìN** |
 | --- | --- |
-| **Como** Administrativo  **Quiero** ver reporte de rendimiento de un alumno  **Para** evaluar su desempeÒo acadÈmico |  |
+| **Como** Administrativo  **Quiero** ver reporte de rendimiento de un alumno  **Para** evaluar su desempe√±o acad√©mico |  |
 | **Prioridad:** Media |  |
 | **Dependencia:** US-CAL-01, US-CAL-02 |  |
-| **Precondiciones**  ï Alumno existe. |  |
-| **Reglas / Validaciones**  ï Mostrar notas parciales, final, estado y promedio (si aplica). |  |
-| **Criterios de AceptaciÛn (Gherkin)**    **Escenario ó Con notas**  DADO alumno con calificaciones  CUANDO genero el reporte  ENTONCES el sistema muestra calificaciones y estados    **Escenario ó Sin notas**  DADO alumno sin calificaciones  CUANDO genero el reporte  ENTONCES el sistema informa ìSin calificaciones registradasî |  |
-| **Casos de Test**  TC-REP-03: Reporte con notas OK.  TC-REP-04: Reporte sin notas ? mensaje ìSin calificacionesî. |  |
-| **Resultado Esperado**  Resumen del desempeÒo del alumno. |  |
+| **Precondiciones**  ‚Ä¢ Alumno existe. |  |
+| **Reglas / Validaciones**  ‚Ä¢ Mostrar notas parciales, final, estado y promedio (si aplica). |  |
+| **Criterios de Aceptaci√≥n (Gherkin)**    **Escenario ‚Äî Con notas**  DADO alumno con calificaciones  CUANDO genero el reporte  ENTONCES el sistema muestra calificaciones y estados    **Escenario ‚Äî Sin notas**  DADO alumno sin calificaciones  CUANDO genero el reporte  ENTONCES el sistema informa ‚ÄúSin calificaciones registradas‚Äù |  |
+| **Casos de Test**  TC-REP-03: Reporte con notas OK.  TC-REP-04: Reporte sin notas ? mensaje ‚ÄúSin calificaciones‚Äù. |  |
+| **Resultado Esperado**  Resumen del desempe√±o del alumno. |  |

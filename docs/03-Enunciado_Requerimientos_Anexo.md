@@ -1,16 +1,16 @@
 # **? PROYECTO FINAL**
 
-# **BACKOFFICE ACAD…MICO ñ ITEC N∞1**
+# **BACKOFFICE ACAD√âMICO ‚Äì ITEC N¬∞1**
 
 ? **BACKLOG DE USER STORIES**
 
-# **ANEXO ó Requerimientos de Asistencia y Carga de Notas**
+# **ANEXO ‚Äî Requerimientos de Asistencia y Carga de Notas**
 
-Complementario al Backoffice AcadÈmico ITEC N∞1
+Complementario al Backoffice Acad√©mico ITEC N¬∞1
 
-# **? EPIC-ASIS ó GestiÛn de Asistencia**
+# **? EPIC-ASIS ‚Äî Gesti√≥n de Asistencia**
 
-## **US-ASIS-03 ó Consultar asistencia por alumno**
+## **US-ASIS-03 ‚Äî Consultar asistencia por alumno**
 
 **Como** Docente / Administrativo
  **Quiero** consultar asistencias de un alumno
@@ -32,9 +32,9 @@ GET /api/v1/asistencias/alumnos/{idAlumno}
 
 * TC-ASIS-05 consulta exitosa
 * TC-ASIS-06 alumno sin asistencias
-* TC-ASIS-07 c·lculo de regularidad correcto
+* TC-ASIS-07 c√°lculo de regularidad correcto
 
-## **US-ASIS-04 ó Justificar inasistencia**
+## **US-ASIS-04 ‚Äî Justificar inasistencia**
 
 Como Docente / Administrativo
  Quiero registrar inasistencias justificadas
@@ -44,7 +44,7 @@ Reglas:
 
 * Motivo obligatorio
 * Adjuntar certificado opcional
-* No computar como ausencia com˙n
+* No computar como ausencia com√∫n
 
 Estados:
 
@@ -52,27 +52,27 @@ Estados:
 * AUSENTE
 * JUSTIFICADA
 
-## **US-ASIS-05 ó Cierre de asistencia por comisiÛn**
+## **US-ASIS-05 ‚Äî Cierre de asistencia por comisi√≥n**
 
 Como Sistema
  Quiero cerrar asistencias de cursada
- Para congelar c·lculo de regularidad.
+ Para congelar c√°lculo de regularidad.
 
 Validaciones:
 
 * No modificar asistencias luego del cierre (salvo admin)
 * Generar regularidad final
 
-# **? EPIC-CAL ó GestiÛn de Notas**
+# **? EPIC-CAL ‚Äî Gesti√≥n de Notas**
 
 ## **Modelo sugerido**
 
-Tipos de evaluaciÛn:
+Tipos de evaluaci√≥n:
 
 * Parcial 1
 * Parcial 2
 * Recuperatorio
-* Trabajo pr·ctico
+* Trabajo pr√°ctico
 * Final
 
 Entidad sugerida:
@@ -95,7 +95,7 @@ Calificacion
 
 - docenteId
 
-## **US-CAL-03 ó Modificar nota**
+## **US-CAL-03 ‚Äî Modificar nota**
 
 Como Docente
  Quiero corregir una nota cargada
@@ -103,7 +103,7 @@ Como Docente
 
 Reglas:
 
-* Registrar auditorÌa:
+* Registrar auditor√≠a:
   + nota anterior
   + nota nueva
   + usuario
@@ -113,7 +113,7 @@ API
 
 PUT /api/v1/calificaciones/{id}
 
-## **US-CAL-04 ó Registrar recuperatorio**
+## **US-CAL-04 ‚Äî Registrar recuperatorio**
 
 Como Docente
  Quiero cargar recuperatorios
@@ -129,13 +129,13 @@ Casos:
 * recuperatorio aprobado
 * recuperatorio desaprobado
 
-## **US-CAL-05 ó C·lculo autom·tico de promedio**
+## **US-CAL-05 ‚Äî C√°lculo autom√°tico de promedio**
 
 Como Sistema
- Quiero calcular promedio autom·tico
- Para mostrar rendimiento acadÈmico.
+ Quiero calcular promedio autom√°tico
+ Para mostrar rendimiento acad√©mico.
 
-FÛrmula configurable:
+F√≥rmula configurable:
 
 Promedio = ? notas / cantidad
 
@@ -145,7 +145,7 @@ Estados:
 * REGULAR
 * DESAPROBADO
 
-## **US-CAL-06 ó Cierre de acta final**
+## **US-CAL-06 ‚Äî Cierre de acta final**
 
 Como Docente
  Quiero cerrar acta de notas
@@ -172,8 +172,8 @@ Criterio:
 
 Alertas:
 
-* Riesgo acadÈmico
-* Riesgo de pÈrdida de regularidad
+* Riesgo acad√©mico
+* Riesgo de p√©rdida de regularidad
 
 ## **Reporte libro de actas**
 
@@ -183,7 +183,7 @@ Debe listar:
 * parciales
 * recuperatorios
 * final
-* condiciÛn
+* condici√≥n
 
 Exportables:
 
@@ -204,13 +204,13 @@ Solo ADM puede:
 ? desbloquear actas cerradas
  ? correcciones extraordinarias
 
-# **Eventos de auditorÌa (muy importante)**
+# **Eventos de auditor√≠a (muy importante)**
 
 Registrar:
 
-* quiÈn cargÛ asistencia
-* quiÈn modificÛ notas
-* cu·ndo
+* qui√©n carg√≥ asistencia
+* qui√©n modific√≥ notas
+* cu√°ndo
 * valores anteriores
 
 Tabla sugerida:
@@ -237,7 +237,7 @@ Asistencia >=70% => Regular
 
 Asistencia <70% => No regular
 
-## **AprobaciÛn**
+## **Aprobaci√≥n**
 
 Nota >=6 -> Aprobado
 
@@ -248,15 +248,15 @@ Nota <6 -> Desaprobado
 * Carga masiva de notas por Excel
 * QR para asistencia
 * Firma digital de actas
-* Notificaciones autom·ticas a alumnos
+* Notificaciones autom√°ticas a alumnos
 
 ## **EPICS agregadas**
 
 * EPIC-ASIS ampliada
 * EPIC-CAL ampliada
-* EPIC-AUD auditorÌa acadÈmica
+* EPIC-AUD auditor√≠a acad√©mica
 
-Esto adem·s te deja listo para despuÈs modelar entidades como:
+Esto adem√°s te deja listo para despu√©s modelar entidades como:
 
 * Asistencia
 * Calificacion
