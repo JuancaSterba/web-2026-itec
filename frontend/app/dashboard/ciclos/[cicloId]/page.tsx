@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import GenerarOfertaAutomaticaDialog from "@/components/ciclos/generar-oferta-automatica-dialog"
 
 interface CicloLectivoResponse {
   id: number
@@ -33,11 +34,18 @@ export default async function CicloDetallePage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">
-          Dashboard del Ciclo {ciclo?.anio ?? cicloId}
-        </h1>
-        <p className="text-sm text-muted-foreground">Elegí una carrera para ver sus períodos académicos</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">
+            Dashboard del Ciclo {ciclo?.anio ?? cicloId}
+          </h1>
+          <p className="text-sm text-muted-foreground">Elegí una carrera para ver sus períodos académicos</p>
+        </div>
+        <GenerarOfertaAutomaticaDialog
+          cicloId={Number(cicloId)}
+          anio={ciclo?.anio ?? new Date().getFullYear()}
+          carrerasDisponibles={(carreras ?? []).map((c) => ({ id: c.id, nombre: c.nombre }))}
+        />
       </div>
 
       {carreras === null ? (
