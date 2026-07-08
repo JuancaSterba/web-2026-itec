@@ -49,8 +49,10 @@ export default function AgregarComisionesPorCarreraDialog({
   materiasPlan: MateriaPlanDisponible[]
   materiaPlanIdsYaOfertados: number[]
 }) {
+  const planPorDefecto = planesDisponibles.length > 0 ? String(planesDisponibles[0].id) : ""
+
   const [open, setOpen] = useState(false)
-  const [planEstudioId, setPlanEstudioId] = useState("")
+  const [planEstudioId, setPlanEstudioId] = useState(planPorDefecto)
   const [seleccionadas, setSeleccionadas] = useState<Set<number>>(new Set())
   const [cupoMaximo, setCupoMaximo] = useState("30")
 
@@ -74,7 +76,7 @@ export default function AgregarComisionesPorCarreraDialog({
 
   function cerrarYResetear() {
     setOpen(false)
-    setPlanEstudioId("")
+    setPlanEstudioId(planPorDefecto)
     setSeleccionadas(new Set())
     setCupoMaximo("30")
   }
@@ -103,25 +105,31 @@ export default function AgregarComisionesPorCarreraDialog({
           <DialogTitle>Agregar Materias de una Carrera a este Período</DialogTitle>
         </DialogHeader>
         <form action={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="planEstudioId">Carrera</Label>
-            <select
-              id="planEstudioId"
-              value={planEstudioId}
-              onChange={(e) => {
-                setPlanEstudioId(e.target.value)
-                setSeleccionadas(new Set())
-              }}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Seleccioná una carrera</option>
-              {planesDisponibles.map((plan) => (
-                <option key={plan.id} value={plan.id}>
-                  {plan.etiqueta}
-                </option>
-              ))}
-            </select>
-          </div>
+          {planesDisponibles.length > 1 ? (
+            <div className="space-y-2">
+              <Label htmlFor="planEstudioId">Carrera</Label>
+              <select
+                id="planEstudioId"
+                value={planEstudioId}
+                onChange={(e) => {
+                  setPlanEstudioId(e.target.value)
+                  setSeleccionadas(new Set())
+                }}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="">Seleccioná una carrera</option>
+                {planesDisponibles.map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.etiqueta}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Carrera: <span className="font-medium text-foreground">{planesDisponibles[0]?.etiqueta ?? "—"}</span>
+            </p>
+          )}
 
           {planEstudioId && (
             <div className="space-y-2">
