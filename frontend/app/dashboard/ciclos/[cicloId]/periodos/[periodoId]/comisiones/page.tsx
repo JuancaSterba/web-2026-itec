@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import NuevaComisionDialog from "@/components/comisiones/nueva-comision-dialog"
+import AgregarComisionesPorCarreraDialog from "@/components/comisiones/agregar-comisiones-por-carrera-dialog"
 import EditarComisionDialog from "@/components/comisiones/editar-comision-dialog"
 import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteComision } from "@/app/actions/comision-actions"
@@ -133,6 +133,12 @@ export default async function OfertaAcademicaPage({
   }
   const carrerasOrdenadas = Array.from(comisionesPorCarrera.keys()).sort()
 
+  const planesDisponibles = (planesEstudio ?? []).map((p) => ({
+    id: p.id,
+    etiqueta: `${p.carreraNombre} - Plan ${p.cohorte}`,
+  }))
+  const materiaPlanIdsYaOfertados = (comisionesDelPeriodo ?? []).map((c) => c.materiaPlanId)
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -148,7 +154,12 @@ export default async function OfertaAcademicaPage({
             alumnosDisponibles={alumnosParaInscripcion}
             cursadasExistentes={cursadasExistentes}
           />
-          <NuevaComisionDialog periodoId={Number(periodoId)} materiasPlanDisponibles={materiasPlanDisponibles} />
+          <AgregarComisionesPorCarreraDialog
+            periodoId={Number(periodoId)}
+            planesDisponibles={planesDisponibles}
+            materiasPlan={materiasPlan ?? []}
+            materiaPlanIdsYaOfertados={materiaPlanIdsYaOfertados}
+          />
         </div>
       </div>
 
