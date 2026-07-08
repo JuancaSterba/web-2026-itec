@@ -8,6 +8,7 @@ import ar.edu.itec1misiones.exception.CursadaNotFoundException;
 import ar.edu.itec1misiones.model.Alumno;
 import ar.edu.itec1misiones.model.Comision;
 import ar.edu.itec1misiones.model.Cursada;
+import ar.edu.itec1misiones.model.MateriaPlan;
 import ar.edu.itec1misiones.repository.AlumnoRepository;
 import ar.edu.itec1misiones.repository.ComisionRepository;
 import ar.edu.itec1misiones.repository.CursadaRepository;
@@ -17,11 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CursadaServiceImpl implements CursadaService {
+
+    // Reutiliza la misma convención de "materia aprobada" ya usada en la Ficha
+    // del Alumno del frontend (condicionFinal es texto libre, sin enum).
+    private static final Pattern APROBADA = Pattern.compile("PROMOCIONA|APROBAD", Pattern.CASE_INSENSITIVE);
 
     private final CursadaRepository cursadaRepository;
     private final AlumnoRepository alumnoRepository;
@@ -33,6 +39,8 @@ public class CursadaServiceImpl implements CursadaService {
                 .orElseThrow(() -> new AlumnoNotFoundException(request.getAlumnoId()));
         Comision comision = comisionRepository.findById(request.getComisionId())
                 .orElseThrow(() -> new ComisionNotFoundException(request.getComisionId()));
+
+        validarCorrelativas(alumno.getId(), comision);
 
         Cursada cursada = new Cursada();
         cursada.setAlumno(alumno);
@@ -76,6 +84,26 @@ public class CursadaServiceImpl implements CursadaService {
         Cursada cursada = cursadaRepository.findById(id)
                 .orElseThrow(() -> new CursadaNotFoundException(id));
         cursadaRepository.delete(cursada);
+    }
+
+    private void validarCorrelativas(Long alumnoId, Comision comision) {
+        MateriaPlan materiaPlan = comision.getMateriaPlan();
+        if (materiaPlan == null || materiaPlan.getCorrelativas().isEmpty()) {
+            return;
+        }
+
+        List<Cursada> cursadasDelAlumno = cursadaRepository.findByAlumnoId(alumnoId);
+        List<String> faltantes = materiaPlan.getCorrelativas().stream()
+                .filter(correlativa -> cursadasDelAlumno.stream().noneMatch(c ->
+                        c.getComision().getMateriaPlan().getId().equals(correlativa.getId())
+                                && APROBADA.matcher(String.valueOf(c.getCondicionFinal())).find()))
+                .map(correlativa -> correlativa.getMateria().getNombre())
+                .toList();
+
+        if (!faltantes.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "No se puede matricular: falta aprobar la/s correlativa/s: " + String.join(", ", faltantes));
+        }
     }
 
     private CursadaResponse toResponse(Cursada cursada) {

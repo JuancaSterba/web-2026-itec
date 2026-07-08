@@ -3,6 +3,8 @@ package ar.edu.itec1misiones.dto.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class MateriaPlanRequest {
 
@@ -15,4 +17,6 @@ public class MateriaPlanRequest {
     private Integer cuatrimestreDictado;
 
     private Integer cargaHoraria;
+
+    private List<Long> correlativaIds;
 }

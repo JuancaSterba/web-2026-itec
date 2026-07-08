@@ -67,9 +67,13 @@ export default function InscribirCuatrimestreDialog({
       return
     }
 
-    await createCursadasMasivas(alumnoId, comisionIds)
-    formRef.current?.reset()
-    setOpen(false)
+    try {
+      await createCursadasMasivas(alumnoId, comisionIds)
+      formRef.current?.reset()
+      setOpen(false)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "No se pudo matricular al alumno")
+    }
   }
 
   return (

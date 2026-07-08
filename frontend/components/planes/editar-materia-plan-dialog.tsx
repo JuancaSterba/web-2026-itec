@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react"
 import { updateMateriaPlan } from "@/app/actions/materia-plan-actions"
 import { anioYCuatrimestre, calcularCuatrimestreDictado } from "@/lib/cuatrimestre-carrera"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -22,11 +23,17 @@ interface MateriaDisponible {
   nombre: string
 }
 
+interface CorrelativaDisponible {
+  id: number
+  materiaNombre: string
+}
+
 interface MateriaPlanEditable {
   id: number
   materiaId: number
   cuatrimestreDictado: number
   cargaHoraria: number
+  correlativaIds: number[]
 }
 
 function BotonGuardar() {
@@ -42,18 +49,33 @@ export default function EditarMateriaPlanDialog({
   materiaPlan,
   planId,
   materiasDisponibles,
+  correlativasDisponibles,
 }: {
   materiaPlan: MateriaPlanEditable
   planId: number
   materiasDisponibles: MateriaDisponible[]
+  correlativasDisponibles: CorrelativaDisponible[]
 }) {
   const [open, setOpen] = useState(false)
+  const [correlativasElegidas, setCorrelativasElegidas] = useState<Set<number>>(
+    new Set(materiaPlan.correlativaIds)
+  )
   const { anio, cuatrimestreDelAnio } = anioYCuatrimestre(materiaPlan.cuatrimestreDictado)
+
+  function toggleCorrelativa(id: number) {
+    setCorrelativasElegidas((prev) => {
+      const nuevo = new Set(prev)
+      if (nuevo.has(id)) nuevo.delete(id)
+      else nuevo.add(id)
+      return nuevo
+    })
+  }
 
   async function handleSubmit(formData: FormData) {
     const anioForm = Number(formData.get("anio"))
     const cuatrimestreDelAnioForm = Number(formData.get("cuatrimestreDelAnio"))
     formData.set("cuatrimestreDictado", String(calcularCuatrimestreDictado(anioForm, cuatrimestreDelAnioForm)))
+    correlativasElegidas.forEach((id) => formData.append("correlativaIds", String(id)))
 
     await updateMateriaPlan(formData, materiaPlan.id, planId)
     setOpen(false)
@@ -118,6 +140,25 @@ export default function EditarMateriaPlanDialog({
               required
             />
           </div>
+          {correlativasDisponibles.length > 0 && (
+            <div className="space-y-2">
+              <Label>Correlativas (materias que hay que tener aprobadas antes)</Label>
+              <div className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-border p-2">
+                {correlativasDisponibles.map((c) => (
+                  <label
+                    key={c.id}
+                    className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+                  >
+                    <Checkbox
+                      checked={correlativasElegidas.has(c.id)}
+                      onCheckedChange={() => toggleCorrelativa(c.id)}
+                    />
+                    <span className="flex-1">{c.materiaNombre}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
           <DialogFooter>
             <BotonGuardar />
           </DialogFooter>

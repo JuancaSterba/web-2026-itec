@@ -42,9 +42,13 @@ export default function AgregarAlumnoDialog({
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(formData: FormData) {
-    await createCursada(formData, comisionId)
-    formRef.current?.reset()
-    setOpen(false)
+    try {
+      await createCursada(formData, comisionId)
+      formRef.current?.reset()
+      setOpen(false)
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "No se pudo matricular al alumno")
+    }
   }
 
   return (

@@ -16,6 +16,7 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
     materiaId: Number(formData.get("materiaId")),
     cuatrimestreDictado: Number(formData.get("cuatrimestreDictado")),
     cargaHoraria: Number(formData.get("cargaHoraria")),
+    correlativaIds: formData.getAll("correlativaIds").map(Number),
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan`, {
@@ -28,7 +29,8 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
   })
 
   if (!response.ok) {
-    throw new Error("No se pudo enlazar la materia al plan de estudio")
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo enlazar la materia al plan de estudio")
   }
 
   revalidatePath("/dashboard/carreras/[id]/planes/[planId]", "page")
@@ -43,6 +45,7 @@ export async function updateMateriaPlan(formData: FormData, materiaPlanId: numbe
     materiaId: Number(formData.get("materiaId")),
     cuatrimestreDictado: Number(formData.get("cuatrimestreDictado")),
     cargaHoraria: Number(formData.get("cargaHoraria")),
+    correlativaIds: formData.getAll("correlativaIds").map(Number),
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan/${materiaPlanId}`, {
@@ -55,7 +58,8 @@ export async function updateMateriaPlan(formData: FormData, materiaPlanId: numbe
   })
 
   if (!response.ok) {
-    throw new Error("No se pudo actualizar la materia del plan")
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo actualizar la materia del plan")
   }
 
   revalidatePath("/dashboard/carreras/[id]/planes/[planId]", "page")

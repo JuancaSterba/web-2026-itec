@@ -12,6 +12,8 @@ interface MateriaPlanResponse {
   materiaNombre: string
   cuatrimestreDictado: number
   cargaHoraria: number
+  correlativaIds: number[]
+  correlativaNombres: string[]
 }
 
 interface MateriaResponse {
@@ -68,7 +70,11 @@ export default async function PlanDetallePage({
           </h1>
           <p className="text-sm text-muted-foreground">{carrera?.nombre ?? `Carrera #${id}`}</p>
         </div>
-        <AgregarMateriaDialog planId={Number(planId)} materiasDisponibles={materias ?? []} />
+        <AgregarMateriaDialog
+          planId={Number(planId)}
+          materiasDisponibles={materias ?? []}
+          correlativasDisponibles={(delPlan ?? []).map((mp) => ({ id: mp.id, materiaNombre: mp.materiaNombre }))}
+        />
       </div>
 
       {delPlan === null ? (
@@ -85,12 +91,20 @@ export default async function PlanDetallePage({
                   <li key={mp.id} className="flex items-center justify-between">
                     <span>
                       {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs/semana)</span>
+                      {mp.correlativaNombres.length > 0 && (
+                        <span className="block text-xs text-muted-foreground">
+                          Correlativas: {mp.correlativaNombres.join(", ")}
+                        </span>
+                      )}
                     </span>
                     <div className="flex gap-1">
                       <EditarMateriaPlanDialog
                         materiaPlan={mp}
                         planId={Number(planId)}
                         materiasDisponibles={materias ?? []}
+                        correlativasDisponibles={(delPlan ?? [])
+                          .filter((otra) => otra.id !== mp.id)
+                          .map((otra) => ({ id: otra.id, materiaNombre: otra.materiaNombre }))}
                       />
                       <EliminarBoton
                         accion={deleteMateriaPlan.bind(null, mp.id)}

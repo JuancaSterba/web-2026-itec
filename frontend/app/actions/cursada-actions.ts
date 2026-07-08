@@ -28,7 +28,8 @@ export async function createCursada(formData: FormData, comisionId: number) {
   })
 
   if (!response.ok) {
-    throw new Error("No se pudo matricular al alumno")
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo matricular al alumno")
   }
 
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
@@ -52,8 +53,15 @@ export async function createCursadasMasivas(alumnoId: number, comisionIds: numbe
     )
   )
 
-  if (respuestas.some((response) => !response.ok)) {
-    throw new Error("No se pudo matricular al alumno en todas las comisiones del cuatrimestre")
+  const fallidas = respuestas.filter((response) => !response.ok)
+  if (fallidas.length > 0) {
+    const cuerpos = await Promise.all(fallidas.map((r) => r.json().catch(() => null)))
+    const mensajes = cuerpos.map((b) => b?.errors?.[0]?.description).filter(Boolean)
+    throw new Error(
+      mensajes.length > 0
+        ? mensajes.join(" / ")
+        : "No se pudo matricular al alumno en todas las comisiones del cuatrimestre"
+    )
   }
 
   revalidatePath("/dashboard/ciclos/[cicloId]/carreras/[carreraId]/periodos/[periodoId]/comisiones", "page")
