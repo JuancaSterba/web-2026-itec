@@ -37,7 +37,7 @@ export async function createComisionesMasivas(
     throw new Error("No se pudieron crear todas las comisiones seleccionadas")
   }
 
-  revalidatePath("/dashboard/ciclos/[cicloId]/periodos/[periodoId]/comisiones", "page")
+  revalidatePath("/dashboard/ciclos/[cicloId]/carreras/[carreraId]/periodos/[periodoId]/comisiones", "page")
 }
 
 export async function updateComision(formData: FormData, comisionId: number, periodoId: number) {
@@ -64,7 +64,7 @@ export async function updateComision(formData: FormData, comisionId: number, per
     throw new Error("No se pudo actualizar la comisión")
   }
 
-  revalidatePath("/dashboard/ciclos/[cicloId]/periodos/[periodoId]/comisiones", "page")
+  revalidatePath("/dashboard/ciclos/[cicloId]/carreras/[carreraId]/periodos/[periodoId]/comisiones", "page")
 }
 
 export async function deleteComision(comisionId: number) {
@@ -82,5 +82,5 @@ export async function deleteComision(comisionId: number) {
     throw new Error("No se pudo desactivar la comisión")
   }
 
-  revalidatePath("/dashboard/ciclos/[cicloId]/periodos/[periodoId]/comisiones", "page")
+  revalidatePath("/dashboard/ciclos/[cicloId]/carreras/[carreraId]/periodos/[periodoId]/comisiones", "page")
 }

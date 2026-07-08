@@ -14,14 +14,20 @@ function formatLabel(segment: string) {
     .join(" ")
 }
 
-// Segmentos de URL puramente estructurales, sin page.tsx propio
-// (ej: /ciclos/[id]/periodos/ no existe, solo /periodos/[periodoId]/comisiones;
-// /dashboard/comisiones tampoco existe, solo /comisiones/[comisionId]).
-// Clickearlos da 404, asi que no se renderizan como Link. Cuando "comisiones"
-// es el ultimo segmento (ej ".../periodos/2/comisiones", que si es pagina
-// real) ya se renderiza como texto por ser el crumb final, asi que agregarlo
-// aca no rompe ese caso.
-const SEGMENTOS_NO_NAVEGABLES = new Set(["periodos", "planes", "comisiones"])
+// Paths puramente estructurales, sin page.tsx propio (URL scaffolding para
+// llegar a una ruta dinamica hija, pero sin lista propia en ese nivel).
+// Clickearlos da 404, asi que se renderizan como texto en vez de Link.
+// Matchean el path COMPLETO hasta ese segmento (no solo el nombre del
+// segmento) porque el mismo nombre puede ser navegable en un contexto y
+// no en otro -- ej "carreras" es real en /dashboard/carreras/1, pero no
+// existe /dashboard/ciclos/5/carreras (esa lista vive en /ciclos/5 mismo).
+const RUTAS_NO_NAVEGABLES = [
+  /^\/dashboard\/ciclos\/[^/]+\/carreras$/,
+  /^\/dashboard\/ciclos\/[^/]+\/carreras\/[^/]+\/periodos$/,
+  /^\/dashboard\/ciclos\/[^/]+\/carreras\/[^/]+\/periodos\/[^/]+$/,
+  /^\/dashboard\/carreras\/[^/]+\/planes$/,
+  /^\/dashboard\/comisiones$/,
+]
 
 export default function Breadcrumbs() {
   const pathname = usePathname()
@@ -30,11 +36,11 @@ export default function Breadcrumbs() {
   if (segments.length === 0) return null
 
   const crumbs = segments.map((segment, index) => {
-    const anterior = segments[index - 1]
+    const href = "/" + segments.slice(0, index + 1).join("/")
     return {
       label: formatLabel(segment),
-      href: "/" + segments.slice(0, index + 1).join("/"),
-      navegable: !SEGMENTOS_NO_NAVEGABLES.has(segment) && anterior !== "periodos",
+      href,
+      navegable: !RUTAS_NO_NAVEGABLES.some((patron) => patron.test(href)),
     }
   })
 
