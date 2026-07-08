@@ -26,6 +26,16 @@ export default function EditableNotaCell({
     const nota = Number(value)
     if (value === "" || Number.isNaN(nota) || nota === initialNota) return
 
+    if (calificacionId && initialNota !== null) {
+      const confirmado = confirm(
+        `Esta nota ya está cargada (${initialNota}). ¿Confirmás que querés sobrescribirla por ${nota}?`
+      )
+      if (!confirmado) {
+        setValue(initialNota.toString())
+        return
+      }
+    }
+
     setIsSaving(true)
     try {
       await saveCalificacion(cursadaId, instancia, nota, calificacionId)
