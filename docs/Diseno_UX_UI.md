@@ -1,6 +1,6 @@
 # Diseño de Experiencia de Usuario (UX/UI) y Patrones de Interfaz
 
-> **Lectura Previa Recomendada:** [Plan_Refactorizacion.md](./Plan_Refactorizacion.md)
+> **Lectura Previa Recomendada:** [Arquitectura_Funcional.md](./Arquitectura_Funcional.md) (modelo de dominio) y [Arquitectura_Navegacion.md](./Arquitectura_Navegacion.md) (jerarquía de navegación que sustenta este diseño).
 
 Para migrar hacia una experiencia de tipo ERP moderno (estilo Odoo, SAP Fiori o Microsoft Dynamics), debemos abandonar el paradigma de "formularios sueltos" e implementar un modelo de **Navegación Contextual y Vistas Maestro-Detalle**.
 

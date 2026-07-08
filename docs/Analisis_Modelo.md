@@ -1,33 +1,66 @@
-# Análisis del Modelo de Dominio y Puntos a Tener en Cuenta
+# Análisis del Modelo de Dominio vs. Requerimientos
 
-El modelo relacional existente en el backend (`backend/core/src/main/java...`) es sólido y modular. Cubre los dominios requeridos por la documentación, incluyendo gestión de usuarios, alumnos, profesores, estructura académica y evaluación.
+> Reescrito 2026-07-08. La versión anterior de este documento (2026-06-13) analizaba el modelo del proyecto base, previo al refactor a Bounded Contexts DDD (`docs/Modelo_Datos.md`). Entidades que mencionaba como `ComisionMateria`, `AlumnoInscripto`, `AlumnoCarrera`, `Examen`, `Nota` ya no existen — fueron reemplazadas por `Comision`, `Cursada`, `InscripcionCarrera`, y las calificaciones viven en el microservicio `ms-notas` (`CalificacionParcial`). Este documento coteja el modelo **actual** contra lo pedido en `01-Enunciado.md`, `02-Enunciado_Requerimientos.md` y `03-Enunciado_Requerimientos_Anexo.md`.
 
-No obstante, previo al desarrollo de la lógica de negocio, se deben revisar y confirmar los siguientes puntos en el código Java para asegurar que cumplan al 100% con los requerimientos documentados:
+## 1. Validación de Correlativas — PARCIAL
 
-## 1. Validación de Correlativas
-- **Requisito:** El sistema debe aplicar reglas académicas de materias correlativas.
-- **Acción sugerida:** Verificar que la entidad `Materia` o `PlanEstudio` contenga una relación recursiva (por ejemplo, `List<Materia> correlativas` con una relación `@ManyToMany` en JPA) o una entidad intermedia que guarde qué materias son pre-requisito de otras. Si no existe, se deberá crear.
+**Requisito** (US-MAT-04): una materia puede tener múltiples correlativas; no se permite correlativa a sí misma; **no se permiten ciclos** (A→B y B→A, o ciclos más largos).
 
-## 2. Cálculo de Regularidad (70% de asistencia)
-- **Requisito:** El alumno debe tener al menos un 70% de asistencia para mantener la regularidad.
-- **Acción sugerida:**
-  - Comprobar que sea posible calcular el total de clases dictadas para una `ComisionMateria`.
-  - Asegurarse de que la entidad `Asistencia` esté correctamente mapeada contra `AlumnoInscripto` (o `Alumno` + `ComisionMateria`) para poder sumar las presencias.
-  - La lógica del cálculo se hará en los servicios (`@Service`), pero el modelo debe tener los campos listos (por ejemplo, el campo `boolean presente` en `Asistencia`).
+**Estado:** `MateriaPlan.correlativas` (`@ManyToMany` autorreferencial, tabla `correlatividades`) implementado 2026-07-08. `MateriaPlanServiceImpl.resolverCorrelativas` valida que las correlativas existan y pertenezcan al mismo plan, y bloquea que una materia sea correlativa de sí misma. `CursadaServiceImpl.guardar` rechaza (400) matricular a un alumno si no tiene aprobada alguna correlativa (`condicionFinal` matchea `PROMOCIONA*|APROBAD*`).
 
-## 3. Manejo y Transición de Estados
-- **Requisito:** Reflejar el estado académico del alumno en la materia (Regular, Libre, Promocionado).
-- **Acción sugerida:** Revisar la entidad `EstadoCursada`. Debe poder automatizar su transición (por ejemplo, pasar a "Libre" si la inasistencia supera el 30%). Es conveniente tener definidos estos estados base de alguna forma estática o como `ENUM` si resulta más simple de consultar en el backend.
+**Falta:** detección de ciclos (A requiere B y B requiere A, o cadenas más largas). Hoy es posible crear ese ciclo sin error — solo se bloquea la auto-referencia directa.
 
-## 4. Revisión de Relaciones (Foreign Keys) en JPA
-- **Requisito:** Generación de reportes académicos.
-- **Acción sugerida:** Validar las anotaciones de las relaciones bidireccionales y unidireccionales (`@OneToMany`, `@ManyToOne`, `@JoinColumn`).
-  - Ejemplo: Un `Examen` tiene muchas `Nota`s. Una `ComisionMateria` dicta una `Materia` y tiene un `Profesor`.
-  - Esto es fundamental para evitar problemas de _N+1 queries_ y garantizar que las consultas para reportes sean óptimas.
+## 2. Cálculo de Regularidad (70% de asistencia) — NO IMPLEMENTADO
 
-## 5. Auditoría y Fechas (Opcional pero recomendado)
-- **Acción sugerida:** Verificar si las entidades de inscripción (`AlumnoCarrera`, `AlumnoInscripto`) y de registros transaccionales guardan una fecha (ej. `LocalDateTime fechaInscripcion`, `fechaAuditoria`). Esto ayuda a mantener un historial claro, alineado con el requerimiento de tener una "baja lógica" y no borrar historial.
+**Requisito** (`01-Enunciado.md` §3.2, US-ASIS-02, US-ASIS-03): el sistema debe calcular automáticamente el % de asistencia y actualizar la condición REGULAR (≥70%) / NO_REGULAR (<70%).
+
+**Estado:** `Asistencia` (ms-asistencias) registra `cursadaId + fecha + estado` (estado es `String` libre, sin enum — la UI usa por convención `PRESENTE`/`AUSENTE`/`TARDANZA`). No existe ningún cálculo de porcentaje ni transición automática de estado en ningún servicio. `Cursada.condicionFinal` es un campo de texto libre que el admin/profesor edita a mano (`EditarCursadaDialog`) — nunca se deriva de la asistencia.
+
+**Mismatch adicional:** el enunciado (US-ASIS-04) pide un estado `JUSTIFICADA` (con motivo obligatorio, no computa como ausencia) además de `PRESENTE`/`AUSENTE`. Lo implementado usa `TARDANZA` en su lugar, sin campo de motivo.
+
+## 3. Aprobación Automática por Nota — NO IMPLEMENTADO
+
+**Requisito** (EPIC-CAL): nota final ≥6 → APROBADO; <6 → DESAPROBADO; si el alumno está NO_REGULAR, rechazar el registro de la nota final.
+
+**Estado:** `Cursada.notaCierre` y `Cursada.condicionFinal` son campos libres editados a mano, sin ninguna de estas dos validaciones. No hay noción de "nota final" distinta de las `CalificacionParcial` — no existe el concepto de instancia final (ver también pendiente 14 en `.remember/PENDIENTES.md`, modalidad PROMOCIONAL/FINAL, pedida por el usuario para más adelante).
+
+## 4. Reportes Académicos — NO IMPLEMENTADO
+
+**Requisito** (`01-Enunciado.md` §3.2, EPIC-REP): reporte de asistencia por materia (US-REP-01) y reporte de rendimiento por alumno (US-REP-02).
+
+**Estado:** no existe ningún reporte formal. Lo más cercano es la Ficha del Alumno (`/dashboard/alumnos/[alumnoId]`), que muestra el progreso académico de un alumno por carrera (materias cursando/aprobadas/libres/pendientes) — cubre el espíritu de US-REP-02 pero no es un reporte parametrizable ni exportable. US-REP-01 (asistencia por materia) no tiene ningún equivalente.
+
+## 5. Auditoría (AuditLog) — NO IMPLEMENTADO
+
+**Requisito** (`03-Enunciado_Requerimientos_Anexo.md`): tabla sugerida `AuditLog` (acción, usuario, entidad, valorAnterior, valorNuevo, fecha). Está listada **antes** de la sección "Futuro (opcional)" del anexo, por lo que probablemente sea parte del alcance base, no una mejora opcional — a confirmar con la cátedra si hay dudas.
+
+**Estado:** no existe ninguna entidad ni mecanismo de auditoría en el backend.
+
+## 6. Relaciones JPA (Foreign Keys) — CUMPLE
+
+El refactor DDD dejó relaciones `@ManyToOne`/`@ManyToMany` limpias y unidireccionales donde corresponde: `Comision → MateriaPlan → PlanEstudio → Carrera`, `Cursada → Alumno + Comision`, `MateriaPlan.correlativas` autorreferencial. No se identificaron problemas evidentes de N+1 para el volumen de datos actual (seed de desarrollo, no hay carga real todavía).
+
+## 7. Auditoría de Fechas y Baja Lógica — CUMPLE PARCIALMENTE
+
+`Cursada.fechaInscripcion` e `InscripcionCarrera.fechaInscripcion` existen. La baja lógica está implementada, pero con **estrategia inconsistente entre entidades** (no es un bug, fue decisión pragmática de esta sesión, pero vale documentarlo):
+- Soft-delete con flag booleano (`activo`/`activa = false`): `CicloLectivo`, `Comision`, `Materia`, `Carrera`, `PlanEstudio`.
+- Reutilización de campo de estado existente (`estado = "BAJA"`): `InscripcionCarrera`.
+- Hard delete (sin historial): `MateriaPlan`, `PeriodoAcademico`, `Cursada`, `ComisionProfesor`.
+
+No hay tabla de auditoría (ver punto 5) que compense la pérdida de historial en los casos de hard delete.
 
 ---
-**Conclusión:**
-La base es excelente. No hace falta reconstruir el modelo de datos. Solo se deben hacer validaciones puntuales de atributos y anotaciones JPA antes de programar los Controladores y Servicios.
+
+## Resumen para la defensa
+
+| Requisito del enunciado | Estado |
+|---|---|
+| Gestión de alumnos/profesores/materias | ✅ Completo |
+| Gestión de asistencias | ✅ Completo (registro), ❌ sin regularidad automática |
+| Gestión de calificaciones | ✅ Completo (registro), ❌ sin aprobación automática |
+| Validación de correlativas | 🟡 Parcial (falta detección de ciclos) |
+| Cálculo de regularidad (70%) | ❌ No implementado |
+| Generación de reportes académicos | ❌ No implementado |
+| Auditoría (AuditLog) | ❌ No implementado |
+| Roles y control de acceso | ✅ Completo (ADMIN/ADMINISTRATIVO/PROFESOR; ALUMNO sin UI propia, fuera de alcance actual del proyecto por decisión explícita) |
+| Diagramas obligatorios (§5 del enunciado) | 🟡 Existen pero desactualizados contra el modelo DDD actual — pendiente de revisión, no cubierto por este documento |

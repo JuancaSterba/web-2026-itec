@@ -70,4 +70,4 @@ El menú principal actúa como punto de entrada a los grandes dominios del siste
 
 ---
 
-> **Lectura Siguiente Recomendada:** [Plan_Refactorizacion.md](./Plan_Refactorizacion.md) (Define el roadmap por etapas para migrar el sistema hacia esta nueva estructura de navegación y arquitectura).
+> **Estado (2026-07-08):** la migración hacia esta estructura de navegación (Ciclo → Carrera → Período → Oferta Académica) ya se completó en el refactor a Bounded Contexts DDD — ver `docs/Modelo_Datos.md` para el modelo vigente.
