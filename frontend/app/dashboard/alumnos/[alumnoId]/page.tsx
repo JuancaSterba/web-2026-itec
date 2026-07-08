@@ -1,6 +1,7 @@
 import { fetchCore } from "@/lib/api-server"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
 
 interface AlumnoResponse {
   id: number
@@ -198,7 +199,7 @@ export default async function FichaAlumnoPage({
                               <span>
                                 {materia.materiaNombre}{" "}
                                 <span className="text-xs text-muted-foreground">
-                                  ({materia.cuatrimestreDictado}º Cuatrimestre)
+                                  ({etiquetaCuatrimestre(materia.cuatrimestreDictado)})
                                 </span>
                               </span>
                               <div className="flex items-center gap-2">
