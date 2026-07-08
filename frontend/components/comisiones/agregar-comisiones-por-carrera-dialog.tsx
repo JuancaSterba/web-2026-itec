@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
 import { createComisionesMasivas } from "@/app/actions/comision-actions"
+import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -155,7 +156,7 @@ export default function AgregarComisionesPorCarreraDialog({
                         <span className="flex-1">
                           {mp.materiaNombre}{" "}
                           <span className="text-xs text-muted-foreground">
-                            ({mp.cuatrimestreDictado}º Cuatrimestre{yaOfertada ? " · ya ofertada" : ""})
+                            ({etiquetaCuatrimestre(mp.cuatrimestreDictado)}{yaOfertada ? " · ya ofertada" : ""})
                           </span>
                         </span>
                       </label>

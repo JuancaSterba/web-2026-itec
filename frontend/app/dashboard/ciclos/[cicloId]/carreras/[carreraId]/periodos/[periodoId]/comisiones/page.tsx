@@ -7,6 +7,7 @@ import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteComision } from "@/app/actions/comision-actions"
 import { Badge } from "@/components/ui/badge"
 import InscribirCuatrimestreDialog from "@/components/comisiones/inscribir-cuatrimestre-dialog"
+import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
 
 interface ComisionResponse {
   id: number
@@ -99,7 +100,7 @@ export default async function OfertaAcademicaPage({
 
   const materiasPlanDisponibles = (materiasPlan ?? []).map((mp) => ({
     id: mp.id,
-    etiqueta: `${mp.materiaNombre} (${mp.cuatrimestreDictado}º Cuatrimestre)`,
+    etiqueta: `${mp.materiaNombre} (${etiquetaCuatrimestre(mp.cuatrimestreDictado)})`,
   }))
   const comisionesParaInscripcion = (comisionesDeLaCarrera ?? []).map((c) => ({
     id: c.id,
@@ -194,7 +195,10 @@ export default async function OfertaAcademicaPage({
                     </TableCell>
                     <TableCell>{materiaNombrePorId.get(comision.materiaPlanId) ?? "—"}</TableCell>
                     <TableCell>
-                      {materiaPlanPorId.get(comision.materiaPlanId)?.cuatrimestreDictado ?? "—"}º
+                      {(() => {
+                        const cuatrimestre = materiaPlanPorId.get(comision.materiaPlanId)?.cuatrimestreDictado
+                        return cuatrimestre ? etiquetaCuatrimestre(cuatrimestre) : "—"
+                      })()}
                     </TableCell>
                     <TableCell>{comision.cupoMaximo}</TableCell>
                     <TableCell>

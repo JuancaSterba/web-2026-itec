@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
 import { createMateriaPlan } from "@/app/actions/materia-plan-actions"
+import { calcularCuatrimestreDictado } from "@/lib/cuatrimestre-carrera"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -41,6 +42,10 @@ export default function AgregarMateriaDialog({
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(formData: FormData) {
+    const anio = Number(formData.get("anio"))
+    const cuatrimestreDelAnio = Number(formData.get("cuatrimestreDelAnio"))
+    formData.set("cuatrimestreDictado", String(calcularCuatrimestreDictado(anio, cuatrimestreDelAnio)))
+
     await createMateriaPlan(formData, planId)
     formRef.current?.reset()
     setOpen(false)
@@ -75,16 +80,23 @@ export default function AgregarMateriaDialog({
               ))}
             </select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="cuatrimestreDictado">Cuatrimestre de la Carrera</Label>
-            <Input
-              id="cuatrimestreDictado"
-              name="cuatrimestreDictado"
-              type="number"
-              min={1}
-              placeholder="Ej: 3 (no del año calendario — posición dentro de los 6 de la carrera)"
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="anio">Año de la Carrera</Label>
+              <Input id="anio" name="anio" type="number" min={1} placeholder="Ej: 2" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cuatrimestreDelAnio">Cuatrimestre del Año</Label>
+              <select
+                id="cuatrimestreDelAnio"
+                name="cuatrimestreDelAnio"
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="1">1º Cuatrimestre</option>
+                <option value="2">2º Cuatrimestre</option>
+              </select>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="cargaHoraria">Carga Horaria Semanal</Label>
