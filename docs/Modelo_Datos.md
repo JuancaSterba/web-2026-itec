@@ -6,32 +6,60 @@ Este modelo reemplaza la estructura de entidades planas anterior por un diseño 
 1. **Desacople de Materias:** `MATERIAS` es ahora un catálogo maestro. La relación con la carrera se da mediante `MATERIAS_PLAN`. Esto evita crear 5 veces "Inglés" si está en 5 carreras.
 2. **Contexto Operativo:** Desaparece `CUATRIMESTRES` como tabla aislada y nacen `CICLOS_LECTIVOS` y `PERIODOS_ACADEMICOS`.
 3. **Comisiones Contextualizadas:** `COMISIONES` ya no cuelga de una materia suelta, sino de una `MATERIAS_PLAN` dentro de un `PERIODO_ACADEMICO`.
+4. **Identidad Unificada (agregado 2026-07-08):** `ALUMNOS`/`PROFESORES` no guardan `dni`/`nombre`/`apellido` propios — son "roles" que apuntan 1:1 a `USUARIOS`, la entidad central de identidad (login, JWT, `legajo` único formato `AAAA-DNI`). Una misma persona puede tener ambos roles sobre el mismo `USUARIOS.id`.
+
+> Corregido 2026-07-08 contra el modelo Java real (antes: faltaba `USUARIOS`, `ALUMNOS`/`PROFESORES` mostraban `dni`/`nombre`/`apellido` propios en vez de la relación con `USUARIOS`; `HORARIOS_CLASE` mostraba `hora_inicio`/`hora_fin`/`aula` inline, cuando en realidad esos datos viven en una entidad `MODULOS_HORARIO` aparte, vinculada M2M; `CORRELATIVIDADES` tenía mal el nombre de columna; faltaban varios flags `activo`/`activa` y campos de fecha).
 
 ---
 
 ```mermaid
 erDiagram
+    %% 0. IDENTIDAD (backend/security)
+    USUARIOS {
+        int id PK
+        string username "= DNI al crear"
+        string password "BCrypt(DNI) al crear"
+        string nombre
+        string apellido
+        string dni
+        string email
+        string telefono
+        string telefono_secundario
+        string legajo "unico, formato AAAA-DNI"
+        boolean enabled "false para ALUMNO/PROFESOR al crear"
+    }
+    USER_ROLES {
+        int user_id FK
+        string role "ADMIN, ADMINISTRATIVO, PROFESOR, ALUMNO"
+    }
+    USUARIOS ||--o{ USER_ROLES : tiene
+
     %% 1. CATÁLOGO ACADÉMICO (Estructura)
     MATERIAS {
         int id PK
         string nombre
         string codigo_interno
+        string descripcion
+        boolean activa
     }
-    
+
     CARRERAS {
         int id PK
         string nombre
         string resolucion_ministerial
+        boolean activa
     }
-    
+
     PLANES_ESTUDIO {
         int id PK
         int carrera_id FK
-        string cohorte_anio
+        string cohorte
+        string resolucion
+        date fecha_implementacion
         boolean activo
     }
     CARRERAS ||--o{ PLANES_ESTUDIO : tiene
-    
+
     MATERIAS_PLAN {
         int id PK
         int plan_estudio_id FK
@@ -41,10 +69,10 @@ erDiagram
     }
     PLANES_ESTUDIO ||--o{ MATERIAS_PLAN : define_estructura_de
     MATERIAS ||--o{ MATERIAS_PLAN : instanciada_en
-    
+
     CORRELATIVIDADES {
         int materia_plan_id FK
-        int correlativa_previa_id FK
+        int correlativa_id FK
     }
     MATERIAS_PLAN ||--o{ CORRELATIVIDADES : requiere_aprobar
 
@@ -54,12 +82,15 @@ erDiagram
         int anio
         date fecha_inicio
         date fecha_fin
+        boolean activo
     }
-    
+
     PERIODOS_ACADEMICOS {
         int id PK
         int ciclo_lectivo_id FK
-        string nombre "ej: 1º Cuatrimestre"
+        string nombre "ej: 1er Cuatrimestre 2026"
+        date fecha_inicio
+        date fecha_fin
     }
     CICLOS_LECTIVOS ||--o{ PERIODOS_ACADEMICOS : subdividido_en
 
@@ -69,11 +100,13 @@ erDiagram
         int materia_plan_id FK
         string nombre_comision "ej: Com. A"
         int cupo_maximo
+        boolean activa
     }
     PERIODOS_ACADEMICOS ||--o{ COMISIONES : oferta_clases_de
     MATERIAS_PLAN ||--o{ COMISIONES : dictado_fisico_de
 
     COMISION_PROFESOR {
+        int id PK
         int comision_id FK
         int profesor_id FK
         string rol "Titular, Ayudante"
@@ -84,26 +117,32 @@ erDiagram
         int id PK
         int comision_id FK
         string dia_semana
-        time hora_inicio
-        time hora_fin
-        string aula
     }
     COMISIONES ||--o{ HORARIOS_CLASE : transcurre_en
 
-    %% 3. ACTORES (Personas)
+    MODULOS_HORARIO {
+        int id PK
+        int numero
+        time hora_inicio
+        time hora_fin
+    }
+    HORARIOS_CLASE }o--o{ MODULOS_HORARIO : ocupa
+
+    %% 3. ACTORES (Personas) — apuntan a USUARIOS, no duplican sus datos
     ALUMNOS {
         int id PK
-        string dni
-        string nombre
-        string apellido
+        int user_id FK
+        boolean activo
     }
-    
+    USUARIOS ||--o| ALUMNOS : es_alumno
+
     PROFESORES {
         int id PK
-        string dni
-        string nombre
-        string apellido
+        int user_id FK
+        string titulo
+        boolean activo
     }
+    USUARIOS ||--o| PROFESORES : es_profesor
     PROFESORES ||--o{ COMISION_PROFESOR : asignado_a
 
     %% 4. EL PUENTE (Registros / Trazabilidad)
@@ -111,8 +150,8 @@ erDiagram
         int id PK
         int alumno_id FK
         int plan_estudio_id FK
-        date fecha_ingreso
-        string estado "Regular, Graduado"
+        date fecha_inscripcion
+        string estado "libre, ej: ACTIVA, BAJA"
     }
     ALUMNOS ||--o{ INSCRIPCION_CARRERA : cursa
     PLANES_ESTUDIO ||--o{ INSCRIPCION_CARRERA : tiene_alumnos
@@ -121,23 +160,25 @@ erDiagram
         int id PK
         int alumno_id FK
         int comision_id FK
-        string condicion_final "Libre, Regular, Promocion"
+        date fecha_inscripcion
+        string condicion_final "libre, ej: REGULAR, LIBRE, PROMOCIONADO"
         decimal nota_cierre
     }
     ALUMNOS ||--o{ CURSADAS : inscripto_en_clase
     COMISIONES ||--o{ CURSADAS : cursada_por
 
+    %% 5. MICROSERVICIOS (ms-asistencias / ms-notas — solo cursada_id, sin FK real)
     ASISTENCIAS {
         int id PK
-        int cursada_id FK
+        int cursada_id "sin FK, otra base de datos"
         date fecha
-        string estado "Presente, Ausente"
+        string estado "libre, ej: PRESENTE, AUSENTE, TARDANZA"
     }
     CURSADAS ||--o{ ASISTENCIAS : registra
 
     CALIFICACIONES_PARCIALES {
         int id PK
-        int cursada_id FK
+        int cursada_id "sin FK, otra base de datos"
         string instancia "Parcial 1, TP"
         decimal nota
         date fecha

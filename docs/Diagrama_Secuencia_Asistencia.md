@@ -2,6 +2,8 @@
 
 Este diagrama ilustra el flujo específico para el registro de asistencias por parte de un docente. Contempla la interacción con el **Microservicio de Asistencias** y la lógica de negocio para el cálculo del 70% de presentismo (que puede derivar en la pérdida de la regularidad del alumno).
 
+> **Estado real (2026-07-08):** el cálculo del 70% y la comunicación MS_Asistencias→Core (pasos del `alt Pierde la Regularidad`) **no están implementados** — es el diseño requerido, no el actual. Hoy el flujo real es: `TomarAsistenciaDialog` (frontend) arma un lote de `{cursadaId, fecha, estado}` por comisión y hace `POST/PUT /api/asistencias` directo contra `ms-asistencias` a través del Gateway (`saveAsistenciasMasivas`, upsert por `cursadaId+fecha`) — sin ningún cálculo de porcentaje ni notificación al Core. Ver `docs/Analisis_Modelo.md` punto 2.
+
 ```mermaid
 sequenceDiagram
     autonumber

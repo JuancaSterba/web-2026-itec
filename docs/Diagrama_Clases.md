@@ -1,129 +1,163 @@
 # Diagrama de Clases (Conceptual)
 
-A continuación se presenta el diagrama de clases modelado a partir de las entidades actuales del backend. Este diagrama refleja la estructura de la gestión académica del ITEC N°1.
+> Reescrito 2026-07-08. La versión anterior (2026-06-13) modelaba el proyecto base: `ComisionMateria`, `Cuatrimestre`, `AlumnoCarrera`, `AlumnoInscripto`, `EstadoCursada` (como entidad), `Examen`, `Nota`, `TipoEvaluacion` — ninguna de estas clases existe hoy. Reescrito contra las entidades JPA reales (`backend/core/.../model/`, `backend/security/.../model/User.java`).
 
 ```mermaid
 classDiagram
-    %% GESTIÓN DE ACCESO
+    %% GESTIÓN DE ACCESO (backend/security)
     class User {
         +Long id
         +String username
         +String password
-        +boolean active
-    }
-    class Rol {
-        +Long id
-        +String nombre
-    }
-    User "*" --> "1" Rol : tiene
-
-    %% ACTORES
-    class Alumno {
-        +Long id
         +String nombre
         +String apellido
         +String dni
         +String email
         +String telefono
+        +String telefonoSecundario
+        +String legajo
+        +boolean enabled
+        +Set~Rol~ roles
+    }
+    class Rol {
+        <<enumeration>>
+        ADMIN
+        ADMINISTRATIVO
+        PROFESOR
+        ALUMNO
+    }
+    User "1" --> "*" Rol : roles
+
+    %% ACTORES (backend/core) — "roles académicos" sobre un User
+    class Alumno {
+        +Long id
+        +boolean activo
     }
     class Profesor {
         +Long id
-        +String nombre
-        +String apellido
-        +String dni
-        +String email
+        +String titulo
+        +boolean activo
     }
-    
+    User "1" --o "0..1" Alumno : es
+    User "1" --o "0..1" Profesor : es
+
     %% ESTRUCTURA ACADÉMICA
     class Carrera {
         +Long id
         +String nombre
+        +String resolucionMinisterial
+        +boolean activa
     }
     class PlanEstudio {
         +Long id
+        +String cohorte
         +String resolucion
-        +Date fechaImplementacion
+        +LocalDate fechaImplementacion
+        +boolean activo
     }
-    Carrera "1" *-- "*" PlanEstudio : posee
-    
+    Carrera "1" *-- "*" PlanEstudio : tiene
+
     class Materia {
         +Long id
         +String nombre
+        +String codigoInterno
+        +String descripcion
+        +boolean activa
     }
-    PlanEstudio "1" *-- "*" Materia : contiene
-    Materia "*" --> "*" Materia : correlativas (A confirmar)
-    
-    class Cuatrimestre {
+    class MateriaPlan {
         +Long id
-        +String denominacion
-        +Date fechaInicio
-        +Date fechaFin
+        +Integer cuatrimestreDictado
+        +Integer cargaHoraria
     }
-    class ComisionMateria {
+    PlanEstudio "1" *-- "*" MateriaPlan : define
+    Materia "1" --> "*" MateriaPlan : instanciada_en
+    MateriaPlan "*" --> "*" MateriaPlan : correlativas
+
+    class CicloLectivo {
         +Long id
-        +String codigoComision
+        +Integer anio
+        +LocalDate fechaInicio
+        +LocalDate fechaFin
+        +boolean activo
     }
-    ComisionMateria "*" --> "1" Materia : dicta
-    ComisionMateria "*" --> "1" Cuatrimestre : corresponde a
-    ComisionMateria "*" --> "1" Profesor : asignado a
-    
-    %% HORARIOS Y ASISTENCIAS
+    class PeriodoAcademico {
+        +Long id
+        +String nombre
+        +LocalDate fechaInicio
+        +LocalDate fechaFin
+    }
+    CicloLectivo "1" *-- "*" PeriodoAcademico : subdividido_en
+
+    class Comision {
+        +Long id
+        +String nombreComision
+        +Integer cupoMaximo
+        +boolean activa
+    }
+    PeriodoAcademico "1" --> "*" Comision : oferta
+    MateriaPlan "1" --> "*" Comision : dictado_fisico_de
+
+    class ComisionProfesor {
+        +Long id
+        +String rol
+    }
+    Comision "1" *-- "*" ComisionProfesor : dictada_por
+    Profesor "1" --> "*" ComisionProfesor : asignado_a
+
+    %% HORARIOS (huérfano — sin UI todavía, ver PENDIENTES.md ítem 9)
     class HorarioClase {
         +Long id
-        +String diaSemana
+        +DayOfWeek diaSemana
     }
     class ModuloHorario {
         +Long id
-        +Time horaInicio
-        +Time horaFin
+        +int numero
+        +LocalTime horaInicio
+        +LocalTime horaFin
     }
-    HorarioClase "*" --> "1" ModuloHorario : rango de
-    ComisionMateria "1" *-- "*" HorarioClase : ocurre en
-    
-    %% INSCRIPCIONES
-    class AlumnoCarrera {
+    Comision "1" *-- "*" HorarioClase : ocurre_en
+    HorarioClase "*" --> "*" ModuloHorario : modulos
+
+    %% INSCRIPCIONES Y CURSADAS
+    class InscripcionCarrera {
         +Long id
-        +Date fechaInscripcion
+        +LocalDate fechaInscripcion
+        +String estado
     }
-    AlumnoCarrera "*" --> "1" Alumno : pertenece a
-    AlumnoCarrera "*" --> "1" Carrera : en
-    
-    class AlumnoInscripto {
+    Alumno "1" --> "*" InscripcionCarrera : se_inscribe
+    PlanEstudio "1" --> "*" InscripcionCarrera : en
+
+    class Cursada {
         +Long id
-        +Date fechaInscripcion
+        +LocalDate fechaInscripcion
+        +String condicionFinal
+        +Double notaCierre
     }
-    class EstadoCursada {
-        +Long id
-        +String nombreEstado
-    }
-    AlumnoInscripto "*" --> "1" Alumno : pertenece a
-    AlumnoInscripto "*" --> "1" ComisionMateria : cursa en
-    AlumnoInscripto "*" --> "1" EstadoCursada : estado (Regular/Libre)
-    
+    Alumno "1" --> "*" Cursada : cursa
+    Comision "1" --> "*" Cursada : cursada_por
+
+    %% MICROSERVICIOS — vinculados solo por Cursada.id (cursadaId), sin FK real
     class Asistencia {
+        <<ms-asistencias>>
         +Long id
-        +Date fecha
-        +boolean presente
+        +Long cursadaId
+        +LocalDate fecha
+        +String estado
     }
-    Asistencia "*" --> "1" AlumnoInscripto : registra
-    Asistencia "*" --> "1" HorarioClase : para
-    
-    %% EVALUACIONES
-    class TipoEvaluacion {
+    class CalificacionParcial {
+        <<ms-notas>>
         +Long id
-        +String tipo
+        +Long cursadaId
+        +String instancia
+        +Double nota
+        +LocalDate fecha
     }
-    class Examen {
-        +Long id
-        +Date fecha
-    }
-    Examen "*" --> "1" ComisionMateria : evaluacion de
-    Examen "*" --> "1" TipoEvaluacion : tipo
-    
-    class Nota {
-        +Long id
-        +Double valor
-    }
-    Nota "*" --> "1" AlumnoInscripto : califica a
-    Nota "*" --> "1" Examen : corresponde a
+    Cursada ..> Asistencia : cursadaId
+    Cursada ..> CalificacionParcial : cursadaId
 ```
+
+### Notas
+
+- `EstadoCursada` (enum `REGULAR`/`APROBADO`/`RECURSA`) existe en el código (`model/EstadoCursada.java`) pero está **sin usar** — `Cursada.condicionFinal` es un `String` libre, no tipado contra ese enum. No se incluye en el diagrama por ese motivo.
+- `HorarioClase`/`ModuloHorario` existen en el backend pero no tienen ningún frontend que los consuma (ver `.remember/PENDIENTES.md` ítem 9).
+- `Asistencia` y `CalificacionParcial` viven en bases de datos separadas (`db_asistencias`, `db_calificaciones`) — la relación con `Cursada` es solo por convención de `cursadaId`, no una FK real de base de datos.

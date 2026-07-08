@@ -1,102 +1,76 @@
 # Diagramas de Secuencia: Inscripciones
 
-A continuación se presentan los flujos de inscripción, tanto para una Carrera como para una Materia. Según las reglas de negocio, actualmente el sistema es operado por el **Administrativo** (el alumno no autogestiona sus inscripciones en esta fase).
+> Reescrito 2026-07-08 con endpoints y nombres de tabla reales (`/api/core/...`, `InscripcionCarrera`, `Cursada`, `MateriaPlan.correlativas`). El flujo 1 y la validación de correlativas del flujo 2 coinciden con lo implementado; el resto de las validaciones (pertenencia a la carrera, alumno ACTIVO) son conceptualmente correctas pero no se verificó línea por línea contra el código de `InscripcionCarreraServiceImpl`/`CursadaServiceImpl`.
+
+A continuación se presentan los flujos de inscripción, tanto para una Carrera como para una Comisión (materia). Según las reglas de negocio, actualmente el sistema es operado por **ADMIN/ADMINISTRATIVO** (el alumno no autogestiona sus inscripciones en esta fase; **PROFESOR** tampoco — desde 2026-07-08 puede ver el roster de sus propias comisiones, pero no inscribir).
 
 ---
 
 ## 1. Inscripción de Alumno a una Carrera
 
-Este proceso vincula al alumno con el plan de estudios general. 
+Este proceso vincula al alumno con un `PlanEstudio` concreto de una `Carrera`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Administrativo
-    participant Frontend as Frontend (Cliente)
-    participant Core as App Principal (Core)
-    participant DB as Base de Datos
+    actor Admin as ADMIN/ADMINISTRATIVO
+    participant Frontend as Frontend (Server Action)
+    participant Gateway as API Gateway
+    participant Core as Backend Core
 
-    Administrativo->>Frontend: Selecciona Alumno y Carrera a inscribir
-    Frontend->>Core: POST /api/v1/inscripciones/carreras (alumnoId, carreraId)
-    
-    activate Core
-    Core->>Core: Valida Token JWT y Rol ADM
-    
-    %% Validaciones previas
-    Core->>DB: Consulta si el Alumno existe y está ACTIVO
-    DB-->>Core: OK (Alumno Activo)
-    
-    Core->>DB: Consulta si ya existe inscripción a la misma Carrera
-    DB-->>Core: Null (No inscripto previamente)
-    
-    %% Guardado
-    Core->>DB: Guarda registro en ALUMNOS_CARRERAS (INSERT)
-    activate DB
-    DB-->>Core: OK (Inscripción creada)
-    deactivate DB
-    
-    Core-->>Frontend: HTTP 201 Created (Inscripción Exitosa)
-    deactivate Core
-    
-    Frontend-->>Administrativo: Muestra mensaje "Alumno inscripto a la carrera"
+    Admin->>Frontend: Selecciona Alumno (existente o nuevo) y Plan de Estudio
+    Frontend->>Gateway: POST /api/core/inscripciones-carreras<br/>{alumnoId, planEstudioId, fechaInscripcion, estado}
+    Gateway->>Core: Rutea (JwtAuth ya validó el rol)
+    Core->>Core: InscripcionCarreraServiceImpl.guardar
+    Core-->>Gateway: 201 Created (InscripcionCarreraResponse)
+    Gateway-->>Frontend: 201 Created
+    Frontend-->>Admin: revalidatePath — la lista se refresca sola
 ```
 
 ---
 
-## 2. Inscripción de Alumno a una Materia (Comisión)
+## 2. Inscripción de Alumno a una Comisión (Cursada)
 
-Una vez que el alumno pertenece a una carrera, el Administrativo lo inscribe a las materias (específicamente a una comisión) en el cuatrimestre correspondiente. Aquí es donde **el sistema debe validar las correlativas**.
+Una vez que el alumno pertenece a una carrera, se lo matricula a una `Comision` concreta (materia dictada en un período). Aquí el sistema valida las correlativas.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Administrativo
-    participant Frontend as Frontend (Cliente)
-    participant Core as App Principal (Core)
-    participant DB as Base de Datos
+    actor Admin as ADMIN/ADMINISTRATIVO
+    participant Frontend as Frontend (Server Action)
+    participant Gateway as API Gateway
+    participant Core as Backend Core
 
-    Administrativo->>Frontend: Selecciona Alumno y Comisión de la Materia
-    Frontend->>Core: POST /api/v1/inscripciones/materias (alumnoId, comisionId)
-    
+    Admin->>Frontend: Selecciona Alumno y Comisión
+    Frontend->>Gateway: POST /api/core/cursadas<br/>{alumnoId, comisionId, fechaInscripcion, condicionFinal}
+    Gateway->>Core: Rutea
+
     activate Core
-    Core->>Core: Valida Token JWT y Rol ADM
-    
-    %% Validación de pertenencia a carrera
-    Core->>DB: Consulta si Alumno pertenece a la Carrera de esa Materia
-    DB-->>Core: OK (Pertenece a la carrera)
-    
-    %% Validación de Correlatividades
-    Core->>DB: Consulta materias correlativas exigidas por esta Materia
-    activate DB
-    DB-->>Core: Retorna lista de Materias Correlativas
-    deactivate DB
-    
-    alt Tiene Correlativas
-        Core->>DB: Consulta el EstadoCursada del Alumno en esas correlativas
-        activate DB
-        DB-->>Core: Retorna estados (Regular / Aprobado)
-        deactivate DB
-        
-        Core->>Core: Verifica si cumple con la aprobación/regularidad exigida
+    Core->>Core: CursadaServiceImpl.guardar
+
+    Note over Core: validarCorrelativas(alumnoId, comision)
+    Core->>Core: comision.materiaPlan.correlativas (¿tiene alguna?)
+
+    alt Tiene correlativas
+        Core->>Core: cursadaRepository.findByAlumnoId(alumnoId)
+        Core->>Core: ¿alguna cursada en una correlativa con<br/>condicionFinal que matchee PROMOCIONA*|APROBAD*?
     end
-    
-    alt No cumple correlativas
-        Core-->>Frontend: HTTP 409 Conflict ("Faltan correlativas")
-        Frontend-->>Administrativo: Muestra error (Falta aprobar Materia X)
-    else Cumple requisitos (o no tiene correlativas)
-        Core->>DB: Guarda registro en ALUMNOS_INSCRIPTOS con estado 'Inscripto'
-        activate DB
-        DB-->>Core: OK (Registro guardado)
-        deactivate DB
-        
-        Core-->>Frontend: HTTP 201 Created (Inscripción Exitosa)
-        Frontend-->>Administrativo: Muestra mensaje "Alumno inscripto a la comisión"
+
+    alt Falta aprobar alguna correlativa
+        Core-->>Gateway: 400 INVALID_ARGUMENT<br/>"falta aprobar la/s correlativa/s: {nombres}"
+        Gateway-->>Frontend: 400
+        Frontend-->>Admin: alert() con el mensaje real del backend
+    else Cumple (o no tiene correlativas)
+        Core->>Core: cursadaRepository.save(...)
+        Core-->>Gateway: 201 Created (CursadaResponse)
+        Gateway-->>Frontend: 201 Created
+        Frontend-->>Admin: revalidatePath — el roster se refresca solo
     end
-    
     deactivate Core
 ```
 
-### 💡 Puntos Claves de este Flujo:
-* **El Actor siempre es el Administrativo**: Se asegura que solo un rol con permisos pueda alterar el plan y las cursadas de un estudiante.
-* **Separación de Inscripciones**: Inscribirse a una carrera es independiente de inscribirse a cursar una materia. Primero debe existir la inscripción a la carrera (tabla `alumnos_carreras`).
-* **Regla de Correlativas (Paso 9 y 10 del segundo diagrama)**: Es el punto más crítico. Antes de hacer el `INSERT` en `alumnos_inscriptos`, el backend debe buscar en el historial del alumno si las materias pre-requisito fueron cursadas y si su estado académico es válido (usualmente se exige estar "Aprobado" o "Regular" dependiendo el plan de estudios).
+### Puntos clave de este flujo
+
+- **El actor siempre es ADMIN/ADMINISTRATIVO** para ambos flujos (crear/editar/matricular). No hay autogestión de alumno ni de profesor.
+- **Separación de inscripciones:** inscribirse a una Carrera (`InscripcionCarrera`) es independiente de matricularse en una Comisión concreta (`Cursada`) — son dos entidades y dos endpoints distintos.
+- **Correlativas (implementado 2026-07-08):** la validación real vive en `CursadaServiceImpl.validarCorrelativas`, se dispara en cada `POST /api/core/cursadas` (incluida la matriculación masiva a un cuatrimestre completo, que hace un `POST` por comisión). **Falta:** detección de ciclos en `MateriaPlan.correlativas` — ver `docs/Analisis_Modelo.md` punto 1.
