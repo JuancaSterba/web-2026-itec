@@ -7,28 +7,34 @@ function getApiBaseUrl() {
   return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 }
 
-export async function createComision(formData: FormData, periodoId: number) {
+export async function createComisionesMasivas(
+  periodoId: number,
+  seleccion: { materiaPlanId: number; nombreComision: string }[],
+  cupoMaximo: number
+) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const payload = {
-    nombreComision: formData.get("nombreComision"),
-    cupoMaximo: Number(formData.get("cupoMaximo")),
-    materiaPlanId: Number(formData.get("materiaPlanId")),
-    periodoAcademicoId: periodoId,
-  }
+  const respuestas = await Promise.all(
+    seleccion.map((item) =>
+      fetch(`${getApiBaseUrl()}/api/core/comisiones`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          nombreComision: item.nombreComision,
+          cupoMaximo,
+          materiaPlanId: item.materiaPlanId,
+          periodoAcademicoId: periodoId,
+        }),
+      })
+    )
+  )
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/comisiones`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify(payload),
-  })
-
-  if (!response.ok) {
-    throw new Error("No se pudo crear la comisión")
+  if (respuestas.some((response) => !response.ok)) {
+    throw new Error("No se pudieron crear todas las comisiones seleccionadas")
   }
 
   revalidatePath("/dashboard/ciclos/[cicloId]/periodos/[periodoId]/comisiones", "page")
