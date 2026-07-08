@@ -1,8 +1,15 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
 import { getUsuarioActual } from "@/lib/auth-server"
+import { getProfesorActual } from "@/lib/profesor-actual"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GraduationCap, Users, UserCheck, BookOpenCheck, ClipboardList } from "lucide-react"
+
+interface ComisionProfesorResponse {
+  id: number
+  comisionId: number
+  profesorId: number
+}
 
 interface CarreraResponse {
   id: number
@@ -75,13 +82,37 @@ function KpiCard({
   )
 }
 
-function DashboardNoAdmin() {
+async function DashboardNoAdmin() {
+  const profesor = await getProfesorActual()
+
+  const [asignaciones, cursadas] = profesor
+    ? await Promise.all([
+        fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
+        fetchCore<CursadaResponse>("/cursadas"),
+      ])
+    : [null, null]
+
+  const misComisionesIds = new Set(
+    (asignaciones ?? []).filter((a) => a.profesorId === profesor?.id).map((a) => a.comisionId)
+  )
+  const alumnosActivos = new Set(
+    (cursadas ?? []).filter((c) => misComisionesIds.has(c.comisionId)).map((c) => c.alumnoId)
+  ).size
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-semibold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Bienvenido/a</p>
       </div>
+
+      {profesor && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <KpiCard titulo="Comisiones Asignadas" valor={misComisionesIds.size} icono={BookOpenCheck} />
+          <KpiCard titulo="Alumnos Activos" valor={alumnosActivos} icono={Users} />
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Accesos rápidos</CardTitle>
