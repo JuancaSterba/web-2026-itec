@@ -45,7 +45,7 @@ public class ProfesorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todos los profesores activos")
     public ResponseEntity<ApiResponse<ProfesorResponse>> listar(HttpServletRequest httpRequest) {
         List<ProfesorResponse> profesores = profesorService.listarActivos();
@@ -58,7 +58,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener un profesor por ID")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorId(
             @PathVariable Long id,
@@ -74,7 +74,7 @@ public class ProfesorController {
     }
 
     @GetMapping("/dni/{dni}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Buscar profesor por DNI")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorDni(
             @PathVariable String dni,

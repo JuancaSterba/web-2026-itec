@@ -45,7 +45,7 @@ public class AlumnoController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todos los alumnos activos")
     public ResponseEntity<ApiResponse<AlumnoResponse>> listar(HttpServletRequest httpRequest) {
         List<AlumnoResponse> alumnos = alumnoService.listarActivos();
@@ -58,7 +58,7 @@ public class AlumnoController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener un alumno por ID")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorId(
             @PathVariable Long id,

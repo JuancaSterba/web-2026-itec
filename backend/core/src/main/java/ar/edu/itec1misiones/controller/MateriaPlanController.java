@@ -42,7 +42,7 @@ public class MateriaPlanController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar toda la estructura curricular")
     public ResponseEntity<ApiResponse<MateriaPlanResponse>> buscarTodos(HttpServletRequest httpRequest) {
         List<MateriaPlanResponse> materiasPlan = materiaPlanService.buscarTodos();
@@ -55,7 +55,7 @@ public class MateriaPlanController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener una materia de plan por ID")
     public ResponseEntity<ApiResponse<MateriaPlanResponse>> buscarPorId(
             @PathVariable Long id,

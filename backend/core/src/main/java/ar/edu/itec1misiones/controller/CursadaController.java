@@ -42,7 +42,7 @@ public class CursadaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todas las cursadas")
     public ResponseEntity<ApiResponse<CursadaResponse>> buscarTodos(HttpServletRequest httpRequest) {
         List<CursadaResponse> cursadas = cursadaService.buscarTodos();
@@ -55,7 +55,7 @@ public class CursadaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener una cursada por ID")
     public ResponseEntity<ApiResponse<CursadaResponse>> buscarPorId(
             @PathVariable Long id,

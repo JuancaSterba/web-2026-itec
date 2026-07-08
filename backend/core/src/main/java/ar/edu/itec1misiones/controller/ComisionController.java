@@ -42,7 +42,7 @@ public class ComisionController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todas las comisiones")
     public ResponseEntity<ApiResponse<ComisionResponse>> buscarTodos(HttpServletRequest httpRequest) {
         List<ComisionResponse> comisiones = comisionService.buscarTodos();
@@ -55,7 +55,7 @@ public class ComisionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener una comisión por ID")
     public ResponseEntity<ApiResponse<ComisionResponse>> buscarPorId(
             @PathVariable Long id,
