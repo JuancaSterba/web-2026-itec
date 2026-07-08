@@ -70,7 +70,10 @@ export default function TomarAsistenciaDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button
+          disabled={cursadas.length === 0}
+          title={cursadas.length === 0 ? "No hay alumnos inscriptos en esta comisión" : undefined}
+        >
           <ClipboardCheck className="size-4" />
           Tomar Asistencia
         </Button>

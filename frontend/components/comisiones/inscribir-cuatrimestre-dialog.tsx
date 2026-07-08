@@ -75,7 +75,11 @@ export default function InscribirCuatrimestreDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button
+          variant="outline"
+          disabled={alumnosDisponibles.length === 0}
+          title={alumnosDisponibles.length === 0 ? "No hay alumnos disponibles para inscribir" : undefined}
+        >
           <UserPlus className="size-4" />
           Inscribir Alumno al Cuatrimestre
         </Button>
