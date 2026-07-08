@@ -47,7 +47,10 @@ export default async function PlanDetallePage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl font-semibold text-foreground">Malla Curricular - Plan {planId}</h1>
-          <p className="text-sm text-muted-foreground">Carrera {id}</p>
+          <p className="text-sm text-muted-foreground">
+            Carrera {id} · el cuatrimestre es la posición de la materia dentro de toda la carrera (1 a 6, por
+            ejemplo), no el cuatrimestre del año calendario
+          </p>
         </div>
         <AgregarMateriaDialog planId={Number(planId)} materiasDisponibles={materias ?? []} />
       </div>
@@ -60,7 +63,7 @@ export default async function PlanDetallePage({
         <div className="space-y-4">
           {cuatrimestres.map((cuatrimestre) => (
             <div key={cuatrimestre} className="rounded-lg border border-border bg-card p-4">
-              <h2 className="mb-2 text-sm font-semibold text-foreground">{cuatrimestre}º Cuatrimestre</h2>
+              <h2 className="mb-2 text-sm font-semibold text-foreground">{cuatrimestre}º Cuatrimestre de la Carrera</h2>
               <ul className="space-y-1 text-sm text-muted-foreground">
                 {porCuatrimestre![cuatrimestre].map((mp) => (
                   <li key={mp.id} className="flex items-center justify-between">
