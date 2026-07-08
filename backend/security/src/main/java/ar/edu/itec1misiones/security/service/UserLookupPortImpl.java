@@ -74,10 +74,10 @@ public class UserLookupPortImpl implements UserLookupPort {
         user.setTelefono(telefono);
         user.setTelefonoSecundario(telefonoSecundario);
         user.setLegajo(LegajoGenerator.generar(dni));
-        // ADMIN/ADMINISTRATIVO tienen login inmediato; Alumnos/Profesores no
-        // tienen UI propia todavia y la cuenta se crea deshabilitada (ver
-        // Reglas_de_Negocio.md).
-        user.setEnabled(rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO);
+        // ADMIN/ADMINISTRATIVO/PROFESOR tienen login inmediato (los 3 tienen
+        // UI propia). ALUMNO no tiene UI propia todavia y la cuenta se crea
+        // deshabilitada (ver Reglas_de_Negocio.md).
+        user.setEnabled(rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO || rol == Rol.PROFESOR);
 
         return userRepository.save(user);
     }
@@ -93,7 +93,7 @@ public class UserLookupPortImpl implements UserLookupPort {
 
         // Si el rol nuevo requiere login inmediato, se habilita la cuenta
         // (nunca se deshabilita una cuenta que ya estaba habilitada).
-        if (rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO) {
+        if (rol == Rol.ADMIN || rol == Rol.ADMINISTRATIVO || rol == Rol.PROFESOR) {
             user.setEnabled(true);
         }
 
