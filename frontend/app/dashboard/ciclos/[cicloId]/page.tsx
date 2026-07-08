@@ -1,9 +1,6 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
-import NuevoPeriodoDialog from "@/components/periodos/nuevo-periodo-dialog"
-import EditarPeriodoDialog from "@/components/periodos/editar-periodo-dialog"
-import EliminarBoton from "@/components/shared/eliminar-boton"
-import { deletePeriodo } from "@/app/actions/periodo-actions"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface CicloLectivoResponse {
   id: number
@@ -13,12 +10,11 @@ interface CicloLectivoResponse {
   activo: boolean
 }
 
-interface PeriodoAcademicoResponse {
+interface CarreraResponse {
   id: number
   nombre: string
-  fechaInicio: string
-  fechaFin: string
-  cicloLectivoId: number
+  resolucionMinisterial: string
+  activa: boolean
 }
 
 export default async function CicloDetallePage({
@@ -28,51 +24,36 @@ export default async function CicloDetallePage({
 }) {
   const { cicloId } = await params
 
-  const [ciclos, periodos] = await Promise.all([
+  const [ciclos, carreras] = await Promise.all([
     fetchCore<CicloLectivoResponse>(`/ciclos-lectivos/${cicloId}`),
-    fetchCore<PeriodoAcademicoResponse>("/periodos-academicos"),
+    fetchCore<CarreraResponse>("/carreras"),
   ])
 
   const ciclo = ciclos?.[0] ?? null
-  const periodosDelCiclo = periodos?.filter((p) => String(p.cicloLectivoId) === cicloId) ?? null
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-semibold text-foreground">
-            Dashboard del Ciclo {ciclo?.anio ?? cicloId}
-          </h1>
-          <p className="text-sm text-muted-foreground">Períodos académicos de este ciclo lectivo</p>
-        </div>
-        <NuevoPeriodoDialog cicloId={Number(cicloId)} />
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">
+          Dashboard del Ciclo {ciclo?.anio ?? cicloId}
+        </h1>
+        <p className="text-sm text-muted-foreground">Elegí una carrera para ver sus períodos académicos</p>
       </div>
 
-      {periodosDelCiclo === null ? (
-        <p className="text-sm text-destructive">No se pudo obtener los períodos académicos. Intentá nuevamente más tarde.</p>
-      ) : periodosDelCiclo.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Este ciclo no tiene períodos académicos registrados.</p>
+      {carreras === null ? (
+        <p className="text-sm text-destructive">No se pudo obtener el listado de carreras. Intentá nuevamente más tarde.</p>
+      ) : carreras.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No hay carreras registradas.</p>
       ) : (
-        <div className="space-y-2">
-          {periodosDelCiclo.map((periodo) => (
-            <div
-              key={periodo.id}
-              className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm transition-colors hover:bg-accent"
-            >
-              <Link
-                href={`/dashboard/ciclos/${cicloId}/periodos/${periodo.id}/comisiones`}
-                className="flex-1 text-sm font-medium text-foreground"
-              >
-                {periodo.nombre}
-              </Link>
-              <div className="flex gap-1">
-                <EditarPeriodoDialog periodo={periodo} cicloId={Number(cicloId)} />
-                <EliminarBoton
-                  accion={deletePeriodo.bind(null, periodo.id)}
-                  entidadLabel={periodo.nombre}
-                />
-              </div>
-            </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {carreras.map((carrera) => (
+            <Link key={carrera.id} href={`/dashboard/ciclos/${cicloId}/carreras/${carrera.id}`}>
+              <Card className="h-full transition-colors hover:bg-accent">
+                <CardHeader>
+                  <CardTitle className="text-base">{carrera.nombre}</CardTitle>
+                </CardHeader>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

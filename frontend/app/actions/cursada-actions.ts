@@ -56,7 +56,7 @@ export async function createCursadasMasivas(alumnoId: number, comisionIds: numbe
     throw new Error("No se pudo matricular al alumno en todas las comisiones del cuatrimestre")
   }
 
-  revalidatePath("/dashboard/ciclos/[cicloId]/periodos/[periodoId]/comisiones", "page")
+  revalidatePath("/dashboard/ciclos/[cicloId]/carreras/[carreraId]/periodos/[periodoId]/comisiones", "page")
 }
 
 export async function updateCursada(formData: FormData, cursadaId: number, alumnoId: number, comisionId: number) {
