@@ -51,7 +51,10 @@ export default function AsignarProfesorDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button
+          disabled={profesoresDisponibles.length === 0}
+          title={profesoresDisponibles.length === 0 ? "No hay profesores disponibles para asignar" : undefined}
+        >
           <Plus className="size-4" />
           Asignar Profesor
         </Button>
