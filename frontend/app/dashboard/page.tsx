@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
+import { getUsuarioActual } from "@/lib/auth-server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GraduationCap, Users, UserCheck, BookOpenCheck } from "lucide-react"
+import { GraduationCap, Users, UserCheck, BookOpenCheck, ClipboardList } from "lucide-react"
 
 interface CarreraResponse {
   id: number
@@ -74,7 +75,44 @@ function KpiCard({
   )
 }
 
+function DashboardNoAdmin() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Bienvenido/a</p>
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Accesos rápidos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Link
+            href="/dashboard/mis-comisiones"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+          >
+            <ClipboardList className="size-4" />
+            Ver mis comisiones
+          </Link>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 export default async function DashboardPage() {
+  // Las métricas de esta página piden endpoints (carreras, periodos-academicos,
+  // planes-estudio, inscripciones-carreras) que siguen ADMIN/ADMINISTRATIVO-only.
+  // PROFESOR ahora es actor real pero no tiene acceso a todo eso: mostrarle esta
+  // pantalla igual terminaba en un cartel de error por datos faltantes. En vez de
+  // eso, se le muestra una versión reducida sin pedir nada que no puede ver.
+  const usuario = await getUsuarioActual()
+  const esAdmin = !!usuario?.roles.some((rol) => rol === "ADMIN" || rol === "ADMINISTRATIVO")
+
+  if (!esAdmin) {
+    return <DashboardNoAdmin />
+  }
+
   const [carreras, alumnos, profesores, comisiones, periodos, cursadas, planesEstudio, inscripciones] =
     await Promise.all([
       fetchCore<CarreraResponse>("/carreras"),
