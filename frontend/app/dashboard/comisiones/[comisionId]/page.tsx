@@ -1,4 +1,6 @@
 import { fetchCore, fetchGateway } from "@/lib/api-server"
+import { getUsuarioActual } from "@/lib/auth-server"
+import { getProfesorActual } from "@/lib/profesor-actual"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -94,6 +96,29 @@ export default async function ComisionDetallePage({
     fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
   ])
 
+  const usuario = await getUsuarioActual()
+  const esAdmin = !!usuario?.roles.some((rol) => rol === "ADMIN" || rol === "ADMINISTRATIVO")
+  let esProfesorPropietario = false
+
+  if (!esAdmin && usuario?.roles.includes("PROFESOR")) {
+    const profesor = await getProfesorActual()
+    esProfesorPropietario =
+      !!profesor &&
+      (comisionesProfesores ?? []).some(
+        (cp) => cp.comisionId === Number(comisionId) && cp.profesorId === profesor.id
+      )
+  }
+
+  const tieneAcceso = esAdmin || esProfesorPropietario
+
+  if (!tieneAcceso) {
+    return (
+      <div className="space-y-6">
+        <p className="text-sm text-destructive">No tenés acceso a esta comisión.</p>
+      </div>
+    )
+  }
+
   const comision = comisiones?.[0] ?? null
   const materiaNombre = materiasPlan?.find((mp) => mp.id === comision?.materiaPlanId)?.materiaNombre
   const cursadasDeLaComision = cursadas?.filter((c) => String(c.comisionId) === comisionId) ?? null
@@ -171,7 +196,7 @@ export default async function ComisionDetallePage({
         <TabsList>
           <TabsTrigger value="general">Información General</TabsTrigger>
           <TabsTrigger value="alumnos">Alumnos Inscritos</TabsTrigger>
-          <TabsTrigger value="docentes">Docentes</TabsTrigger>
+          {esAdmin && <TabsTrigger value="docentes">Docentes</TabsTrigger>}
           <TabsTrigger value="asistencias">Asistencias</TabsTrigger>
           <TabsTrigger value="calificaciones">Calificaciones</TabsTrigger>
         </TabsList>
@@ -189,9 +214,11 @@ export default async function ComisionDetallePage({
         </TabsContent>
 
         <TabsContent value="alumnos" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
-          <div className="flex justify-end">
-            <AgregarAlumnoDialog comisionId={Number(comisionId)} alumnosDisponibles={alumnos ?? []} />
-          </div>
+          {esAdmin && (
+            <div className="flex justify-end">
+              <AgregarAlumnoDialog comisionId={Number(comisionId)} alumnosDisponibles={alumnos ?? []} />
+            </div>
+          )}
           {cursadasDeLaComision === null ? (
             <p className="text-destructive">No se pudo obtener los alumnos inscritos.</p>
           ) : cursadasDeLaComision.length === 0 ? (
@@ -203,7 +230,7 @@ export default async function ComisionDetallePage({
                   <TableHead>Alumno</TableHead>
                   <TableHead>Condición Final</TableHead>
                   <TableHead>Nota de Cierre</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  {esAdmin && <TableHead className="text-right">Acciones</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -216,13 +243,15 @@ export default async function ComisionDetallePage({
                       </TableCell>
                       <TableCell>{cursada.condicionFinal}</TableCell>
                       <TableCell>{cursada.notaCierre ?? "—"}</TableCell>
-                      <TableCell className="flex justify-end gap-1">
-                        <EditarCursadaDialog cursada={cursada} />
-                        <EliminarBoton
-                          accion={deleteCursada.bind(null, cursada.id)}
-                          entidadLabel={alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}
-                        />
-                      </TableCell>
+                      {esAdmin && (
+                        <TableCell className="flex justify-end gap-1">
+                          <EditarCursadaDialog cursada={cursada} />
+                          <EliminarBoton
+                            accion={deleteCursada.bind(null, cursada.id)}
+                            entidadLabel={alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}
+                          />
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })}
@@ -231,46 +260,48 @@ export default async function ComisionDetallePage({
           )}
         </TabsContent>
 
-        <TabsContent value="docentes" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
-          <div className="flex justify-end">
-            <AsignarProfesorDialog comisionId={Number(comisionId)} profesoresDisponibles={profesores ?? []} />
-          </div>
-          {docentesDeLaComision === null ? (
-            <p className="text-destructive">No se pudo obtener los docentes asignados.</p>
-          ) : docentesDeLaComision.length === 0 ? (
-            <p className="text-muted-foreground">No hay profesores asignados a esta comisión.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Profesor</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {docentesDeLaComision.map((cp) => {
-                  const profesor = profesorPorId.get(cp.profesorId)
-                  return (
-                    <TableRow key={cp.id}>
-                      <TableCell>
-                        {profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
-                      </TableCell>
-                      <TableCell>{cp.rol || "—"}</TableCell>
-                      <TableCell className="flex justify-end gap-1">
-                        <EditarProfesorAsignadoDialog asignacion={cp} profesoresDisponibles={profesores ?? []} />
-                        <EliminarBoton
-                          accion={deleteComisionProfesor.bind(null, cp.id)}
-                          entidadLabel={profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </TabsContent>
+        {esAdmin && (
+          <TabsContent value="docentes" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+            <div className="flex justify-end">
+              <AsignarProfesorDialog comisionId={Number(comisionId)} profesoresDisponibles={profesores ?? []} />
+            </div>
+            {docentesDeLaComision === null ? (
+              <p className="text-destructive">No se pudo obtener los docentes asignados.</p>
+            ) : docentesDeLaComision.length === 0 ? (
+              <p className="text-muted-foreground">No hay profesores asignados a esta comisión.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Profesor</TableHead>
+                    <TableHead>Rol</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {docentesDeLaComision.map((cp) => {
+                    const profesor = profesorPorId.get(cp.profesorId)
+                    return (
+                      <TableRow key={cp.id}>
+                        <TableCell>
+                          {profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
+                        </TableCell>
+                        <TableCell>{cp.rol || "—"}</TableCell>
+                        <TableCell className="flex justify-end gap-1">
+                          <EditarProfesorAsignadoDialog asignacion={cp} profesoresDisponibles={profesores ?? []} />
+                          <EliminarBoton
+                            accion={deleteComisionProfesor.bind(null, cp.id)}
+                            entidadLabel={profesor ? `${profesor.nombre} ${profesor.apellido}` : `Profesor #${cp.profesorId}`}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+        )}
 
         <TabsContent value="asistencias" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
