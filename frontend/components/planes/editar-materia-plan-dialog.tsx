@@ -82,12 +82,13 @@ export default function EditarMateriaPlanDialog({
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cuatrimestreDictado">Cuatrimestre</Label>
+            <Label htmlFor="cuatrimestreDictado">Cuatrimestre de la Carrera</Label>
             <Input
               id="cuatrimestreDictado"
               name="cuatrimestreDictado"
               type="number"
               min={1}
+              placeholder="Ej: 3 (no del año calendario — posición dentro de los 6 de la carrera)"
               defaultValue={materiaPlan.cuatrimestreDictado}
               required
             />

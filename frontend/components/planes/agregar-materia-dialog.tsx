@@ -76,8 +76,15 @@ export default function AgregarMateriaDialog({
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cuatrimestreDictado">Cuatrimestre</Label>
-            <Input id="cuatrimestreDictado" name="cuatrimestreDictado" type="number" min={1} required />
+            <Label htmlFor="cuatrimestreDictado">Cuatrimestre de la Carrera</Label>
+            <Input
+              id="cuatrimestreDictado"
+              name="cuatrimestreDictado"
+              type="number"
+              min={1}
+              placeholder="Ej: 3 (no del año calendario — posición dentro de los 6 de la carrera)"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="cargaHoraria">Carga Horaria Semanal</Label>
