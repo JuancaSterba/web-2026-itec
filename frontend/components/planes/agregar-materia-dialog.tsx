@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
 import { createMateriaPlan } from "@/app/actions/materia-plan-actions"
@@ -59,6 +59,12 @@ export default function AgregarMateriaDialog({
   const [errorNueva, setErrorNueva] = useState<string | null>(null)
   const [guardandoNueva, setGuardandoNueva] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    setMaterias(materiasDisponibles)
+  }, [materiasDisponibles])
+
+  const materiasOrdenadas = [...materias].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
 
   function toggleCorrelativa(id: number) {
     setCorrelativasElegidas((prev) => {
@@ -150,7 +156,7 @@ export default function AgregarMateriaDialog({
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">Seleccioná una materia</option>
-              {materias.map((materia) => (
+              {materiasOrdenadas.map((materia) => (
                 <option key={materia.id} value={materia.id}>
                   {materia.nombre}
                 </option>

@@ -62,7 +62,9 @@ export default async function PlanDetallePage({
   const cuatrimestres = porCuatrimestre ? Object.keys(porCuatrimestre).map(Number).sort((a, b) => a - b) : []
 
   const materiaIdsUsadas = new Set((delPlan ?? []).map((mp) => mp.materiaId))
-  const materiasParaAgregar = (materias ?? []).filter((m) => !materiaIdsUsadas.has(m.id))
+  const materiasParaAgregar = (materias ?? [])
+    .filter((m) => !materiaIdsUsadas.has(m.id))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
 
   return (
     <div className="space-y-6">
@@ -77,7 +79,9 @@ export default async function PlanDetallePage({
         <AgregarMateriaDialog
           planId={Number(planId)}
           materiasDisponibles={materiasParaAgregar}
-          correlativasDisponibles={(delPlan ?? []).map((mp) => ({ id: mp.id, materiaNombre: mp.materiaNombre }))}
+          correlativasDisponibles={(delPlan ?? [])
+            .map((mp) => ({ id: mp.id, materiaNombre: mp.materiaNombre }))
+            .sort((a, b) => a.materiaNombre.localeCompare(b.materiaNombre, "es"))}
         />
       </div>
 
@@ -105,10 +109,13 @@ export default async function PlanDetallePage({
                       <EditarMateriaPlanDialog
                         materiaPlan={mp}
                         planId={Number(planId)}
-                        materiasDisponibles={(materias ?? []).filter((m) => m.id === mp.materiaId || !materiaIdsUsadas.has(m.id))}
+                        materiasDisponibles={(materias ?? [])
+                          .filter((m) => m.id === mp.materiaId || !materiaIdsUsadas.has(m.id))
+                          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))}
                         correlativasDisponibles={(delPlan ?? [])
                           .filter((otra) => otra.id !== mp.id)
-                          .map((otra) => ({ id: otra.id, materiaNombre: otra.materiaNombre }))}
+                          .map((otra) => ({ id: otra.id, materiaNombre: otra.materiaNombre }))
+                          .sort((a, b) => a.materiaNombre.localeCompare(b.materiaNombre, "es"))}
                       />
                       <EliminarBoton
                         accion={deleteMateriaPlan.bind(null, mp.id)}
