@@ -31,18 +31,30 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         Random random = new Random();
         for (long cursadaId = 1; cursadaId <= CURSADAS_SEMBRADAS; cursadaId++) {
+            // El seeder de Core crea 2 cursadas por alumno en orden: primero
+            // comisionProg1 (id 1), después comisionLogica (id 2) -> cursadaId impar
+            // va a la comisión 1, par va a la comisión 2.
+            long comisionId = cursadaId % 2 == 1 ? 1L : 2L;
+
+            // minusWeeks(N) siempre cae en el mismo día de semana que "hoy", que es
+            // justo el día de clase que siembra el DatabaseSeeder de Core -> las 3
+            // fechas quedan válidas contra HorarioClase sin importar qué día se
+            // levante el entorno.
             calificacionParcialRepository.save(new CalificacionParcial(
-                    null, cursadaId, cursadaId, "Primer Parcial", notaAleatoria(random),
-                    LocalDate.now().minusDays(30), TipoInstancia.PARCIAL));
+                    null, cursadaId, comisionId, "Primer Parcial", notaAleatoria(random),
+                    LocalDate.now().minusWeeks(4), TipoInstancia.PARCIAL));
             calificacionParcialRepository.save(new CalificacionParcial(
-                    null, cursadaId, cursadaId, "Segundo Parcial", notaAleatoria(random),
-                    LocalDate.now().minusDays(10), TipoInstancia.PARCIAL));
+                    null, cursadaId, comisionId, "Segundo Parcial", notaAleatoria(random),
+                    LocalDate.now().minusWeeks(2), TipoInstancia.PARCIAL));
+            calificacionParcialRepository.save(new CalificacionParcial(
+                    null, cursadaId, comisionId, "Tercer Parcial", notaAleatoria(random),
+                    LocalDate.now(), TipoInstancia.PARCIAL));
         }
 
         log.info("[Seeder] Datos de desarrollo insertados correctamente.");
     }
 
     private Double notaAleatoria(Random random) {
-        return (double) (random.nextInt(5) + 6);
+        return (double) (random.nextInt(7) + 4);
     }
 }

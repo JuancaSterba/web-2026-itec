@@ -29,10 +29,15 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("[Seeder] Inicializando datos de desarrollo...");
 
         for (long cursadaId = 1; cursadaId <= CURSADAS_SEMBRADAS; cursadaId++) {
+            // Mismo criterio que ms-notas: el seeder de Core crea cursadaId impar en
+            // comisionProg1 (id 1) y par en comisionLogica (id 2).
+            long comisionId = cursadaId % 2 == 1 ? 1L : 2L;
             for (int indiceFecha = 0; indiceFecha < DIAS_ATRAS.length; indiceFecha++) {
+                // DIAS_ATRAS son multiplos de 7 -> mismo dia de semana que "hoy",
+                // que es el dia de clase que siembra el DatabaseSeeder de Core.
                 LocalDate fecha = LocalDate.now().minusDays(DIAS_ATRAS[indiceFecha]);
                 String estado = estadoPara(cursadaId, indiceFecha);
-                asistenciaRepository.save(new Asistencia(null, cursadaId, cursadaId, fecha, estado));
+                asistenciaRepository.save(new Asistencia(null, cursadaId, comisionId, fecha, estado));
             }
         }
 

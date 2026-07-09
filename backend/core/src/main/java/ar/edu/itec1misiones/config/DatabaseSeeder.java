@@ -9,7 +9,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +32,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final InscripcionCarreraRepository inscripcionCarreraRepository;
     private final CursadaRepository cursadaRepository;
     private final CoreUserRepository userRepository;
+    private final HorarioClaseRepository horarioClaseRepository;
+    private final ModuloHorarioRepository moduloHorarioRepository;
 
     @Override
     public void run(String... args) {
@@ -65,12 +69,16 @@ public class DatabaseSeeder implements CommandLineRunner {
                         .build());
 
         // --- Malla Curricular ---
+        // Prog I es PROMOCIONAL (para probar el camino "promedio >= 7 promociona sin
+        // final"); el resto queda FINAL (default) para probar el camino "siempre va a
+        // rendir final" y "final aprobado sube a APROBADA".
         MateriaPlan mpProg1 = materiaPlanRepository.save(
                 MateriaPlan.builder()
                         .planEstudio(plan)
                         .materia(prog1)
                         .cuatrimestreDictado(1)
                         .cargaHoraria(6)
+                        .modalidadEvaluacion(ModalidadEvaluacion.PROMOCIONAL)
                         .build());
 
         MateriaPlan mpLogica = materiaPlanRepository.save(
@@ -135,6 +143,37 @@ public class DatabaseSeeder implements CommandLineRunner {
                         .materiaPlan(mpLogica)
                         .activa(true)
                         .build());
+
+        // --- Horarios de Clase ---
+        // Usa el día de semana de "hoy" (no un valor fijo) para que las fechas que
+        // siembran ms-notas/ms-asistencias (hoy, hoy-7d, hoy-14d... siempre el mismo
+        // día de semana) coincidan con un día de clase real, sin importar qué día se
+        // levante el entorno.
+        DayOfWeek diaDeHoy = LocalDate.now().getDayOfWeek();
+
+        ModuloHorario moduloManiana = new ModuloHorario();
+        moduloManiana.setNumero(1);
+        moduloManiana.setHoraInicio(LocalTime.of(8, 0));
+        moduloManiana.setHoraFin(LocalTime.of(10, 0));
+        moduloManiana = moduloHorarioRepository.save(moduloManiana);
+
+        ModuloHorario moduloTarde = new ModuloHorario();
+        moduloTarde.setNumero(2);
+        moduloTarde.setHoraInicio(LocalTime.of(14, 0));
+        moduloTarde.setHoraFin(LocalTime.of(16, 0));
+        moduloTarde = moduloHorarioRepository.save(moduloTarde);
+
+        HorarioClase horarioProg1 = new HorarioClase();
+        horarioProg1.setDiaSemana(diaDeHoy);
+        horarioProg1.setComision(comisionProg1);
+        horarioProg1.setModulos(List.of(moduloManiana));
+        horarioClaseRepository.save(horarioProg1);
+
+        HorarioClase horarioLogica = new HorarioClase();
+        horarioLogica.setDiaSemana(diaDeHoy);
+        horarioLogica.setComision(comisionLogica);
+        horarioLogica.setModulos(List.of(moduloTarde));
+        horarioClaseRepository.save(horarioLogica);
 
         // --- Estudiantes ---
         Alumno juan = crearAlumno("Juan", "Pérez", "40111222", "juan.perez");
