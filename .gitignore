@@ -5,7 +5,7 @@
 CLAUDE.md
 GEMINI.md
 CURSOR.md
-AGENT.md
+AGENTS.md
 .cursorrules
 
 # Carpetas destinadas a guardar prompts o historiales de agentes
@@ -16,10 +16,10 @@ agentes/
 prompts/
 .gemini/
 backend/skills-lock.json
-backend/AGENT.md
 docs/backend/registro_sesiones.md
 
 .playwright-mcp/
 /docs/superpowers/
 .remember/
 .superpowers/
+graphify-out/
