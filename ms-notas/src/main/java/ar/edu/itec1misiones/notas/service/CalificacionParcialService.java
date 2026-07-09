@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.notas.service;
 
+import ar.edu.itec1misiones.notas.client.HorarioClient;
 import ar.edu.itec1misiones.notas.dto.CalificacionParcialRequest;
 import ar.edu.itec1misiones.notas.model.CalificacionParcial;
 import ar.edu.itec1misiones.notas.model.TipoInstancia;
@@ -8,22 +9,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CalificacionParcialService {
 
     private final CalificacionParcialRepository calificacionParcialRepository;
+    private final HorarioClient horarioClient;
 
-    public CalificacionParcialService(CalificacionParcialRepository calificacionParcialRepository) {
+    public CalificacionParcialService(CalificacionParcialRepository calificacionParcialRepository,
+                                       HorarioClient horarioClient) {
         this.calificacionParcialRepository = calificacionParcialRepository;
+        this.horarioClient = horarioClient;
     }
 
     public CalificacionParcial crear(CalificacionParcialRequest request) {
-        if (request.getTipo() == TipoInstancia.PARCIAL
-                && calificacionParcialRepository.countByCursadaIdAndTipo(request.getCursadaId(), TipoInstancia.PARCIAL) >= 3) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Ya se cargaron los 3 parciales de esta cursada");
+        if (request.getTipo() == TipoInstancia.PARCIAL) {
+            if (calificacionParcialRepository.countByCursadaIdAndTipo(request.getCursadaId(), TipoInstancia.PARCIAL) >= 3) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Ya se cargaron los 3 parciales de esta cursada");
+            }
+            validarFechaDeClase(request.getComisionId(), request.getFecha());
         }
 
         CalificacionParcial calificacion = new CalificacionParcial();
@@ -42,6 +50,9 @@ public class CalificacionParcialService {
 
     public CalificacionParcial actualizar(Long id, CalificacionParcialRequest request) {
         CalificacionParcial calificacion = buscarPorId(id);
+        if (request.getTipo() == TipoInstancia.PARCIAL) {
+            validarFechaDeClase(request.getComisionId(), request.getFecha());
+        }
         calificacion.setCursadaId(request.getCursadaId());
         calificacion.setComisionId(request.getComisionId());
         calificacion.setInstancia(request.getInstancia());
@@ -54,6 +65,14 @@ public class CalificacionParcialService {
     public void eliminar(Long id) {
         CalificacionParcial calificacion = buscarPorId(id);
         calificacionParcialRepository.delete(calificacion);
+    }
+
+    private void validarFechaDeClase(Long comisionId, java.time.LocalDate fecha) {
+        Set<DayOfWeek> diasDeClase = horarioClient.diasDeClase(comisionId);
+        if (!diasDeClase.contains(fecha.getDayOfWeek())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La fecha no coincide con ningún día de clase de la comisión");
+        }
     }
 
     private CalificacionParcial buscarPorId(Long id) {
