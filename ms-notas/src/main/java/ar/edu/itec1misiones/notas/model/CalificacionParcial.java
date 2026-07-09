@@ -1,6 +1,8 @@
 package ar.edu.itec1misiones.notas.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +27,9 @@ public class CalificacionParcial {
     @NotNull(message = "El ID de la cursada es obligatorio")
     private Long cursadaId;
 
+    @NotNull(message = "El ID de la comisión es obligatorio")
+    private Long comisionId;
+
     @NotBlank(message = "La instancia es obligatoria")
     private String instancia;
 
@@ -33,4 +38,8 @@ public class CalificacionParcial {
 
     @NotNull(message = "La fecha es obligatoria")
     private LocalDate fecha;
+
+    @NotNull(message = "El tipo de instancia es obligatorio")
+    @Enumerated(EnumType.STRING)
+    private TipoInstancia tipo;
 }
