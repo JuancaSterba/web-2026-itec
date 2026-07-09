@@ -39,6 +39,7 @@ public class MateriaPlanServiceImpl implements MateriaPlanService {
         materiaPlan.setMateria(materia);
         materiaPlan.setCuatrimestreDictado(request.getCuatrimestreDictado());
         materiaPlan.setCargaHoraria(request.getCargaHoraria());
+        materiaPlan.setModalidadEvaluacion(request.getModalidadEvaluacion());
         materiaPlan.setCorrelativas(resolverCorrelativas(request.getCorrelativaIds(), planEstudio.getId(), null));
 
         return toResponse(materiaPlanRepository.save(materiaPlan));
@@ -72,6 +73,7 @@ public class MateriaPlanServiceImpl implements MateriaPlanService {
         materiaPlan.setMateria(materia);
         materiaPlan.setCuatrimestreDictado(request.getCuatrimestreDictado());
         materiaPlan.setCargaHoraria(request.getCargaHoraria());
+        materiaPlan.setModalidadEvaluacion(request.getModalidadEvaluacion());
         materiaPlan.setCorrelativas(resolverCorrelativas(request.getCorrelativaIds(), planEstudio.getId(), id));
 
         return toResponse(materiaPlanRepository.save(materiaPlan));
@@ -111,6 +113,7 @@ public class MateriaPlanServiceImpl implements MateriaPlanService {
                 .materiaNombre(materiaPlan.getMateria().getNombre())
                 .cuatrimestreDictado(materiaPlan.getCuatrimestreDictado())
                 .cargaHoraria(materiaPlan.getCargaHoraria())
+                .modalidadEvaluacion(materiaPlan.getModalidadEvaluacion())
                 .correlativaIds(materiaPlan.getCorrelativas().stream().map(MateriaPlan::getId).toList())
                 .correlativaNombres(materiaPlan.getCorrelativas().stream()
                         .map(c -> c.getMateria().getNombre()).toList())
