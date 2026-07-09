@@ -2,9 +2,11 @@ package ar.edu.itec1misiones.notas.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
+import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.notas.dto.CalificacionParcialRequest;
 import ar.edu.itec1misiones.notas.model.CalificacionParcial;
 import ar.edu.itec1misiones.notas.service.CalificacionParcialService;
+import ar.edu.itec1misiones.util.RoleGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,7 @@ public class CalificacionParcialController {
             @RequestBody @Valid CalificacionParcialRequest request,
             HttpServletRequest httpRequest) {
 
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
         CalificacionParcial calificacion = calificacionParcialService.crear(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<CalificacionParcial>builder()
@@ -49,6 +52,7 @@ public class CalificacionParcialController {
     public ResponseEntity<ApiResponse<CalificacionParcial>> listar(
             @RequestParam(required = false) Long cursadaId,
             HttpServletRequest httpRequest) {
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
         List<CalificacionParcial> calificaciones = calificacionParcialService.listar(cursadaId);
         return ResponseEntity.ok(
                 ApiResponse.<CalificacionParcial>builder()
@@ -64,6 +68,7 @@ public class CalificacionParcialController {
             @RequestBody @Valid CalificacionParcialRequest request,
             HttpServletRequest httpRequest) {
 
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
         CalificacionParcial actualizada = calificacionParcialService.actualizar(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<CalificacionParcial>builder()
@@ -78,6 +83,7 @@ public class CalificacionParcialController {
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO);
         calificacionParcialService.eliminar(id);
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()
