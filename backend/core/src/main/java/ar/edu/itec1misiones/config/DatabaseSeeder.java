@@ -1,6 +1,7 @@
 package ar.edu.itec1misiones.config;
 
 import ar.edu.itec1misiones.model.*;
+import ar.edu.itec1misiones.model.CondicionFinal;
 import ar.edu.itec1misiones.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -156,7 +157,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                             .alumno(alumno)
                             .comision(comisionProg1)
                             .fechaInscripcion(LocalDate.now())
-                            .condicionFinal("REGULAR")
+                            .condicionFinal(CondicionFinal.REGULAR)
                             .build());
 
             cursadaRepository.save(
@@ -164,7 +165,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                             .alumno(alumno)
                             .comision(comisionLogica)
                             .fechaInscripcion(LocalDate.now())
-                            .condicionFinal("LIBRE")
+                            .condicionFinal(CondicionFinal.LIBRE)
                             .build());
         }
 

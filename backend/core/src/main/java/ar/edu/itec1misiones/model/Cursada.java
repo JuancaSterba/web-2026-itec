@@ -1,6 +1,8 @@
 package ar.edu.itec1misiones.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,6 +35,9 @@ public class Cursada {
     private Comision comision;
 
     private LocalDate fechaInscripcion;
-    private String condicionFinal;
+
+    @Enumerated(EnumType.STRING)
+    private CondicionFinal condicionFinal;
+
     private Double notaCierre;
 }

@@ -7,6 +7,7 @@ import ar.edu.itec1misiones.exception.ComisionNotFoundException;
 import ar.edu.itec1misiones.exception.CursadaNotFoundException;
 import ar.edu.itec1misiones.model.Alumno;
 import ar.edu.itec1misiones.model.Comision;
+import ar.edu.itec1misiones.model.CondicionFinal;
 import ar.edu.itec1misiones.model.Cursada;
 import ar.edu.itec1misiones.model.MateriaPlan;
 import ar.edu.itec1misiones.repository.AlumnoRepository;
@@ -18,16 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CursadaServiceImpl implements CursadaService {
-
-    // Reutiliza la misma convención de "materia aprobada" ya usada en la Ficha
-    // del Alumno del frontend (condicionFinal es texto libre, sin enum).
-    private static final Pattern APROBADA = Pattern.compile("PROMOCIONA|APROBAD", Pattern.CASE_INSENSITIVE);
 
     private final CursadaRepository cursadaRepository;
     private final AlumnoRepository alumnoRepository;
@@ -96,7 +92,7 @@ public class CursadaServiceImpl implements CursadaService {
         List<String> faltantes = materiaPlan.getCorrelativas().stream()
                 .filter(correlativa -> cursadasDelAlumno.stream().noneMatch(c ->
                         c.getComision().getMateriaPlan().getId().equals(correlativa.getId())
-                                && APROBADA.matcher(String.valueOf(c.getCondicionFinal())).find()))
+                                && esAprobada(c.getCondicionFinal())))
                 .map(correlativa -> correlativa.getMateria().getNombre())
                 .toList();
 
@@ -104,6 +100,11 @@ public class CursadaServiceImpl implements CursadaService {
             throw new IllegalArgumentException(
                     "No se puede matricular: falta aprobar la/s correlativa/s: " + String.join(", ", faltantes));
         }
+    }
+
+    private boolean esAprobada(CondicionFinal condicion) {
+        return condicion == CondicionFinal.PROMOCIONADA
+                || condicion == CondicionFinal.APROBADA;
     }
 
     private CursadaResponse toResponse(Cursada cursada) {

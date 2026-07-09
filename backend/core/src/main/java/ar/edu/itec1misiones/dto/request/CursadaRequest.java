@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.dto.request;
 
+import ar.edu.itec1misiones.model.CondicionFinal;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class CursadaRequest {
 
     private LocalDate fechaInscripcion;
 
-    private String condicionFinal;
+    private CondicionFinal condicionFinal;
 
     private Double notaCierre;
 }
