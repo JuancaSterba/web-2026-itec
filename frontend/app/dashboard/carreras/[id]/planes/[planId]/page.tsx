@@ -61,6 +61,11 @@ export default async function PlanDetallePage({
 
   const cuatrimestres = porCuatrimestre ? Object.keys(porCuatrimestre).map(Number).sort((a, b) => a - b) : []
 
+  const materiaIdsUsadas = new Set((delPlan ?? []).map((mp) => mp.materiaId))
+  const materiasParaAgregar = (materias ?? [])
+    .filter((m) => !materiaIdsUsadas.has(m.id))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -73,8 +78,10 @@ export default async function PlanDetallePage({
         </div>
         <AgregarMateriaDialog
           planId={Number(planId)}
-          materiasDisponibles={materias ?? []}
-          correlativasDisponibles={(delPlan ?? []).map((mp) => ({ id: mp.id, materiaNombre: mp.materiaNombre }))}
+          materiasDisponibles={materiasParaAgregar}
+          correlativasDisponibles={(delPlan ?? [])
+            .map((mp) => ({ id: mp.id, materiaNombre: mp.materiaNombre }))
+            .sort((a, b) => a.materiaNombre.localeCompare(b.materiaNombre, "es"))}
         />
       </div>
 
@@ -102,10 +109,13 @@ export default async function PlanDetallePage({
                       <EditarMateriaPlanDialog
                         materiaPlan={mp}
                         planId={Number(planId)}
-                        materiasDisponibles={materias ?? []}
+                        materiasDisponibles={(materias ?? [])
+                          .filter((m) => m.id === mp.materiaId || !materiaIdsUsadas.has(m.id))
+                          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))}
                         correlativasDisponibles={(delPlan ?? [])
                           .filter((otra) => otra.id !== mp.id)
-                          .map((otra) => ({ id: otra.id, materiaNombre: otra.materiaNombre }))}
+                          .map((otra) => ({ id: otra.id, materiaNombre: otra.materiaNombre }))
+                          .sort((a, b) => a.materiaNombre.localeCompare(b.materiaNombre, "es"))}
                       />
                       <EliminarBoton
                         accion={deleteMateriaPlan.bind(null, mp.id)}

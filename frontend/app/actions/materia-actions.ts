@@ -27,10 +27,13 @@ export async function createMateria(formData: FormData) {
   })
 
   if (!response.ok) {
-    throw new Error("No se pudo crear la materia")
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo crear la materia")
   }
 
+  const body = await response.json()
   revalidatePath("/dashboard/materias")
+  return body.data[0] as { id: number; nombre: string }
 }
 
 export async function updateMateria(id: number, formData: FormData) {

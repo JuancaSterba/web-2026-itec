@@ -50,6 +50,7 @@ export default function EditarCarreraDialog({ carrera }: { carrera: CarreraEdita
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
+            setOpen(true)
           }}
         >
           <Pencil className="size-4" />

@@ -51,6 +51,7 @@ export default function EditarCicloDialog({ ciclo }: { ciclo: CicloEditable }) {
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
+            setOpen(true)
           }}
         >
           <Pencil className="size-4" />
