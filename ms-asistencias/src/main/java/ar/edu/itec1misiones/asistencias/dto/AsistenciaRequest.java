@@ -12,6 +12,9 @@ public class AsistenciaRequest {
     @NotNull(message = "El ID de la cursada es obligatorio")
     private Long cursadaId;
 
+    @NotNull(message = "El ID de la comisión es obligatorio")
+    private Long comisionId;
+
     @NotNull(message = "La fecha es obligatoria")
     private LocalDate fecha;
 

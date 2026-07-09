@@ -22,6 +22,7 @@ public class AsistenciaService {
     public Asistencia crear(AsistenciaRequest request) {
         Asistencia asistencia = new Asistencia();
         asistencia.setCursadaId(request.getCursadaId());
+        asistencia.setComisionId(request.getComisionId());
         asistencia.setFecha(request.getFecha());
         asistencia.setEstado(request.getEstado());
         return asistenciaRepository.save(asistencia);
@@ -34,6 +35,7 @@ public class AsistenciaService {
     public Asistencia actualizar(Long id, AsistenciaRequest request) {
         Asistencia asistencia = buscarPorId(id);
         asistencia.setCursadaId(request.getCursadaId());
+        asistencia.setComisionId(request.getComisionId());
         asistencia.setFecha(request.getFecha());
         asistencia.setEstado(request.getEstado());
         return asistenciaRepository.save(asistencia);
