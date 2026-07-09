@@ -30,7 +30,7 @@ function BotonGuardar() {
   )
 }
 
-export default function NuevaInstanciaDialog({ cursadas }: { cursadas: CursadaParaNota[] }) {
+export default function NuevaInstanciaDialog({ comisionId, cursadas }: { comisionId: number; cursadas: CursadaParaNota[] }) {
   const [open, setOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -44,7 +44,7 @@ export default function NuevaInstanciaDialog({ cursadas }: { cursadas: CursadaPa
       .filter((r) => r.notaRaw !== "")
       .map((r) => ({ cursadaId: r.cursadaId, nota: Number(r.notaRaw) }))
 
-    await saveCalificacionesMasivas(instancia, registros)
+    await saveCalificacionesMasivas(comisionId, instancia, registros)
     formRef.current?.reset()
     setOpen(false)
   }

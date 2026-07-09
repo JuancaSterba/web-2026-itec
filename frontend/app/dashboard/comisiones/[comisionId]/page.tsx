@@ -57,6 +57,7 @@ interface CalificacionParcialResponse {
   instancia: string
   nota: number
   fecha: string
+  tipo: string
 }
 
 interface AsistenciaResponse {
@@ -305,7 +306,7 @@ export default async function ComisionDetallePage({
 
         <TabsContent value="asistencias" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
-            <TomarAsistenciaDialog cursadas={cursadasParaAsistencia} asistenciasExistentes={asistenciasExistentes} />
+            <TomarAsistenciaDialog comisionId={Number(comisionId)} cursadas={cursadasParaAsistencia} asistenciasExistentes={asistenciasExistentes} />
           </div>
           {cursadasDeLaComision === null || asistenciasPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las asistencias. Intentá nuevamente más tarde.</p>
@@ -346,7 +347,7 @@ export default async function ComisionDetallePage({
 
         <TabsContent value="calificaciones" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
-            <NuevaInstanciaDialog cursadas={cursadasParaAsistencia} />
+            <NuevaInstanciaDialog comisionId={Number(comisionId)} cursadas={cursadasParaAsistencia} />
           </div>
           {cursadasDeLaComision === null || calificacionesPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las calificaciones. Intentá nuevamente más tarde.</p>
@@ -375,7 +376,9 @@ export default async function ComisionDetallePage({
                           <TableCell key={instancia}>
                             <EditableNotaCell
                               cursadaId={cursada.id}
+                              comisionId={Number(comisionId)}
                               instancia={instancia}
+                              tipo="PARCIAL"
                               initialNota={calificacion?.nota ?? null}
                               calificacionId={calificacion?.id}
                             />
