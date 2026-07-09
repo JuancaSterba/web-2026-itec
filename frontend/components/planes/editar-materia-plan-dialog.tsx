@@ -34,6 +34,7 @@ interface MateriaPlanEditable {
   cuatrimestreDictado: number
   cargaHoraria: number
   correlativaIds: number[]
+  modalidadEvaluacion: string
 }
 
 function BotonGuardar() {
@@ -139,6 +140,19 @@ export default function EditarMateriaPlanDialog({
               defaultValue={materiaPlan.cargaHoraria}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="modalidadEvaluacion">Modalidad de Evaluación</Label>
+            <select
+              id="modalidadEvaluacion"
+              name="modalidadEvaluacion"
+              defaultValue={materiaPlan.modalidadEvaluacion}
+              required
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="FINAL">Final (requiere examen final)</option>
+              <option value="PROMOCIONAL">Promocional (puede promocionar sin final)</option>
+            </select>
           </div>
           {correlativasDisponibles.length > 0 && (
             <div className="space-y-2">

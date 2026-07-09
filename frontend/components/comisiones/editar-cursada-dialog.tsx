@@ -55,13 +55,18 @@ export default function EditarCursadaDialog({ cursada }: { cursada: CursadaEdita
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="condicionFinal">Condición Final</Label>
-            <Input
+            <select
               id="condicionFinal"
               name="condicionFinal"
               defaultValue={cursada.condicionFinal}
-              placeholder="REGULAR / PROMOCIONADO / LIBRE"
               required
-            />
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="LIBRE">Libre</option>
+              <option value="REGULAR">Regular</option>
+              <option value="PROMOCIONADA">Promocionada</option>
+              <option value="APROBADA">Aprobada</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="notaCierre">Nota de Cierre</Label>

@@ -14,6 +14,7 @@ interface MateriaPlanResponse {
   cargaHoraria: number
   correlativaIds: number[]
   correlativaNombres: string[]
+  modalidadEvaluacion: string
 }
 
 interface MateriaResponse {
@@ -90,7 +91,7 @@ export default async function PlanDetallePage({
                 {porCuatrimestre![cuatrimestre].map((mp) => (
                   <li key={mp.id} className="flex items-center justify-between">
                     <span>
-                      {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs/semana)</span>
+                      {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs/semana · {mp.modalidadEvaluacion === "PROMOCIONAL" ? "Promocional" : "Final"})</span>
                       {mp.correlativaNombres.length > 0 && (
                         <span className="block text-xs text-muted-foreground">
                           Correlativas: {mp.correlativaNombres.join(", ")}

@@ -17,6 +17,7 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
     cuatrimestreDictado: Number(formData.get("cuatrimestreDictado")),
     cargaHoraria: Number(formData.get("cargaHoraria")),
     correlativaIds: formData.getAll("correlativaIds").map(Number),
+    modalidadEvaluacion: formData.get("modalidadEvaluacion"),
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan`, {
@@ -46,6 +47,7 @@ export async function updateMateriaPlan(formData: FormData, materiaPlanId: numbe
     cuatrimestreDictado: Number(formData.get("cuatrimestreDictado")),
     cargaHoraria: Number(formData.get("cargaHoraria")),
     correlativaIds: formData.getAll("correlativaIds").map(Number),
+    modalidadEvaluacion: formData.get("modalidadEvaluacion"),
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan/${materiaPlanId}`, {

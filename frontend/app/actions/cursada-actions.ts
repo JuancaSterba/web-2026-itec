@@ -96,6 +96,25 @@ export async function updateCursada(formData: FormData, cursadaId: number, alumn
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
 }
 
+export async function cerrarCursada(cursadaId: number) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const response = await fetch(`${getApiBaseUrl()}/api/core/cursadas/${cursadaId}/cerrar`, {
+    method: "POST",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo cerrar la cursada")
+  }
+
+  revalidatePath("/dashboard/comisiones/[comisionId]", "page")
+}
+
 export async function deleteCursada(cursadaId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
