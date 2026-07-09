@@ -5,6 +5,8 @@ import ar.edu.itec1misiones.asistencias.model.Asistencia;
 import ar.edu.itec1misiones.asistencias.service.AsistenciaService;
 import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
+import ar.edu.itec1misiones.model.Rol;
+import ar.edu.itec1misiones.util.RoleGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,6 +40,7 @@ public class AsistenciaController {
             @RequestBody @Valid AsistenciaRequest request,
             HttpServletRequest httpRequest) {
 
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
         Asistencia asistencia = asistenciaService.crear(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<Asistencia>builder()
@@ -52,6 +55,7 @@ public class AsistenciaController {
             @RequestParam(required = false) Long cursadaId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             HttpServletRequest httpRequest) {
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
         List<Asistencia> asistencias = asistenciaService.listar(cursadaId, fecha);
         return ResponseEntity.ok(
                 ApiResponse.<Asistencia>builder()
@@ -67,6 +71,7 @@ public class AsistenciaController {
             @RequestBody @Valid AsistenciaRequest request,
             HttpServletRequest httpRequest) {
 
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
         Asistencia actualizada = asistenciaService.actualizar(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<Asistencia>builder()
@@ -81,6 +86,7 @@ public class AsistenciaController {
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO);
         asistenciaService.eliminar(id);
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()
