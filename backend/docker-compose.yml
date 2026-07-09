@@ -50,6 +50,9 @@ services:
       # necesitan la misma clave. Si backend/.env define JWT_SECRET, se usa esa;
       # si no, cae al mismo default hardcodeado en application-security.yml.
       - JWT_SECRET=${JWT_SECRET:-tu-clave-muy-segura-de-32-caracteres-o-mas-1234}
+      # NotasClient (calculo de condicion) llama a ms-notas dentro de la red de
+      # Docker, no por localhost.
+      - NOTAS_API_URL=http://ms-notas:8084
     ports:
       # Mapeamos el puerto de nuestra máquina al puerto del contenedor de forma dinámica
       - "${APP_PORT:-8080}:${APP_PORT:-8080}"

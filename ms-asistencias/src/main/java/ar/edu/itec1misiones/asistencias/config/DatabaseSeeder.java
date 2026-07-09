@@ -32,7 +32,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             for (int indiceFecha = 0; indiceFecha < DIAS_ATRAS.length; indiceFecha++) {
                 LocalDate fecha = LocalDate.now().minusDays(DIAS_ATRAS[indiceFecha]);
                 String estado = estadoPara(cursadaId, indiceFecha);
-                asistenciaRepository.save(new Asistencia(null, cursadaId, fecha, estado));
+                asistenciaRepository.save(new Asistencia(null, cursadaId, cursadaId, fecha, estado));
             }
         }
 

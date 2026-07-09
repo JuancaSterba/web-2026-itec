@@ -9,6 +9,7 @@ import EditableNotaCell from "@/components/comisiones/editable-nota-cell"
 import TomarAsistenciaDialog from "@/components/comisiones/tomar-asistencia-dialog"
 import AsignarProfesorDialog from "@/components/comisiones/asignar-profesor-dialog"
 import EditarCursadaDialog from "@/components/comisiones/editar-cursada-dialog"
+import CerrarCursadaBoton from "@/components/comisiones/cerrar-cursada-boton"
 import EditarProfesorAsignadoDialog from "@/components/comisiones/editar-profesor-asignado-dialog"
 import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteCursada } from "@/app/actions/cursada-actions"
@@ -57,6 +58,7 @@ interface CalificacionParcialResponse {
   instancia: string
   nota: number
   fecha: string
+  tipo: string
 }
 
 interface AsistenciaResponse {
@@ -245,6 +247,7 @@ export default async function ComisionDetallePage({
                       <TableCell>{cursada.notaCierre ?? "—"}</TableCell>
                       {esAdmin && (
                         <TableCell className="flex justify-end gap-1">
+                          <CerrarCursadaBoton cursadaId={cursada.id} />
                           <EditarCursadaDialog cursada={cursada} />
                           <EliminarBoton
                             accion={deleteCursada.bind(null, cursada.id)}
@@ -305,7 +308,7 @@ export default async function ComisionDetallePage({
 
         <TabsContent value="asistencias" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
-            <TomarAsistenciaDialog cursadas={cursadasParaAsistencia} asistenciasExistentes={asistenciasExistentes} />
+            <TomarAsistenciaDialog comisionId={Number(comisionId)} cursadas={cursadasParaAsistencia} asistenciasExistentes={asistenciasExistentes} />
           </div>
           {cursadasDeLaComision === null || asistenciasPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las asistencias. Intentá nuevamente más tarde.</p>
@@ -346,7 +349,7 @@ export default async function ComisionDetallePage({
 
         <TabsContent value="calificaciones" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
-            <NuevaInstanciaDialog cursadas={cursadasParaAsistencia} />
+            <NuevaInstanciaDialog comisionId={Number(comisionId)} cursadas={cursadasParaAsistencia} />
           </div>
           {cursadasDeLaComision === null || calificacionesPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las calificaciones. Intentá nuevamente más tarde.</p>
@@ -375,7 +378,9 @@ export default async function ComisionDetallePage({
                           <TableCell key={instancia}>
                             <EditableNotaCell
                               cursadaId={cursada.id}
+                              comisionId={Number(comisionId)}
                               instancia={instancia}
+                              tipo="PARCIAL"
                               initialNota={calificacion?.nota ?? null}
                               calificacionId={calificacion?.id}
                             />

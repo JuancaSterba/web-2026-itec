@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.dto.request;
 
+import ar.edu.itec1misiones.model.ModalidadEvaluacion;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -19,4 +20,7 @@ public class MateriaPlanRequest {
     private Integer cargaHoraria;
 
     private List<Long> correlativaIds;
+
+    @NotNull(message = "La modalidad de evaluación es obligatoria")
+    private ModalidadEvaluacion modalidadEvaluacion;
 }

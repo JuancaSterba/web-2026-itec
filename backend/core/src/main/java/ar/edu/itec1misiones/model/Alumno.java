@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -21,19 +22,23 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Alumno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
     private boolean activo = true;
 
+    @Builder.Default
     @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InscripcionCarrera> inscripciones = new ArrayList<>();
 
+    @Builder.Default
     @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)

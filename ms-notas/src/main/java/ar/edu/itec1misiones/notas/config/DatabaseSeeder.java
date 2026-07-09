@@ -1,6 +1,7 @@
 package ar.edu.itec1misiones.notas.config;
 
 import ar.edu.itec1misiones.notas.model.CalificacionParcial;
+import ar.edu.itec1misiones.notas.model.TipoInstancia;
 import ar.edu.itec1misiones.notas.repository.CalificacionParcialRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         Random random = new Random();
         for (long cursadaId = 1; cursadaId <= CURSADAS_SEMBRADAS; cursadaId++) {
             calificacionParcialRepository.save(new CalificacionParcial(
-                    null, cursadaId, "Primer Parcial", notaAleatoria(random), LocalDate.now().minusDays(30)));
+                    null, cursadaId, cursadaId, "Primer Parcial", notaAleatoria(random),
+                    LocalDate.now().minusDays(30), TipoInstancia.PARCIAL));
             calificacionParcialRepository.save(new CalificacionParcial(
-                    null, cursadaId, "Segundo Parcial", notaAleatoria(random), LocalDate.now().minusDays(10)));
+                    null, cursadaId, cursadaId, "Segundo Parcial", notaAleatoria(random),
+                    LocalDate.now().minusDays(10), TipoInstancia.PARCIAL));
         }
 
         log.info("[Seeder] Datos de desarrollo insertados correctamente.");

@@ -9,8 +9,10 @@ function getApiBaseUrl() {
 
 export async function saveCalificacion(
   cursadaId: number,
+  comisionId: number,
   instancia: string,
   nota: number,
+  tipo: "PARCIAL" | "FINAL",
   calificacionId?: number
 ) {
   const cookieStore = await cookies()
@@ -18,8 +20,10 @@ export async function saveCalificacion(
 
   const payload = {
     cursadaId,
+    comisionId,
     instancia,
     nota,
+    tipo,
     fecha: new Date().toISOString().split("T")[0],
   }
 
@@ -37,13 +41,15 @@ export async function saveCalificacion(
   })
 
   if (!response.ok) {
-    throw new Error("No se pudo guardar la calificación")
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo guardar la calificación")
   }
 
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
 }
 
 export async function saveCalificacionesMasivas(
+  comisionId: number,
   instancia: string,
   registros: { cursadaId: number; nota: number }[]
 ) {
@@ -59,7 +65,14 @@ export async function saveCalificacionesMasivas(
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify({ cursadaId: registro.cursadaId, instancia, nota: registro.nota, fecha }),
+        body: JSON.stringify({
+          cursadaId: registro.cursadaId,
+          comisionId,
+          instancia,
+          nota: registro.nota,
+          fecha,
+          tipo: "PARCIAL",
+        }),
       })
     )
   )

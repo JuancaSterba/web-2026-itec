@@ -8,6 +8,7 @@ function getApiBaseUrl() {
 }
 
 export async function saveAsistenciasMasivas(
+  comisionId: number,
   fecha: string,
   registros: { cursadaId: number; estado: string; asistenciaId?: number }[]
 ) {
@@ -25,13 +26,17 @@ export async function saveAsistenciasMasivas(
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify({ cursadaId: registro.cursadaId, fecha, estado: registro.estado }),
+        body: JSON.stringify({ cursadaId: registro.cursadaId, comisionId, fecha, estado: registro.estado }),
       })
     })
   )
 
   if (respuestas.some((response) => !response.ok)) {
-    throw new Error("No se pudo guardar la lista de asistencias completa")
+    const cuerpos = await Promise.all(
+      respuestas.filter((r) => !r.ok).map((r) => r.json().catch(() => null))
+    )
+    const mensajes = cuerpos.map((b) => b?.errors?.[0]?.description).filter(Boolean)
+    throw new Error(mensajes.length > 0 ? mensajes.join(" / ") : "No se pudo guardar la lista de asistencias completa")
   }
 
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")

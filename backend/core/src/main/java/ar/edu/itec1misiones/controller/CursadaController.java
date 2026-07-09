@@ -2,8 +2,10 @@ package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.request.CursadaRequest;
+import ar.edu.itec1misiones.dto.response.CondicionPreviewResponse;
 import ar.edu.itec1misiones.dto.response.CursadaResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
+import ar.edu.itec1misiones.service.CondicionCursadaService;
 import ar.edu.itec1misiones.service.CursadaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +26,7 @@ import java.util.List;
 public class CursadaController {
 
     private final CursadaService cursadaService;
+    private final CondicionCursadaService condicionCursadaService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
@@ -83,6 +86,38 @@ public class CursadaController {
                 ApiResponse.<CursadaResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
                         .data(List.of(cursada))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{id}/condicion-preview")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Calcular la condición final de una cursada sin persistirla")
+    public ResponseEntity<ApiResponse<CondicionPreviewResponse>> condicionPreview(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        CondicionPreviewResponse preview = condicionCursadaService.calcular(id);
+        return ResponseEntity.ok(
+                ApiResponse.<CondicionPreviewResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(preview))
+                        .build()
+        );
+    }
+
+    @PostMapping("/{id}/cerrar")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Calcular y persistir la condición final de una cursada")
+    public ResponseEntity<ApiResponse<CondicionPreviewResponse>> cerrar(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        CondicionPreviewResponse resultado = condicionCursadaService.cerrar(id);
+        return ResponseEntity.ok(
+                ApiResponse.<CondicionPreviewResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(resultado))
                         .build()
         );
     }

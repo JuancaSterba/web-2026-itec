@@ -48,6 +48,11 @@ services:
       # application-prod.yml por defecto usa ddl-auto=validate; en el primer arranque
       # el esquema esta vacio, asi que necesitamos "update" para que Hibernate cree las tablas.
       - DB_DDL_AUTO=update
+      # Para validar fechas contra HorarioClase (HorarioClient), este servicio llama
+      # a Core dentro de la red de Docker, no por localhost. Mismo JWT_SECRET que
+      # backend-app/api-gateway para que el token interno que mintea sea valido.
+      - CORE_API_URL=http://backend-app:8082
+      - JWT_SECRET=${JWT_SECRET:-tu-clave-muy-segura-de-32-caracteres-o-mas-1234}
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -66,6 +71,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD:-root}
       - DB_DDL_AUTO=update
+      # Para validar fechas contra HorarioClase (HorarioClient), este servicio llama
+      # a Core dentro de la red de Docker, no por localhost. Mismo JWT_SECRET que
+      # backend-app/api-gateway para que el token interno que mintea sea valido.
+      - CORE_API_URL=http://backend-app:8082
+      - JWT_SECRET=${JWT_SECRET:-tu-clave-muy-segura-de-32-caracteres-o-mas-1234}
     depends_on:
       mysql-db:
         condition: service_healthy

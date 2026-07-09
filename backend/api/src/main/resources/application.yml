@@ -30,3 +30,7 @@ logging:
   level:
     root: info
     org.springframework.web: debug
+
+notas:
+  api:
+    url: ${NOTAS_API_URL:http://localhost:8084}

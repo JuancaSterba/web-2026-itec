@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input"
 
 export default function EditableNotaCell({
   cursadaId,
+  comisionId,
   instancia,
+  tipo,
   initialNota,
   calificacionId,
 }: {
   cursadaId: number
+  comisionId: number
   instancia: string
+  tipo: "PARCIAL" | "FINAL"
   initialNota: number | null
   calificacionId?: number
 }) {
@@ -38,7 +42,7 @@ export default function EditableNotaCell({
 
     setIsSaving(true)
     try {
-      await saveCalificacion(cursadaId, instancia, nota, calificacionId)
+      await saveCalificacion(cursadaId, comisionId, instancia, nota, tipo, calificacionId)
     } finally {
       setIsSaving(false)
     }

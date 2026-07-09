@@ -39,9 +39,11 @@ function BotonGuardar() {
 }
 
 export default function TomarAsistenciaDialog({
+  comisionId,
   cursadas,
   asistenciasExistentes,
 }: {
+  comisionId: number
   cursadas: CursadaParaAsistencia[]
   asistenciasExistentes: AsistenciaExistente[]
 }) {
@@ -62,7 +64,7 @@ export default function TomarAsistenciaDialog({
       }
     })
 
-    await saveAsistenciasMasivas(fecha, registros)
+    await saveAsistenciasMasivas(comisionId, fecha, registros)
     formRef.current?.reset()
     setOpen(false)
   }

@@ -2,6 +2,8 @@ package ar.edu.itec1misiones.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,6 +45,10 @@ public class MateriaPlan {
 
     private Integer cuatrimestreDictado;
     private Integer cargaHoraria;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ModalidadEvaluacion modalidadEvaluacion = ModalidadEvaluacion.FINAL;
 
     @ToString.Exclude
     @JsonIgnore
