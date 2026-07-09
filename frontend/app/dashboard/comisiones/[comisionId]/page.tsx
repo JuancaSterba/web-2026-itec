@@ -163,9 +163,12 @@ export default async function ComisionDetallePage({
     })
   }
 
-  const instancias = Array.from(
-    new Set(Array.from(calificacionesPorCursada?.values() ?? []).flat().map((c) => c.instancia))
-  ).sort()
+  const calificacionesParciales = Array.from(calificacionesPorCursada?.values() ?? [])
+    .flat()
+    .filter((c) => c.tipo === "PARCIAL")
+
+  const instancias = Array.from(new Set(calificacionesParciales.map((c) => c.instancia))).sort()
+  const yaHayTresParciales = instancias.length >= 3
 
   const fechasAsistencia = Array.from(
     new Set(Array.from(asistenciasPorCursada?.values() ?? []).flat().map((a) => a.fecha))
@@ -349,7 +352,11 @@ export default async function ComisionDetallePage({
 
         <TabsContent value="calificaciones" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           <div className="flex justify-end">
-            <NuevaInstanciaDialog comisionId={Number(comisionId)} cursadas={cursadasParaAsistencia} />
+            {yaHayTresParciales ? (
+              <p className="text-xs text-muted-foreground">Ya se cargaron los 3 parciales de esta comisión.</p>
+            ) : (
+              <NuevaInstanciaDialog comisionId={Number(comisionId)} cursadas={cursadasParaAsistencia} />
+            )}
           </div>
           {cursadasDeLaComision === null || calificacionesPorCursada === null ? (
             <p className="text-destructive">No se pudo obtener las calificaciones. Intentá nuevamente más tarde.</p>
@@ -363,12 +370,18 @@ export default async function ComisionDetallePage({
                   {instancias.map((instancia) => (
                     <TableHead key={instancia}>{instancia}</TableHead>
                   ))}
+                  <TableHead>Promedio</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {cursadasDeLaComision.map((cursada) => {
                   const alumno = alumnoPorId.get(cursada.alumnoId)
                   const calificaciones = calificacionesPorCursada!.get(cursada.id) ?? []
+                  const parcialesDeLaCursada = calificaciones.filter((c) => c.tipo === "PARCIAL")
+                  const promedio =
+                    parcialesDeLaCursada.length === 3
+                      ? parcialesDeLaCursada.reduce((suma, c) => suma + c.nota, 0) / 3
+                      : null
                   return (
                     <TableRow key={cursada.id}>
                       <TableCell>{alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}</TableCell>
@@ -387,6 +400,7 @@ export default async function ComisionDetallePage({
                           </TableCell>
                         )
                       })}
+                      <TableCell className="font-medium">{promedio !== null ? promedio.toFixed(2) : "—"}</TableCell>
                     </TableRow>
                   )
                 })}
