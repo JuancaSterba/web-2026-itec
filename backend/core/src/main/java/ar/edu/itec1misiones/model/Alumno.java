@@ -29,13 +29,16 @@ public class Alumno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
     private boolean activo = true;
 
+    @Builder.Default
     @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InscripcionCarrera> inscripciones = new ArrayList<>();
 
+    @Builder.Default
     @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
