@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -107,6 +109,20 @@ public class HorarioClaseServiceImpl implements HorarioClaseService {
                 .comisionId(horario.getComision().getId())
                 .materiaNombre(horario.getComision().getMateriaPlan().getMateria().getNombre())
                 .modulos(modulosResponse)
+                .proximaFecha(calcularProximaFecha(horario.getDiaSemana(), LocalDate.now()))
                 .build();
+    }
+
+    /**
+     * Traduce el "dia de semana recurrente" del horario a la proxima fecha
+     * concreta en que se dicta esa clase. Si hoy es el dia de la clase,
+     * devuelve hoy (item 9 de PENDIENTES.md).
+     */
+    static LocalDate calcularProximaFecha(DayOfWeek diaSemana, LocalDate hoy) {
+        int diasHastaProxima = diaSemana.getValue() - hoy.getDayOfWeek().getValue();
+        if (diasHastaProxima < 0) {
+            diasHastaProxima += 7;
+        }
+        return hoy.plusDays(diasHastaProxima);
     }
 }

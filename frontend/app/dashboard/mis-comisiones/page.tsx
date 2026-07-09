@@ -35,6 +35,34 @@ interface CursadaResponse {
   comisionId: number
 }
 
+interface ModuloHorarioResponse {
+  id: number
+  numero: number
+  horaInicio: string
+  horaFin: string
+}
+
+interface HorarioClaseResponse {
+  id: number
+  diaSemana: string
+  comisionId: number
+  materiaNombre: string
+  modulos: ModuloHorarioResponse[]
+  proximaFecha: string
+}
+
+function formatearProximaClase(horarios: HorarioClaseResponse[]): string | null {
+  if (horarios.length === 0) return null
+
+  const proximo = [...horarios].sort((a, b) => a.proximaFecha.localeCompare(b.proximaFecha))[0]
+  const fecha = new Date(`${proximo.proximaFecha}T00:00:00`)
+  const fechaTexto = new Intl.DateTimeFormat("es-AR", { weekday: "long", day: "numeric", month: "long" }).format(fecha)
+  const primerModulo = proximo.modulos[0]
+  const horaTexto = primerModulo ? ` · ${primerModulo.horaInicio.slice(0, 5)}hs` : ""
+
+  return `${fechaTexto}${horaTexto}`
+}
+
 async function MisComisionesLista() {
   const profesor = await getProfesorActual()
 
@@ -68,12 +96,22 @@ async function MisComisionesLista() {
     .map((a) => comisiones.find((c) => c.id === a.comisionId))
     .filter((c): c is ComisionResponse => c !== undefined)
 
+  const horariosPorComision = new Map(
+    await Promise.all(
+      misComisiones.map(
+        async (comision) =>
+          [comision.id, (await fetchCore<HorarioClaseResponse>(`/horarios/comision/${comision.id}`)) ?? []] as const
+      )
+    )
+  )
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {misComisiones.map((comision) => {
         const materiaNombre = (materiasPlan ?? []).find((mp) => mp.id === comision.materiaPlanId)?.materiaNombre
         const periodoNombre = (periodos ?? []).find((p) => p.id === comision.periodoAcademicoId)?.nombre
         const cantidadAlumnos = (cursadas ?? []).filter((c) => c.comisionId === comision.id).length
+        const proximaClase = formatearProximaClase(horariosPorComision.get(comision.id) ?? [])
 
         return (
           <Link key={comision.id} href={`/dashboard/comisiones/${comision.id}`}>
@@ -83,6 +121,9 @@ async function MisComisionesLista() {
                 <CardDescription>
                   {periodoNombre ?? "—"} · {cantidadAlumnos} alumno{cantidadAlumnos === 1 ? "" : "s"}
                 </CardDescription>
+                {proximaClase && (
+                  <CardDescription className="text-foreground">Próxima clase: {proximaClase}</CardDescription>
+                )}
               </CardHeader>
             </Card>
           </Link>

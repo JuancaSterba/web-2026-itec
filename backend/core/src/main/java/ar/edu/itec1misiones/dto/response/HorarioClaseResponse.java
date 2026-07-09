@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -17,4 +18,5 @@ public class HorarioClaseResponse {
     private Long comisionId;
     private String materiaNombre;
     private List<ModuloHorarioResponse> modulos;
+    private LocalDate proximaFecha;
 }

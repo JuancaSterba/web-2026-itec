@@ -55,7 +55,7 @@ public class HorarioClaseController {
     }
 
     @GetMapping("/comision/{comisionId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar horarios de clase de una comisión")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getByComisionId(
             @PathVariable Long comisionId,
