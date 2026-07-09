@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -210,6 +211,20 @@ public class CoreExceptionHandler {
 
         ErrorDto error = new ErrorDto("ROL_YA_ASIGNADO", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiResponse<Object>> handleResponseStatus(
+            ResponseStatusException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("CONDICION_ERROR", ex.getReason());
+        return ResponseEntity.status(ex.getStatusCode()).body(
                 ApiResponse.builder()
                         .meta(MetaBuilderHelper.buildMeta(request))
                         .errors(List.of(error))
