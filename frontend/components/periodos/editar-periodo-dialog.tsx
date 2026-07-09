@@ -51,6 +51,7 @@ export default function EditarPeriodoDialog({ periodo, cicloId }: { periodo: Per
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
+            setOpen(true)
           }}
         >
           <Pencil className="size-4" />

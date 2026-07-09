@@ -51,6 +51,7 @@ export default function EditarPlanDialog({ plan, carreraId }: { plan: PlanEditab
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
+            setOpen(true)
           }}
         >
           <Pencil className="size-4" />
