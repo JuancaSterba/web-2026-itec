@@ -11,9 +11,11 @@ export async function createCarrera(formData: FormData) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
+  const cupoActual = formData.get("cupoActual")
   const payload = {
     nombre: formData.get("nombre"),
     resolucionMinisterial: formData.get("resolucionMinisterial"),
+    cupoActual: cupoActual ? Number(cupoActual) : null,
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/carreras`, {
@@ -36,9 +38,11 @@ export async function updateCarrera(id: number, formData: FormData) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
+  const cupoActual = formData.get("cupoActual")
   const payload = {
     nombre: formData.get("nombre"),
     resolucionMinisterial: formData.get("resolucionMinisterial"),
+    cupoActual: cupoActual ? Number(cupoActual) : null,
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/carreras/${id}`, {

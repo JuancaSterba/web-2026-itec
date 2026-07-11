@@ -10,4 +10,6 @@ public class CarreraRequest {
     private String nombre;
 
     private String resolucionMinisterial;
+
+    private Integer cupoActual;
 }

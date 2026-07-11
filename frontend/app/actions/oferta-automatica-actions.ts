@@ -14,6 +14,11 @@ interface PlanEstudioResponse {
   activo: boolean
 }
 
+interface CarreraResponse {
+  id: number
+  cupoActual: number | null
+}
+
 interface MateriaPlanResponse {
   id: number
   planEstudioId: number
@@ -62,23 +67,26 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
 
   // 2. Por cada carrera elegida, crear 1 Comisión por materia de su plan
   // activo: cuatrimestre curricular impar -> 1er período, par -> 2do período.
-  const [planesEstudio, materiasPlan] = await Promise.all([
+  const [planesEstudio, materiasPlan, carreras] = await Promise.all([
     fetchCore<PlanEstudioResponse>("/planes-estudio"),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
+    fetchCore<CarreraResponse>("/carreras"),
   ])
+  const cupoPorCarreraId = new Map((carreras ?? []).map((c) => [c.id, c.cupoActual]))
 
-  const comisionesACrear: { nombreComision: string; materiaPlanId: number; periodoAcademicoId: number }[] = []
+  const comisionesACrear: { nombreComision: string; materiaPlanId: number; periodoAcademicoId: number; cupoMaximo: number }[] = []
 
   for (const carreraId of carreraIds) {
     const plan = (planesEstudio ?? []).find((p) => p.carreraId === carreraId && p.activo)
     if (!plan) continue
 
+    const cupoMaximo = cupoPorCarreraId.get(carreraId) ?? CUPO_DEFAULT
     const materiasDelPlan = (materiasPlan ?? []).filter((mp) => mp.planEstudioId === plan.id)
     for (const mp of materiasDelPlan) {
       const esImpar = mp.cuatrimestreDictado % 2 !== 0
       const periodoAcademicoId = esImpar ? periodoIdParaImpar : periodoIdParaPar
       if (!periodoAcademicoId) continue
-      comisionesACrear.push({ nombreComision: mp.materiaNombre, materiaPlanId: mp.id, periodoAcademicoId })
+      comisionesACrear.push({ nombreComision: mp.materiaNombre, materiaPlanId: mp.id, periodoAcademicoId, cupoMaximo })
     }
   }
 
@@ -89,7 +97,7 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
         headers: authHeaders,
         body: JSON.stringify({
           nombreComision: item.nombreComision,
-          cupoMaximo: CUPO_DEFAULT,
+          cupoMaximo: item.cupoMaximo,
           materiaPlanId: item.materiaPlanId,
           periodoAcademicoId: item.periodoAcademicoId,
         }),

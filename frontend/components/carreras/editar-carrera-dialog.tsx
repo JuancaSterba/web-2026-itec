@@ -20,6 +20,7 @@ interface CarreraEditable {
   id: number
   nombre: string
   resolucionMinisterial: string
+  cupoActual: number | null
 }
 
 function BotonGuardar() {
@@ -72,6 +73,20 @@ export default function EditarCarreraDialog({ carrera }: { carrera: CarreraEdita
               name="resolucionMinisterial"
               defaultValue={carrera.resolucionMinisterial}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cupoActual">Cupo de Inscripción (1er año)</Label>
+            <Input
+              id="cupoActual"
+              name="cupoActual"
+              type="number"
+              min={1}
+              defaultValue={carrera.cupoActual ?? ""}
+              placeholder="Ej: 60"
+            />
+            <p className="text-xs text-muted-foreground">
+              Dato de referencia para generar la oferta académica y medir ocupación; no limita inscripciones.
+            </p>
           </div>
           <DialogFooter>
             <BotonGuardar />

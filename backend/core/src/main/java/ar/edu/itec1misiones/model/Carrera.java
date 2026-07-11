@@ -22,6 +22,12 @@ public class Carrera {
     private String nombre;
     private String resolucionMinisterial;
 
+    // Cupo de inscripcion de referencia (tipicamente el de 1er año). No es un
+    // limite duro: es un dato informativo usado para generar el cupoMaximo de
+    // las comisiones al ofertar automaticamente, y para metricas de ocupacion.
+    // Un solo valor por carrera, editable año a año; no se duplica por materia.
+    private Integer cupoActual;
+
     @Builder.Default
     private boolean activa = true;
 }
