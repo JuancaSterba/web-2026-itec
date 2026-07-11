@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface InscripcionCarreraRepository extends JpaRepository<InscripcionCarrera, Long> {
     boolean existsByAlumnoIdAndPlanEstudioId(Long alumnoId, Long planEstudioId);
+    boolean existsByAlumnoIdAndPlanEstudioCarreraIdAndEstadoNot(Long alumnoId, Long carreraId, String estado);
     List<InscripcionCarrera> findByAlumnoId(Long alumnoId);
 }

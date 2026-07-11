@@ -3,6 +3,7 @@ package ar.edu.itec1misiones.service.impl;
 import ar.edu.itec1misiones.dto.request.InscripcionCarreraRequest;
 import ar.edu.itec1misiones.dto.response.InscripcionCarreraResponse;
 import ar.edu.itec1misiones.exception.AlumnoNotFoundException;
+import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnCarreraException;
 import ar.edu.itec1misiones.exception.InscripcionCarreraNotFoundException;
 import ar.edu.itec1misiones.exception.PlanEstudioNotFoundException;
 import ar.edu.itec1misiones.model.Alumno;
@@ -23,6 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InscripcionCarreraServiceImpl implements InscripcionCarreraService {
 
+    private static final String ESTADO_BAJA = "BAJA";
+
     private final InscripcionCarreraRepository inscripcionCarreraRepository;
     private final AlumnoRepository alumnoRepository;
     private final PlanEstudioRepository planEstudioRepository;
@@ -33,6 +36,14 @@ public class InscripcionCarreraServiceImpl implements InscripcionCarreraService 
                 .orElseThrow(() -> new AlumnoNotFoundException(request.getAlumnoId()));
         PlanEstudio planEstudio = planEstudioRepository.findById(request.getPlanEstudioId())
                 .orElseThrow(() -> new PlanEstudioNotFoundException(request.getPlanEstudioId()));
+
+        // Regla de negocio: inscripción única por carrera (cualquier plan/ciclo).
+        // Las inscripciones en estado BAJA no bloquean, para permitir re-alta.
+        Long carreraId = planEstudio.getCarrera().getId();
+        if (inscripcionCarreraRepository.existsByAlumnoIdAndPlanEstudioCarreraIdAndEstadoNot(
+                alumno.getId(), carreraId, ESTADO_BAJA)) {
+            throw new AlumnoYaInscriptoEnCarreraException(alumno.getId(), planEstudio.getCarrera().getNombre());
+        }
 
         InscripcionCarrera inscripcion = new InscripcionCarrera();
         inscripcion.setAlumno(alumno);
@@ -73,7 +84,7 @@ public class InscripcionCarreraServiceImpl implements InscripcionCarreraService 
     public void darDeBaja(Long id) {
         InscripcionCarrera inscripcion = inscripcionCarreraRepository.findById(id)
                 .orElseThrow(() -> new InscripcionCarreraNotFoundException(id));
-        inscripcion.setEstado("BAJA");
+        inscripcion.setEstado(ESTADO_BAJA);
         inscripcionCarreraRepository.save(inscripcion);
     }
 
