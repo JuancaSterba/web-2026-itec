@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
 import { createComisionesMasivas } from "@/app/actions/comision-actions"
-import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
+import { anioYCuatrimestre, etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,11 +44,13 @@ export default function AgregarComisionesPorCarreraDialog({
   planesDisponibles,
   materiasPlan,
   materiaPlanIdsYaOfertados,
+  cuatrimestreDelAnioPeriodo,
 }: {
   periodoId: number
   planesDisponibles: PlanDisponible[]
   materiasPlan: MateriaPlanDisponible[]
   materiaPlanIdsYaOfertados: number[]
+  cuatrimestreDelAnioPeriodo: 1 | 2
 }) {
   const planPorDefecto = planesDisponibles.length > 0 ? String(planesDisponibles[0].id) : ""
 
@@ -63,8 +65,9 @@ export default function AgregarComisionesPorCarreraDialog({
     if (!planEstudioId) return []
     return materiasPlan
       .filter((mp) => String(mp.planEstudioId) === planEstudioId)
+      .filter((mp) => anioYCuatrimestre(mp.cuatrimestreDictado).cuatrimestreDelAnio === cuatrimestreDelAnioPeriodo)
       .sort((a, b) => a.cuatrimestreDictado - b.cuatrimestreDictado)
-  }, [materiasPlan, planEstudioId])
+  }, [materiasPlan, planEstudioId, cuatrimestreDelAnioPeriodo])
 
   function toggleMateria(id: number) {
     setSeleccionadas((prev) => {
@@ -134,9 +137,11 @@ export default function AgregarComisionesPorCarreraDialog({
 
           {planEstudioId && (
             <div className="space-y-2">
-              <Label>Materias del Plan (todos los cuatrimestres)</Label>
+              <Label>Materias del Plan que corresponden a este cuatrimestre</Label>
               {materiasDelPlan.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Esta carrera no tiene materias en su malla.</p>
+                <p className="text-sm text-muted-foreground">
+                  Esta carrera no tiene materias de su malla que correspondan a este cuatrimestre.
+                </p>
               ) : (
                 <div className="max-h-64 space-y-1 overflow-y-auto rounded-md border border-border p-2">
                   {materiasDelPlan.map((mp) => {

@@ -7,7 +7,7 @@ import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteComision } from "@/app/actions/comision-actions"
 import { Badge } from "@/components/ui/badge"
 import InscribirCuatrimestreDialog from "@/components/comisiones/inscribir-cuatrimestre-dialog"
-import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
+import { anioYCuatrimestre, etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
 
 interface ComisionResponse {
   id: number
@@ -62,6 +62,7 @@ interface CarreraResponse {
 interface PeriodoAcademicoResponse {
   id: number
   nombre: string
+  fechaInicio: string
 }
 
 export default async function OfertaAcademicaPage({
@@ -85,6 +86,8 @@ export default async function OfertaAcademicaPage({
 
   const carrera = carreras?.[0] ?? null
   const periodo = (periodos ?? []).find((p) => String(p.id) === periodoId) ?? null
+  const cuatrimestreDelAnioPeriodo: 1 | 2 =
+    periodo && new Date(periodo.fechaInicio).getMonth() + 1 <= 6 ? 1 : 2
 
   const materiaPlanPorId = new Map((materiasPlan ?? []).map((mp) => [mp.id, mp]))
   const materiaNombrePorId = new Map((materiasPlan ?? []).map((mp) => [mp.id, mp.materiaNombre]))
@@ -98,10 +101,16 @@ export default async function OfertaAcademicaPage({
       return String(plan?.carreraId) === carreraId
     }) ?? null
 
-  const materiasPlanDisponibles = (materiasPlan ?? []).map((mp) => ({
-    id: mp.id,
-    etiqueta: `${mp.materiaNombre} (${etiquetaCuatrimestre(mp.cuatrimestreDictado)})`,
-  }))
+  const planEstudioIdsDeLaCarrera = new Set(
+    (planesEstudio ?? []).filter((p) => String(p.carreraId) === carreraId).map((p) => p.id)
+  )
+
+  const materiasPlanDelPeriodo = (materiasPlan ?? [])
+    .filter((mp) => planEstudioIdsDeLaCarrera.has(mp.planEstudioId))
+    .filter((mp) => anioYCuatrimestre(mp.cuatrimestreDictado).cuatrimestreDelAnio === cuatrimestreDelAnioPeriodo)
+    .map((mp) => ({ id: mp.id, etiqueta: `${mp.materiaNombre} (${etiquetaCuatrimestre(mp.cuatrimestreDictado)})` }))
+    .sort((a, b) => a.etiqueta.localeCompare(b.etiqueta, "es"))
+
   const comisionesParaInscripcion = (comisionesDeLaCarrera ?? []).map((c) => ({
     id: c.id,
     etiqueta: `${c.nombreComision} - ${materiaNombrePorId.get(c.materiaPlanId) ?? "—"}`,
@@ -114,9 +123,6 @@ export default async function OfertaAcademicaPage({
   // Solo alumnos inscriptos (estado != BAJA) al plan de esta carrera, y que
   // no esten ya matriculados en TODAS las comisiones de esta carrera en
   // este período (si les falta al menos una, se muestran igual).
-  const planEstudioIdsDeLaCarrera = new Set(
-    (planesEstudio ?? []).filter((p) => String(p.carreraId) === carreraId).map((p) => p.id)
-  )
   const alumnoIdsInscriptosEnCarrera = new Set(
     (inscripcionesCarrera ?? [])
       .filter((i) => planEstudioIdsDeLaCarrera.has(i.planEstudioId) && i.estado !== "BAJA")
@@ -157,6 +163,7 @@ export default async function OfertaAcademicaPage({
             planesDisponibles={planesDeLaCarrera}
             materiasPlan={materiasPlan ?? []}
             materiaPlanIdsYaOfertados={materiaPlanIdsYaOfertados}
+            cuatrimestreDelAnioPeriodo={cuatrimestreDelAnioPeriodo}
           />
         </div>
       </div>
@@ -186,39 +193,50 @@ export default async function OfertaAcademicaPage({
                   const cuatB = materiaPlanPorId.get(b.materiaPlanId)?.cuatrimestreDictado ?? 0
                   return cuatA - cuatB
                 })
-                .map((comision) => (
-                  <TableRow key={comision.id}>
-                    <TableCell>
-                      <Link href={`/dashboard/comisiones/${comision.id}`} className="font-medium hover:underline">
-                        {comision.nombreComision}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{materiaNombrePorId.get(comision.materiaPlanId) ?? "—"}</TableCell>
-                    <TableCell>
-                      {(() => {
-                        const cuatrimestre = materiaPlanPorId.get(comision.materiaPlanId)?.cuatrimestreDictado
-                        return cuatrimestre ? etiquetaCuatrimestre(cuatrimestre) : "—"
-                      })()}
-                    </TableCell>
-                    <TableCell>{comision.cupoMaximo}</TableCell>
-                    <TableCell>
-                      <Badge variant={comision.activa ? "default" : "secondary"}>
-                        {comision.activa ? "Activa" : "Inactiva"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="flex justify-end gap-1">
-                      <EditarComisionDialog
-                        comision={comision}
-                        periodoId={Number(periodoId)}
-                        materiasPlanDisponibles={materiasPlanDisponibles}
-                      />
-                      <EliminarBoton
-                        accion={deleteComision.bind(null, comision.id)}
-                        entidadLabel={comision.nombreComision}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                .map((comision) => {
+                  const materiaActual = materiaPlanPorId.get(comision.materiaPlanId)
+                  const materiasParaEditar = materiasPlanDelPeriodo.some((m) => m.id === comision.materiaPlanId)
+                    ? materiasPlanDelPeriodo
+                    : [
+                        ...materiasPlanDelPeriodo,
+                        {
+                          id: comision.materiaPlanId,
+                          etiqueta: materiaActual
+                            ? `${materiaActual.materiaNombre} (${etiquetaCuatrimestre(materiaActual.cuatrimestreDictado)})`
+                            : "—",
+                        },
+                      ]
+                  return (
+                    <TableRow key={comision.id}>
+                      <TableCell>
+                        <Link href={`/dashboard/comisiones/${comision.id}`} className="font-medium hover:underline">
+                          {comision.nombreComision}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{materiaNombrePorId.get(comision.materiaPlanId) ?? "—"}</TableCell>
+                      <TableCell>
+                        {materiaActual ? etiquetaCuatrimestre(materiaActual.cuatrimestreDictado) : "—"}
+                      </TableCell>
+                      <TableCell>{comision.cupoMaximo}</TableCell>
+                      <TableCell>
+                        <Badge variant={comision.activa ? "default" : "secondary"}>
+                          {comision.activa ? "Activa" : "Inactiva"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="flex justify-end gap-1">
+                        <EditarComisionDialog
+                          comision={comision}
+                          periodoId={Number(periodoId)}
+                          materiasPlanDisponibles={materiasParaEditar}
+                        />
+                        <EliminarBoton
+                          accion={deleteComision.bind(null, comision.id)}
+                          entidadLabel={comision.nombreComision}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
             </TableBody>
           </Table>
         </div>
