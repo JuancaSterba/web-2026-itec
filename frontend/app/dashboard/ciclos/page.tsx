@@ -52,7 +52,7 @@ export default async function CiclosPage() {
               <Card className="h-full transition-colors hover:bg-accent">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-base">Ciclo Lectivo {ciclo.anio}</CardTitle>
-                  <div className="flex items-center gap-1" onClick={(e) => e.preventDefault()}>
+                  <div className="flex items-center gap-1">
                     <Badge variant={ciclo.activo ? "default" : "secondary"}>
                       {ciclo.activo ? "Activo" : "Inactivo"}
                     </Badge>
