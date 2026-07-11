@@ -218,6 +218,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AlumnoYaInscriptoEnCarreraException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAlumnoYaInscriptoEnCarrera(
+            AlumnoYaInscriptoEnCarreraException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("ALUMNO_YA_INSCRIPTO_CARRERA", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiResponse<Object>> handleResponseStatus(
             ResponseStatusException ex,
