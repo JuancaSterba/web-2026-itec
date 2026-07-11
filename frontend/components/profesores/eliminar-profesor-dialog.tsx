@@ -12,25 +12,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { eliminarProfesor, type Profesor } from "@/lib/services/profesores.service"
+import { deleteProfesor } from "@/app/actions/profesor-actions"
+import type { Profesor } from "@/lib/services/profesores.service"
 
 interface EliminarProfesorDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   profesor: Profesor | null
-  onSuccess: (id: number) => void
 }
 
-export function EliminarProfesorDialog({ open, onOpenChange, profesor, onSuccess }: EliminarProfesorDialogProps) {
+export function EliminarProfesorDialog({ open, onOpenChange, profesor }: EliminarProfesorDialogProps) {
   const [submitting, setSubmitting] = useState(false)
 
   const handleDelete = async () => {
     if (!profesor) return
     setSubmitting(true)
     try {
-      await eliminarProfesor(profesor.id)
+      await deleteProfesor(profesor.id)
       toast.success("Profesor eliminado correctamente")
-      onSuccess(profesor.id)
       onOpenChange(false)
     } catch (err: any) {
       toast.error(err?.message || "No se pudo eliminar el profesor")

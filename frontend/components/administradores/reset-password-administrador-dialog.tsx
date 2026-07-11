@@ -12,20 +12,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { resetPasswordAdministrador, type Administrador } from "@/lib/services/administradores.service"
+import { resetPasswordAdministrador } from "@/app/actions/administrador-actions"
+import type { Administrador } from "@/lib/services/administradores.service"
 
 interface ResetPasswordAdministradorDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   administrador: Administrador | null
-  onSuccess: (administrador: Administrador) => void
 }
 
 export function ResetPasswordAdministradorDialog({
   open,
   onOpenChange,
   administrador,
-  onSuccess,
 }: ResetPasswordAdministradorDialogProps) {
   const [submitting, setSubmitting] = useState(false)
 
@@ -33,11 +32,10 @@ export function ResetPasswordAdministradorDialog({
     if (!administrador) return
     setSubmitting(true)
     try {
-      const actualizado = await resetPasswordAdministrador(administrador.id)
+      await resetPasswordAdministrador(administrador.id)
       toast.success("Contraseña reseteada correctamente", {
         description: `Nueva contraseña: ${administrador.dni}`,
       })
-      onSuccess(actualizado)
       onOpenChange(false)
     } catch (err: any) {
       toast.error(err?.message || "No se pudo resetear la contraseña")

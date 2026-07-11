@@ -14,14 +14,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { actualizarProfesor, crearProfesor, type Profesor } from "@/lib/services/profesores.service"
-import { buscarPersonaPorDni, type PersonaResumen } from "@/lib/services/personas.service"
+import { createProfesor, updateProfesor } from "@/app/actions/profesor-actions"
+import { buscarPersonaPorDniAction, type PersonaResumen } from "@/app/actions/persona-actions"
+import type { Profesor } from "@/lib/services/profesores.service"
 
 interface ProfesorFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   profesor: Profesor | null
-  onSuccess: (profesor: Profesor) => void
 }
 
 const emptyForm = {
@@ -34,7 +34,7 @@ const emptyForm = {
   telefonoSecundario: "",
 }
 
-export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: ProfesorFormDialogProps) {
+export function ProfesorFormDialog({ open, onOpenChange, profesor }: ProfesorFormDialogProps) {
   const isEditing = !!profesor
   const [form, setForm] = useState(emptyForm)
   const [activo, setActivo] = useState(true)
@@ -67,7 +67,7 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
       setPersonaExistente(null)
       return
     }
-    const persona = await buscarPersonaPorDni(form.dni).catch(() => null)
+    const persona = await buscarPersonaPorDniAction(form.dni).catch(() => null)
     setPersonaExistente(persona)
     if (persona) {
       setForm((prev) => ({
@@ -133,24 +133,23 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor, onSuccess }: 
     setSubmitting(true)
     setError(null)
     try {
+      const formData = new FormData()
+      formData.append("nombre", form.nombre.trim())
+      formData.append("apellido", form.apellido.trim())
+      formData.append("dni", form.dni.trim())
+      formData.append("email", form.email.trim())
+      formData.append("telefono", form.telefono.trim())
+      formData.append("titulo", form.titulo.trim())
+      formData.append("telefonoSecundario", form.telefonoSecundario.trim())
+
       if (isEditing) {
-        const actualizado = await actualizarProfesor(profesor!.id, {
-          nombre: form.nombre.trim(),
-          apellido: form.apellido.trim(),
-          dni: form.dni.trim(),
-          email: form.email.trim(),
-          titulo: form.titulo.trim(),
-          telefonoSecundario: form.telefonoSecundario.trim(),
-          activo,
-        })
+        await updateProfesor(profesor!.id, formData, activo)
         toast.success("Profesor actualizado correctamente")
-        onSuccess(actualizado)
       } else {
-        const creado = await crearProfesor(form)
+        await createProfesor(formData)
         toast.success("Profesor creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
         })
-        onSuccess(creado)
       }
       onOpenChange(false)
     } catch (err: any) {

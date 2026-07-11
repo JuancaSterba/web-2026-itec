@@ -42,28 +42,4 @@ export interface ActualizarAlumnoInput {
   telefonoSecundario?: string
 }
 
-const BASE_PATH = "/api/core/alumnos"
 
-export async function listarAlumnos(): Promise<Alumno[]> {
-  const response = await apiClient.get<Alumno[]>(BASE_PATH)
-  return response.data
-}
-
-export async function buscarAlumnoPorDni(dni: string): Promise<Alumno> {
-  const response = await apiClient.get<Alumno[]>(`${BASE_PATH}/dni/${dni}`)
-  return response.data[0]
-}
-
-export async function crearAlumno(input: CrearAlumnoInput): Promise<Alumno> {
-  const response = await apiClient.post<Alumno[]>(BASE_PATH, input)
-  return response.data[0]
-}
-
-export async function actualizarAlumno(id: number, input: ActualizarAlumnoInput): Promise<Alumno> {
-  const response = await apiClient.put<Alumno[]>(`${BASE_PATH}/${id}`, input)
-  return response.data[0]
-}
-
-export async function eliminarAlumno(id: number): Promise<void> {
-  await apiClient.delete<string>(`${BASE_PATH}/${id}`)
-}

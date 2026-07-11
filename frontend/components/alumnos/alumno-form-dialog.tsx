@@ -14,14 +14,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { actualizarAlumno, crearAlumno, type Alumno } from "@/lib/services/alumnos.service"
-import { buscarPersonaPorDni, type PersonaResumen } from "@/lib/services/personas.service"
+import { createAlumno, updateAlumno } from "@/app/actions/alumno-actions"
+import { buscarPersonaPorDniAction, type PersonaResumen } from "@/app/actions/persona-actions"
+import type { Alumno } from "@/lib/services/alumnos.service"
 
 interface AlumnoFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   alumno: Alumno | null
-  onSuccess: (alumno: Alumno) => void
 }
 
 const emptyForm = {
@@ -33,7 +33,7 @@ const emptyForm = {
   telefonoSecundario: "",
 }
 
-export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: AlumnoFormDialogProps) {
+export function AlumnoFormDialog({ open, onOpenChange, alumno }: AlumnoFormDialogProps) {
   const isEditing = !!alumno
   const [form, setForm] = useState(emptyForm)
   const [activo, setActivo] = useState(true)
@@ -65,7 +65,7 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
       setPersonaExistente(null)
       return
     }
-    const persona = await buscarPersonaPorDni(form.dni).catch(() => null)
+    const persona = await buscarPersonaPorDniAction(form.dni).catch(() => null)
     setPersonaExistente(persona)
     if (persona) {
       setForm((prev) => ({
@@ -119,23 +119,22 @@ export function AlumnoFormDialog({ open, onOpenChange, alumno, onSuccess }: Alum
     setSubmitting(true)
     setError(null)
     try {
+      const formData = new FormData()
+      formData.append("nombre", form.nombre.trim())
+      formData.append("apellido", form.apellido.trim())
+      formData.append("dni", form.dni.trim())
+      formData.append("email", form.email.trim())
+      formData.append("telefono", form.telefono.trim())
+      formData.append("telefonoSecundario", form.telefonoSecundario.trim())
+      
       if (isEditing) {
-        const actualizado = await actualizarAlumno(alumno!.id, {
-          nombre: form.nombre.trim(),
-          apellido: form.apellido.trim(),
-          dni: form.dni.trim(),
-          email: form.email.trim(),
-          activo,
-          telefonoSecundario: form.telefonoSecundario.trim(),
-        })
+        await updateAlumno(alumno!.id, formData, activo)
         toast.success("Alumno actualizado correctamente")
-        onSuccess(actualizado)
       } else {
-        const creado = await crearAlumno(form)
+        await createAlumno(formData)
         toast.success("Alumno creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
         })
-        onSuccess(creado)
       }
       onOpenChange(false)
     } catch (err: any) {

@@ -40,27 +40,4 @@ export interface ActualizarAdministradorInput {
   enabled: boolean
 }
 
-const BASE_PATH = "/api/core/administradores"
 
-export async function listarAdministradores(): Promise<Administrador[]> {
-  const response = await apiClient.get<Administrador[]>(BASE_PATH)
-  return response.data
-}
-
-export async function crearAdministrador(input: CrearAdministradorInput): Promise<Administrador> {
-  const response = await apiClient.post<Administrador[]>(BASE_PATH, input)
-  return response.data[0]
-}
-
-export async function actualizarAdministrador(
-  id: number,
-  input: ActualizarAdministradorInput
-): Promise<Administrador> {
-  const response = await apiClient.put<Administrador[]>(`${BASE_PATH}/${id}`, input)
-  return response.data[0]
-}
-
-export async function resetPasswordAdministrador(id: number): Promise<Administrador> {
-  const response = await apiClient.post<Administrador[]>(`${BASE_PATH}/${id}/reset-password`)
-  return response.data[0]
-}

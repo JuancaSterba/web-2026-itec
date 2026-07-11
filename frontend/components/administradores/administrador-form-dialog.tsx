@@ -15,19 +15,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useAuth } from "@/hooks/use-auth"
-import {
-  actualizarAdministrador,
-  crearAdministrador,
-  type Administrador,
-  type RolAdministrador,
-} from "@/lib/services/administradores.service"
-import { buscarPersonaPorDni, type PersonaResumen } from "@/lib/services/personas.service"
+import { createAdministrador, updateAdministrador } from "@/app/actions/administrador-actions"
+import { buscarPersonaPorDniAction, type PersonaResumen } from "@/app/actions/persona-actions"
+import type { Administrador, RolAdministrador } from "@/lib/services/administradores.service"
 
 interface AdministradorFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   administrador: Administrador | null
-  onSuccess: (administrador: Administrador) => void
 }
 
 const emptyForm = {
@@ -43,7 +38,6 @@ export function AdministradorFormDialog({
   open,
   onOpenChange,
   administrador,
-  onSuccess,
 }: AdministradorFormDialogProps) {
   const { user } = useAuth()
   const isEditing = !!administrador
@@ -87,7 +81,7 @@ export function AdministradorFormDialog({
       setPersonaExistente(null)
       return
     }
-    const persona = await buscarPersonaPorDni(form.dni).catch(() => null)
+    const persona = await buscarPersonaPorDniAction(form.dni).catch(() => null)
     setPersonaExistente(persona)
     if (persona) {
       setForm((prev) => ({
@@ -123,31 +117,22 @@ export function AdministradorFormDialog({
     setSubmitting(true)
     setError(null)
     try {
+      const formData = new FormData()
+      formData.append("nombre", form.nombre.trim())
+      formData.append("apellido", form.apellido.trim())
+      formData.append("dni", form.dni.trim())
+      formData.append("email", form.email.trim())
+      formData.append("telefono", form.telefono.trim())
+      form.roles.forEach((rol) => formData.append("roles", rol))
+
       if (isEditing) {
-        const actualizado = await actualizarAdministrador(administrador!.id, {
-          dni: form.dni.trim(),
-          nombre: form.nombre.trim(),
-          apellido: form.apellido.trim(),
-          email: form.email.trim(),
-          telefono: form.telefono.trim(),
-          roles: form.roles,
-          enabled,
-        })
+        await updateAdministrador(administrador!.id, formData, enabled)
         toast.success("Administrador actualizado correctamente")
-        onSuccess(actualizado)
       } else {
-        const creado = await crearAdministrador({
-          nombre: form.nombre.trim(),
-          apellido: form.apellido.trim(),
-          dni: form.dni.trim(),
-          email: form.email.trim(),
-          telefono: form.telefono.trim(),
-          roles: form.roles,
-        })
+        await createAdministrador(formData)
         toast.success("Administrador creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
         })
-        onSuccess(creado)
       }
       onOpenChange(false)
     } catch (err: any) {

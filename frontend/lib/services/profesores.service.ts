@@ -43,23 +43,4 @@ export interface ActualizarProfesorInput {
   activo: boolean
 }
 
-const BASE_PATH = "/api/core/profesores"
 
-export async function listarProfesores(): Promise<Profesor[]> {
-  const response = await apiClient.get<Profesor[]>(BASE_PATH)
-  return response.data
-}
-
-export async function crearProfesor(input: CrearProfesorInput): Promise<Profesor> {
-  const response = await apiClient.post<Profesor[]>(BASE_PATH, input)
-  return response.data[0]
-}
-
-export async function actualizarProfesor(id: number, input: ActualizarProfesorInput): Promise<Profesor> {
-  const response = await apiClient.put<Profesor[]>(`${BASE_PATH}/${id}`, input)
-  return response.data[0]
-}
-
-export async function eliminarProfesor(id: number): Promise<void> {
-  await apiClient.delete<string>(`${BASE_PATH}/${id}`)
-}
