@@ -28,7 +28,8 @@ export async function createInscripcionCarrera(formData: FormData) {
   })
 
   if (!response.ok) {
-    throw new Error("No se pudo inscribir al alumno en la carrera")
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo inscribir al alumno en la carrera")
   }
 
   revalidatePath("/dashboard/carreras/[id]", "page")
@@ -81,7 +82,8 @@ export async function crearAlumnoEInscribir(formData: FormData) {
   })
 
   if (!respuestaInscripcion.ok) {
-    throw new Error("El alumno se creó, pero no se pudo inscribir en la carrera")
+    const body = await respuestaInscripcion.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "El alumno se creó, pero no se pudo inscribir en la carrera")
   }
 
   revalidatePath("/dashboard/carreras/[id]", "page")
