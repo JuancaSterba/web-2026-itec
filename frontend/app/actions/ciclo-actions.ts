@@ -30,7 +30,11 @@ export async function createCiclo(formData: FormData) {
     throw new Error("No se pudo crear el ciclo lectivo")
   }
 
+  const json = await response.json()
+  const creado = json?.data?.[0]
+
   revalidatePath("/dashboard/ciclos")
+  return { id: creado?.id as number, anio: (creado?.anio ?? payload.anio) as number }
 }
 
 export async function updateCiclo(id: number, formData: FormData) {
