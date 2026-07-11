@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
+import { toast } from "sonner"
 import { UserPlus } from "lucide-react"
 import { createInscripcionCarrera, crearAlumnoEInscribir } from "@/app/actions/inscripcion-carrera-actions"
 import { Button } from "@/components/ui/button"
@@ -52,14 +53,19 @@ export default function InscribirAlumnoDialog({
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(formData: FormData) {
-    if (modo === "existente") {
-      await createInscripcionCarrera(formData)
-    } else {
-      await crearAlumnoEInscribir(formData)
+    try {
+      if (modo === "existente") {
+        await createInscripcionCarrera(formData)
+      } else {
+        await crearAlumnoEInscribir(formData)
+      }
+      formRef.current?.reset()
+      setOpen(false)
+      setModo("existente")
+      toast.success("Alumno inscripto en la carrera correctamente")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo inscribir al alumno en la carrera")
     }
-    formRef.current?.reset()
-    setOpen(false)
-    setModo("existente")
   }
 
   return (
