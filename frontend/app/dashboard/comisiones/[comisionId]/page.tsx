@@ -221,7 +221,10 @@ export default async function ComisionDetallePage({
         <TabsContent value="alumnos" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
           {esAdmin && (
             <div className="flex justify-end">
-              <AgregarAlumnoDialog comisionId={Number(comisionId)} alumnosDisponibles={alumnos ?? []} />
+              <AgregarAlumnoDialog 
+                comisionId={Number(comisionId)} 
+                alumnosDisponibles={(alumnos ?? []).filter(a => !(cursadasDeLaComision ?? []).some(c => c.alumnoId === a.id))} 
+              />
             </div>
           )}
           {cursadasDeLaComision === null ? (

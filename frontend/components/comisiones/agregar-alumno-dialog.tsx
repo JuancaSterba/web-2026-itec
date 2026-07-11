@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 import { createCursada } from "@/app/actions/cursada-actions"
 import { Button } from "@/components/ui/button"
 import {
@@ -46,8 +47,9 @@ export default function AgregarAlumnoDialog({
       await createCursada(formData, comisionId)
       formRef.current?.reset()
       setOpen(false)
+      toast.success("Alumno matriculado correctamente")
     } catch (error) {
-      alert(error instanceof Error ? error.message : "No se pudo matricular al alumno")
+      toast.error(error instanceof Error ? error.message : "No se pudo matricular al alumno")
     }
   }
 

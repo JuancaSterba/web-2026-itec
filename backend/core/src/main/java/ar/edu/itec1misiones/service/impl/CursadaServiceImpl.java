@@ -3,6 +3,7 @@ package ar.edu.itec1misiones.service.impl;
 import ar.edu.itec1misiones.dto.request.CursadaRequest;
 import ar.edu.itec1misiones.dto.response.CursadaResponse;
 import ar.edu.itec1misiones.exception.AlumnoNotFoundException;
+import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnComisionException;
 import ar.edu.itec1misiones.exception.ComisionNotFoundException;
 import ar.edu.itec1misiones.exception.CursadaNotFoundException;
 import ar.edu.itec1misiones.model.Alumno;
@@ -37,6 +38,10 @@ public class CursadaServiceImpl implements CursadaService {
                 .orElseThrow(() -> new ComisionNotFoundException(request.getComisionId()));
 
         validarCorrelativas(alumno.getId(), comision);
+
+        if (cursadaRepository.existsByAlumnoIdAndComisionId(alumno.getId(), comision.getId())) {
+            throw new AlumnoYaInscriptoEnComisionException(alumno.getId(), comision.getId());
+        }
 
         Cursada cursada = new Cursada();
         cursada.setAlumno(alumno);

@@ -232,6 +232,20 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AlumnoYaInscriptoEnComisionException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAlumnoYaInscriptoEnComision(
+            AlumnoYaInscriptoEnComisionException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("ALUMNO_YA_INSCRIPTO_COMISION", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiResponse<Object>> handleResponseStatus(
             ResponseStatusException ex,
