@@ -14,4 +14,6 @@ public class CicloLectivoRequest {
     private LocalDate fechaInicio;
 
     private LocalDate fechaFin;
+
+    private Boolean activo;
 }

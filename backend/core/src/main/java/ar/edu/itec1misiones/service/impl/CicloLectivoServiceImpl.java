@@ -53,6 +53,10 @@ public class CicloLectivoServiceImpl implements CicloLectivoService {
         ciclo.setAnio(request.getAnio());
         ciclo.setFechaInicio(request.getFechaInicio());
         ciclo.setFechaFin(request.getFechaFin());
+        
+        if (request.getActivo() != null) {
+            ciclo.setActivo(request.getActivo());
+        }
 
         return toResponse(cicloLectivoRepository.save(ciclo));
     }

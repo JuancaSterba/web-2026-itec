@@ -45,6 +45,7 @@ export async function updateCiclo(id: number, formData: FormData) {
     anio: Number(formData.get("anio")),
     fechaInicio: formData.get("fechaInicio"),
     fechaFin: formData.get("fechaFin"),
+    activo: formData.get("activo") === "on",
   }
 
   const response = await fetch(`${getApiBaseUrl()}/api/core/ciclos-lectivos/${id}`, {

@@ -15,12 +15,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Switch } from "@/components/ui/switch"
 
 interface CicloEditable {
   id: number
   anio: number
   fechaInicio: string
   fechaFin: string
+  activo: boolean
 }
 
 function BotonGuardar() {
@@ -73,6 +75,10 @@ export default function EditarCicloDialog({ ciclo }: { ciclo: CicloEditable }) {
           <div className="space-y-2">
             <Label htmlFor="fechaFin">Fecha de Fin</Label>
             <Input id="fechaFin" name="fechaFin" type="date" defaultValue={ciclo.fechaFin} />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch id="activo" name="activo" defaultChecked={ciclo.activo} />
+            <Label htmlFor="activo">Ciclo Activo</Label>
           </div>
           <DialogFooter>
             <BotonGuardar />
