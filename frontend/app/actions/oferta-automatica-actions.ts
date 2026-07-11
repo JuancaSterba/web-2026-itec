@@ -26,6 +26,12 @@ interface MateriaPlanResponse {
   cuatrimestreDictado: number
 }
 
+interface PeriodoAcademicoResponse {
+  id: number
+  nombre: string
+  cicloLectivoId: number
+}
+
 const CUPO_DEFAULT = 30
 
 export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: number, carreraIds: number[]) {
@@ -36,7 +42,11 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
     ...(token && { Authorization: `Bearer ${token}` }),
   }
 
-  // 1. Crear los 2 períodos institucionales del año.
+  // 1. Crear los 2 períodos institucionales del año (reusando los que ya
+  // existan para este ciclo con el mismo nombre, para no duplicarlos).
+  const periodosExistentes = (await fetchCore<PeriodoAcademicoResponse>("/periodos-academicos")) ?? []
+  const periodosDelCiclo = periodosExistentes.filter((p) => p.cicloLectivoId === cicloId)
+
   const periodosACrear = [
     { nombre: `1er Cuatrimestre ${anio}`, fechaInicio: `${anio}-03-01`, fechaFin: `${anio}-07-15`, paridad: 1 },
     { nombre: `2do Cuatrimestre ${anio}`, fechaInicio: `${anio}-08-01`, fechaFin: `${anio}-12-15`, paridad: 0 },
@@ -44,6 +54,10 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
 
   const periodosCreados = await Promise.all(
     periodosACrear.map(async (periodo) => {
+      const existente = periodosDelCiclo.find((p) => p.nombre === periodo.nombre)
+      if (existente) {
+        return { id: existente.id, paridad: periodo.paridad }
+      }
       const response = await fetch(`${getApiBaseUrl()}/api/core/periodos-academicos`, {
         method: "POST",
         headers: authHeaders,
