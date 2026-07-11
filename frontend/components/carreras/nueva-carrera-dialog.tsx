@@ -56,6 +56,13 @@ export default function NuevaCarreraDialog() {
             <Label htmlFor="resolucionMinisterial">Resolución Ministerial</Label>
             <Input id="resolucionMinisterial" name="resolucionMinisterial" />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="cupoActual">Cupo de Inscripción (1er año)</Label>
+            <Input id="cupoActual" name="cupoActual" type="number" min={1} placeholder="Ej: 60" />
+            <p className="text-xs text-muted-foreground">
+              Dato de referencia para generar la oferta académica y medir ocupación; no limita inscripciones.
+            </p>
+          </div>
           <DialogFooter>
             <BotonGuardar />
           </DialogFooter>

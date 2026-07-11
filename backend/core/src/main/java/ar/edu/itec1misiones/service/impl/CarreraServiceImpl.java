@@ -24,6 +24,7 @@ public class CarreraServiceImpl implements CarreraService {
         Carrera carrera = new Carrera();
         carrera.setNombre(request.getNombre());
         carrera.setResolucionMinisterial(request.getResolucionMinisterial());
+        carrera.setCupoActual(request.getCupoActual());
         carrera.setActiva(true);
         return toResponse(carreraRepository.save(carrera));
     }
@@ -47,6 +48,7 @@ public class CarreraServiceImpl implements CarreraService {
                 .orElseThrow(() -> new CarreraNotFoundException(id));
         carrera.setNombre(request.getNombre());
         carrera.setResolucionMinisterial(request.getResolucionMinisterial());
+        carrera.setCupoActual(request.getCupoActual());
         return toResponse(carreraRepository.save(carrera));
     }
 
@@ -63,6 +65,7 @@ public class CarreraServiceImpl implements CarreraService {
                 .id(carrera.getId())
                 .nombre(carrera.getNombre())
                 .resolucionMinisterial(carrera.getResolucionMinisterial())
+                .cupoActual(carrera.getCupoActual())
                 .activa(carrera.isActiva())
                 .build();
     }

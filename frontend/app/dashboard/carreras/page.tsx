@@ -10,6 +10,7 @@ interface CarreraResponse {
   id: number
   nombre: string
   resolucionMinisterial: string
+  cupoActual: number | null
   activa: boolean
 }
 
@@ -38,7 +39,10 @@ export default async function CarrerasPage() {
                 <CardHeader className="flex flex-row items-start justify-between space-y-0">
                   <div>
                     <CardTitle className="text-base">{carrera.nombre}</CardTitle>
-                    <CardDescription>Resolución {carrera.resolucionMinisterial}</CardDescription>
+                    <CardDescription>
+                      Resolución {carrera.resolucionMinisterial}
+                      {carrera.cupoActual != null ? ` · Cupo ${carrera.cupoActual}` : ""}
+                    </CardDescription>
                   </div>
                   <div className="flex gap-1">
                     <EditarCarreraDialog carrera={carrera} />
