@@ -15,8 +15,16 @@ interface CicloLectivoResponse {
   activo: boolean
 }
 
+interface CarreraResponse {
+  id: number
+  nombre: string
+}
+
 export default async function CiclosPage() {
-  const ciclos = await fetchCore<CicloLectivoResponse>("/ciclos-lectivos")
+  const [ciclos, carreras] = await Promise.all([
+    fetchCore<CicloLectivoResponse>("/ciclos-lectivos"),
+    fetchCore<CarreraResponse>("/carreras"),
+  ])
 
   return (
     <div className="space-y-6">
@@ -25,7 +33,7 @@ export default async function CiclosPage() {
           <h1 className="font-display text-3xl font-semibold text-foreground">Ciclos Lectivos</h1>
           <p className="text-sm text-muted-foreground">Seleccioná un ciclo para ver sus períodos académicos</p>
         </div>
-        <NuevoCicloDialog />
+        <NuevoCicloDialog carrerasDisponibles={(carreras ?? []).map((c) => ({ id: c.id, nombre: c.nombre }))} />
       </div>
 
       {ciclos === null ? (
