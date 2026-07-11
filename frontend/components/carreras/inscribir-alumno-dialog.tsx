@@ -53,19 +53,20 @@ export default function InscribirAlumnoDialog({
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(formData: FormData) {
-    try {
-      if (modo === "existente") {
-        await createInscripcionCarrera(formData)
-      } else {
-        await crearAlumnoEInscribir(formData)
-      }
-      formRef.current?.reset()
-      setOpen(false)
-      setModo("existente")
-      toast.success("Alumno inscripto en la carrera correctamente")
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo inscribir al alumno en la carrera")
+    const resultado =
+      modo === "existente"
+        ? await createInscripcionCarrera(formData)
+        : await crearAlumnoEInscribir(formData)
+
+    if (!resultado.ok) {
+      toast.error("error" in resultado ? resultado.error : "Ocurrió un error");
+      return
     }
+
+    formRef.current?.reset()
+    setOpen(false)
+    setModo("existente")
+    toast.success("Alumno inscripto en la carrera correctamente")
   }
 
   return (

@@ -63,6 +63,13 @@ export default async function CarreraDetallePage({
   const inscripcionesDeLaCarrera = inscripciones?.filter((i) => planIds.has(i.planEstudioId)) ?? null
   const alumnoPorId = new Map((alumnos ?? []).map((a) => [a.id, a]))
 
+  // Inscripción única por carrera: los alumnos con inscripción vigente
+  // (estado distinto de BAJA) no se ofrecen de nuevo en el dialog.
+  const alumnosYaInscriptos = new Set(
+    (inscripcionesDeLaCarrera ?? []).filter((i) => i.estado !== "BAJA").map((i) => i.alumnoId)
+  )
+  const alumnosInscribibles = (alumnos ?? []).filter((a) => !alumnosYaInscriptos.has(a.id))
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -75,7 +82,7 @@ export default async function CarreraDetallePage({
           </p>
         </div>
         <div className="flex gap-2">
-          <InscribirAlumnoDialog planesDisponibles={planesParaInscripcion} alumnosDisponibles={alumnos ?? []} />
+          <InscribirAlumnoDialog planesDisponibles={planesParaInscripcion} alumnosDisponibles={alumnosInscribibles} />
           <NuevoPlanDialog carreraId={Number(id)} />
         </div>
       </div>
