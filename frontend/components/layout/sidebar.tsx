@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Calendar,
   ClipboardList,
+  ClipboardCheck,
   ChevronLeft,
   ChevronRight,
   BookOpen,
@@ -40,6 +41,7 @@ export const navigation = [
     group: "Gestión Académica",
     items: [
       { name: "Ciclos Lectivos", href: "/dashboard/ciclos", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
+      { name: "Mesas de Examen", href: "/dashboard/mesas-examen", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO"] },
       { name: "Mis Clases", href: "/dashboard/mis-comisiones", icon: ClipboardList, roles: ["PROFESOR"] },
     ],
   },

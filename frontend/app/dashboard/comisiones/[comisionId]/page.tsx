@@ -58,7 +58,6 @@ interface CalificacionParcialResponse {
   instancia: string
   nota: number
   fecha: string
-  tipo: string
 }
 
 interface AsistenciaResponse {
@@ -163,9 +162,7 @@ export default async function ComisionDetallePage({
     })
   }
 
-  const calificacionesParciales = Array.from(calificacionesPorCursada?.values() ?? [])
-    .flat()
-    .filter((c) => c.tipo === "PARCIAL")
+  const calificacionesParciales = Array.from(calificacionesPorCursada?.values() ?? []).flat()
 
   const instancias = Array.from(new Set(calificacionesParciales.map((c) => c.instancia))).sort()
   const yaHayTresParciales = instancias.length >= 3
@@ -380,7 +377,7 @@ export default async function ComisionDetallePage({
                 {cursadasDeLaComision.map((cursada) => {
                   const alumno = alumnoPorId.get(cursada.alumnoId)
                   const calificaciones = calificacionesPorCursada!.get(cursada.id) ?? []
-                  const parcialesDeLaCursada = calificaciones.filter((c) => c.tipo === "PARCIAL")
+                  const parcialesDeLaCursada = calificaciones
                   const promedio =
                     parcialesDeLaCursada.length === 3
                       ? parcialesDeLaCursada.reduce((suma, c) => suma + c.nota, 0) / 3
@@ -396,7 +393,6 @@ export default async function ComisionDetallePage({
                               cursadaId={cursada.id}
                               comisionId={Number(comisionId)}
                               instancia={instancia}
-                              tipo="PARCIAL"
                               initialNota={calificacion?.nota ?? null}
                               calificacionId={calificacion?.id}
                             />
