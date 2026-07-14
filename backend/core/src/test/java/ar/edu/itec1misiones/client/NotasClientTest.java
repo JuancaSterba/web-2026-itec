@@ -22,7 +22,7 @@ class NotasClientTest {
         MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
 
         String body = """
-                {"data":[{"id":1,"cursadaId":5,"comisionId":9,"instancia":"Primer Parcial","nota":8.0,"fecha":"2026-06-01","tipo":"PARCIAL"}],"errors":[]}
+                {"data":[{"id":1,"cursadaId":5,"comisionId":9,"instancia":"Primer Parcial","nota":8.0,"fecha":"2026-06-01"}],"errors":[]}
                 """;
 
         server.expect(requestTo("http://localhost:8084/api/calificaciones-parciales?cursadaId=5"))
@@ -34,7 +34,7 @@ class NotasClientTest {
         List<CalificacionParcialDto> resultado = client.obtenerPorCursada(5L);
 
         assertEquals(1, resultado.size());
-        assertEquals("PARCIAL", resultado.get(0).getTipo());
+        assertEquals("Primer Parcial", resultado.get(0).getInstancia());
         server.verify();
     }
 }

@@ -28,11 +28,9 @@ public class CondicionCursadaService {
         Cursada cursada = cursadaRepository.findById(cursadaId)
                 .orElseThrow(() -> new CursadaNotFoundException(cursadaId));
 
-        List<CalificacionParcialDto> notas = notasClient.obtenerPorCursada(cursadaId);
-
-        List<CalificacionParcialDto> parciales = notas.stream()
-                .filter(n -> "PARCIAL".equals(n.getTipo()))
-                .toList();
+        // ms-notas solo almacena parciales de cursada; los finales viven en
+        // CalificacionMesa, atados a una MesaExamen.
+        List<CalificacionParcialDto> parciales = notasClient.obtenerPorCursada(cursadaId);
 
         if (parciales.size() != 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,

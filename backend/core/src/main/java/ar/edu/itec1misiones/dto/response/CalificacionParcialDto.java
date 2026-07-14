@@ -18,5 +18,4 @@ public class CalificacionParcialDto {
     private String instancia;
     private Double nota;
     private LocalDate fecha;
-    private String tipo;
 }
