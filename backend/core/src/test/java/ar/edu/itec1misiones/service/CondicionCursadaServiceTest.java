@@ -111,11 +111,24 @@ class CondicionCursadaServiceTest {
     }
 
     @Test
-    void notaFinalNoAplicaSiLaBaseEsLibre() {
+    void libreConFinalAprobadoPasaAAprobada() {
         when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
         when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
                 parcial(1.0), parcial(2.0), parcial(1.0),
                 finalDto(9.0, LocalDate.now())));
+
+        CondicionPreviewResponse resultado = service.calcular(100L);
+
+        assertEquals(CondicionFinal.APROBADA, resultado.getCondicionFinal());
+        assertEquals(9.0, resultado.getNotaCierre());
+    }
+
+    @Test
+    void libreConFinalReprobadoSigueLibre() {
+        when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
+        when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
+                parcial(1.0), parcial(2.0), parcial(1.0),
+                finalDto(3.0, LocalDate.now())));
 
         CondicionPreviewResponse resultado = service.calcular(100L);
 

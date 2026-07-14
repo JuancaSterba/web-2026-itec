@@ -56,7 +56,8 @@ public class CondicionCursadaService {
             condicion = CondicionFinal.REGULAR;
         }
 
-        if (condicion == CondicionFinal.REGULAR) {
+        // REGULAR rinde final regular; LIBRE rinde examen libre (todas las materias lo permiten)
+        if (condicion == CondicionFinal.REGULAR || condicion == CondicionFinal.LIBRE) {
             List<CalificacionParcialDto> finales = notas.stream()
                     .filter(n -> "FINAL".equals(n.getTipo()))
                     .sorted(Comparator.comparing(CalificacionParcialDto::getFecha))
