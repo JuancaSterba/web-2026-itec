@@ -86,67 +86,16 @@ class CondicionCursadaServiceTest {
     }
 
     @Test
-    void notaFinalAprobadaSubeARegularAAprobada() {
+    void notasDeTipoFinalSonIgnoradasEnLaCursada() {
         when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
         when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
                 parcial(5.0), parcial(5.0), parcial(5.0),
-                finalDto(7.0, LocalDate.now())));
-
-        CondicionPreviewResponse resultado = service.calcular(100L);
-
-        assertEquals(CondicionFinal.APROBADA, resultado.getCondicionFinal());
-        assertEquals(7.0, resultado.getNotaCierre());
-    }
-
-    @Test
-    void notaFinalReprobadaMantieneRegular() {
-        when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
-        when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
-                parcial(5.0), parcial(5.0), parcial(5.0),
-                finalDto(2.0, LocalDate.now())));
-
-        CondicionPreviewResponse resultado = service.calcular(100L);
-
-        assertEquals(CondicionFinal.REGULAR, resultado.getCondicionFinal());
-    }
-
-    @Test
-    void libreConFinalAprobadoPasaAAprobada() {
-        when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
-        when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
-                parcial(1.0), parcial(2.0), parcial(1.0),
                 finalDto(9.0, LocalDate.now())));
 
         CondicionPreviewResponse resultado = service.calcular(100L);
 
-        assertEquals(CondicionFinal.APROBADA, resultado.getCondicionFinal());
-        assertEquals(9.0, resultado.getNotaCierre());
-    }
-
-    @Test
-    void libreConFinalReprobadoSigueLibre() {
-        when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
-        when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
-                parcial(1.0), parcial(2.0), parcial(1.0),
-                finalDto(3.0, LocalDate.now())));
-
-        CondicionPreviewResponse resultado = service.calcular(100L);
-
-        assertEquals(CondicionFinal.LIBRE, resultado.getCondicionFinal());
-    }
-
-    @Test
-    void seUsaLaFinalMasRecienteSiHayVarias() {
-        when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cursadaCon(ModalidadEvaluacion.FINAL)));
-        when(notasClient.obtenerPorCursada(100L)).thenReturn(List.of(
-                parcial(5.0), parcial(5.0), parcial(5.0),
-                finalDto(2.0, LocalDate.now().minusDays(30)),
-                finalDto(8.0, LocalDate.now())));
-
-        CondicionPreviewResponse resultado = service.calcular(100L);
-
-        assertEquals(CondicionFinal.APROBADA, resultado.getCondicionFinal());
-        assertEquals(8.0, resultado.getNotaCierre());
+        assertEquals(CondicionFinal.REGULAR, resultado.getCondicionFinal());
+        assertEquals(5.0, resultado.getNotaCierre());
     }
 
     @Test
