@@ -42,7 +42,7 @@ public class PeriodoAcademicoController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todos los periodos académicos")
     public ResponseEntity<ApiResponse<PeriodoAcademicoResponse>> buscarTodos(HttpServletRequest httpRequest) {
         List<PeriodoAcademicoResponse> periodos = periodoAcademicoService.buscarTodos();
@@ -55,7 +55,7 @@ public class PeriodoAcademicoController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener un periodo académico por ID")
     public ResponseEntity<ApiResponse<PeriodoAcademicoResponse>> buscarPorId(
             @PathVariable Long id,
