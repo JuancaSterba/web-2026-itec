@@ -12,7 +12,6 @@ export async function saveCalificacion(
   comisionId: number,
   instancia: string,
   nota: number,
-  tipo: "PARCIAL" | "FINAL",
   calificacionId?: number
 ) {
   const cookieStore = await cookies()
@@ -23,7 +22,6 @@ export async function saveCalificacion(
     comisionId,
     instancia,
     nota,
-    tipo,
     fecha: new Date().toISOString().split("T")[0],
   }
 
@@ -71,7 +69,6 @@ export async function saveCalificacionesMasivas(
           instancia,
           nota: registro.nota,
           fecha,
-          tipo: "PARCIAL",
         }),
       })
     )

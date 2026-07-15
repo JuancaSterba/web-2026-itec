@@ -1,6 +1,5 @@
 package ar.edu.itec1misiones.notas.dto;
 
-import ar.edu.itec1misiones.notas.model.TipoInstancia;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,7 +23,4 @@ public class CalificacionParcialRequest {
 
     @NotNull(message = "La fecha es obligatoria")
     private LocalDate fecha;
-
-    @NotNull(message = "El tipo de instancia es obligatorio")
-    private TipoInstancia tipo;
 }

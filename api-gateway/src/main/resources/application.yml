@@ -51,7 +51,7 @@ spring:
         - id: notas-api
           uri: ${NOTAS_API_URL:http://localhost:8084}
           predicates:
-            - Path=/api/calificaciones-parciales/**
+            - Path=/api/calificaciones-parciales/**,/api/notas/**
           filters:
             - JwtAuth
 

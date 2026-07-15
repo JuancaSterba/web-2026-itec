@@ -1,7 +1,6 @@
 package ar.edu.itec1misiones.notas.repository;
 
 import ar.edu.itec1misiones.notas.model.CalificacionParcial;
-import ar.edu.itec1misiones.notas.model.TipoInstancia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,5 +12,5 @@ public interface CalificacionParcialRepository extends JpaRepository<Calificacio
     @Query("SELECT c FROM CalificacionParcial c WHERE (:cursadaId IS NULL OR c.cursadaId = :cursadaId)")
     List<CalificacionParcial> buscarPorFiltros(@Param("cursadaId") Long cursadaId);
 
-    long countByCursadaIdAndTipo(Long cursadaId, TipoInstancia tipo);
+    long countByCursadaId(Long cursadaId);
 }

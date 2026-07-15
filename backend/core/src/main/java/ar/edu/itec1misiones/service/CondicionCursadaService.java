@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -29,11 +28,9 @@ public class CondicionCursadaService {
         Cursada cursada = cursadaRepository.findById(cursadaId)
                 .orElseThrow(() -> new CursadaNotFoundException(cursadaId));
 
-        List<CalificacionParcialDto> notas = notasClient.obtenerPorCursada(cursadaId);
-
-        List<CalificacionParcialDto> parciales = notas.stream()
-                .filter(n -> "PARCIAL".equals(n.getTipo()))
-                .toList();
+        // ms-notas solo almacena parciales de cursada; los finales viven en
+        // CalificacionMesa, atados a una MesaExamen.
+        List<CalificacionParcialDto> parciales = notasClient.obtenerPorCursada(cursadaId);
 
         if (parciales.size() != 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -43,8 +40,9 @@ public class CondicionCursadaService {
         double promedio = parciales.stream().mapToDouble(CalificacionParcialDto::getNota).average().orElse(0);
         ModalidadEvaluacion modalidad = cursada.getComision().getMateriaPlan().getModalidadEvaluacion();
 
+        // La cursada solo determina la condicion base; la aprobacion de la materia
+        // se resuelve en las Mesas de Examen (instancias independientes).
         CondicionFinal condicion;
-        double notaCierre = promedio;
 
         if (promedio < 4) {
             condicion = CondicionFinal.LIBRE;
@@ -56,27 +54,11 @@ public class CondicionCursadaService {
             condicion = CondicionFinal.REGULAR;
         }
 
-        // REGULAR rinde final regular; LIBRE rinde examen libre (todas las materias lo permiten)
-        if (condicion == CondicionFinal.REGULAR || condicion == CondicionFinal.LIBRE) {
-            List<CalificacionParcialDto> finales = notas.stream()
-                    .filter(n -> "FINAL".equals(n.getTipo()))
-                    .sorted(Comparator.comparing(CalificacionParcialDto::getFecha))
-                    .toList();
-
-            if (!finales.isEmpty()) {
-                CalificacionParcialDto ultimaFinal = finales.get(finales.size() - 1);
-                if (ultimaFinal.getNota() >= 4) {
-                    condicion = CondicionFinal.APROBADA;
-                    notaCierre = ultimaFinal.getNota();
-                }
-            }
-        }
-
         return CondicionPreviewResponse.builder()
                 .cursadaId(cursadaId)
                 .promedioParciales(promedio)
                 .condicionFinal(condicion)
-                .notaCierre(notaCierre)
+                .notaCierre(promedio)
                 .build();
     }
 

@@ -120,6 +120,34 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MesaExamenNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMesaExamenNotFound(
+            MesaExamenNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("MESA_EXAMEN_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AlumnoYaInscriptoEnMesaException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAlumnoYaInscriptoEnMesa(
+            AlumnoYaInscriptoEnMesaException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("ALUMNO_YA_INSCRIPTO_MESA", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(CursadaNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleCursadaNotFound(
             CursadaNotFoundException ex,

@@ -6,6 +6,7 @@ import { fetchCore } from "@/lib/api-server"
 
 interface ProfesorResponse {
   id: number
+  userId: number
   nombre: string
   apellido: string
   dni: string
@@ -13,6 +14,7 @@ interface ProfesorResponse {
 
 export interface ProfesorActual {
   id: number
+  userId: number
   nombre: string
   apellido: string
 }
@@ -25,5 +27,5 @@ export async function getProfesorActual(): Promise<ProfesorActual | null> {
   const profesor = profesores?.[0]
   if (!profesor) return null
 
-  return { id: profesor.id, nombre: profesor.nombre, apellido: profesor.apellido }
+  return { id: profesor.id, userId: profesor.userId, nombre: profesor.nombre, apellido: profesor.apellido }
 }
