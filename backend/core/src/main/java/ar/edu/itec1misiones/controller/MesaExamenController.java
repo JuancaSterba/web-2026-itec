@@ -45,9 +45,13 @@ public class MesaExamenController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
-    @Operation(summary = "Listar todas las mesas de examen")
-    public ResponseEntity<ApiResponse<MesaExamenResponse>> buscarTodas(HttpServletRequest httpRequest) {
-        List<MesaExamenResponse> mesas = mesaExamenService.buscarTodas();
+    @Operation(summary = "Listar las mesas de examen, opcionalmente filtradas por integrante del tribunal")
+    public ResponseEntity<ApiResponse<MesaExamenResponse>> buscarTodas(
+            @RequestParam(required = false) Long tribunalUserId,
+            HttpServletRequest httpRequest) {
+        List<MesaExamenResponse> mesas = tribunalUserId != null
+                ? mesaExamenService.buscarPorTribunal(tribunalUserId)
+                : mesaExamenService.buscarTodas();
         return ResponseEntity.ok(
                 ApiResponse.<MesaExamenResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))

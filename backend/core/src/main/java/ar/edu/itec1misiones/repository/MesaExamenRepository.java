@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface MesaExamenRepository extends JpaRepository<MesaExamen, Long> {
     List<MesaExamen> findByMateriaPlanId(Long materiaPlanId);
+    // Mesas donde el User (rol PROFESOR) integra el tribunal.
+    List<MesaExamen> findByTribunalId(Long userId);
 }

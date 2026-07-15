@@ -73,6 +73,14 @@ public class MesaExamenServiceImpl implements MesaExamenService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<MesaExamenResponse> buscarPorTribunal(Long tribunalUserId) {
+        return mesaExamenRepository.findByTribunalId(tribunalUserId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MesaExamenResponse buscarPorId(Long id) {
         return toResponse(mesaExamenRepository.findById(id)
                 .orElseThrow(() -> new MesaExamenNotFoundException(id)));

@@ -104,6 +104,22 @@ class MesaExamenServiceImplTest {
     }
 
     @Test
+    void buscarPorTribunalDevuelveSoloLasMesasDelProfesor() {
+        MesaExamen mesa = MesaExamen.builder()
+                .id(50L)
+                .materiaPlan(MateriaPlan.builder().id(1L).build())
+                .periodoAcademico(PeriodoAcademico.builder().id(2L).build())
+                .estado(EstadoMesa.PROGRAMADA)
+                .build();
+        when(mesaExamenRepository.findByTribunalId(10L)).thenReturn(java.util.List.of(mesa));
+
+        var resultado = service.buscarPorTribunal(10L);
+
+        assertEquals(1, resultado.size());
+        assertEquals(50L, resultado.get(0).getId());
+    }
+
+    @Test
     void inscribirAlumnoPersisteLaInscripcion() {
         MesaExamen mesa = MesaExamen.builder().id(50L).estado(EstadoMesa.PROGRAMADA).build();
         when(mesaExamenRepository.findById(50L)).thenReturn(Optional.of(mesa));

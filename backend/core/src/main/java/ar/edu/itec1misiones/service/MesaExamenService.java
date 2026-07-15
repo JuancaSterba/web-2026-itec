@@ -10,6 +10,7 @@ import java.util.List;
 public interface MesaExamenService {
     MesaExamenResponse crear(MesaExamenRequest request);
     List<MesaExamenResponse> buscarTodas();
+    List<MesaExamenResponse> buscarPorTribunal(Long tribunalUserId);
     MesaExamenResponse buscarPorId(Long id);
     InscripcionMesaResponse inscribirAlumno(Long mesaExamenId, InscripcionMesaRequest request);
     List<InscripcionMesaResponse> listarInscripciones(Long mesaExamenId);
