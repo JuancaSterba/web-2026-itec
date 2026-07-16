@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import SelectMateriaBuscable from "@/components/materias/select-materia-buscable"
 
 interface MateriaDisponible {
   id: number
@@ -52,7 +53,13 @@ export default function NuevaMesaDialog({
   profesoresDisponibles: ProfesorDisponible[]
 }) {
   const [open, setOpen] = useState(false)
+  const [materiaPlanId, setMateriaPlanId] = useState("")
   const formRef = useRef<HTMLFormElement>(null)
+
+  function handleOpenChange(value: boolean) {
+    setOpen(value)
+    if (!value) setMateriaPlanId("")
+  }
 
   async function handleSubmit(formData: FormData) {
     const tribunalIds = profesoresDisponibles
@@ -68,6 +75,7 @@ export default function NuevaMesaDialog({
         tribunalIds,
       })
       formRef.current?.reset()
+      setMateriaPlanId("")
       setOpen(false)
       toast.success("Mesa de examen creada correctamente")
     } catch (error) {
@@ -76,7 +84,7 @@ export default function NuevaMesaDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="size-4" />
@@ -90,19 +98,15 @@ export default function NuevaMesaDialog({
         <form ref={formRef} action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="materiaPlanId">Materia</Label>
-            <select
+            <SelectMateriaBuscable
               id="materiaPlanId"
               name="materiaPlanId"
+              materias={materiasDisponibles}
+              value={materiaPlanId}
+              onValueChange={setMateriaPlanId}
+              placeholder="Seleccioná una materia"
               required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Seleccioná una materia</option>
-              {materiasDisponibles.map((materia) => (
-                <option key={materia.id} value={materia.id}>
-                  {materia.nombre}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <div className="space-y-2">
