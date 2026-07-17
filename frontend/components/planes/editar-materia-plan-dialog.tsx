@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Pencil } from "lucide-react"
+import { toast } from "sonner"
 import { updateMateriaPlan } from "@/app/actions/materia-plan-actions"
 import { anioYCuatrimestre, calcularCuatrimestreDictado } from "@/lib/cuatrimestre-carrera"
 import { Button } from "@/components/ui/button"
@@ -80,6 +81,11 @@ export default function EditarMateriaPlanDialog({
   }
 
   async function handleSubmit(formData: FormData) {
+    if (!materiaId) {
+      toast.error("Seleccioná una materia")
+      return
+    }
+
     const anioForm = Number(formData.get("anio"))
     const cuatrimestreDelAnioForm = Number(formData.get("cuatrimestreDelAnio"))
     formData.set("cuatrimestreDictado", String(calcularCuatrimestreDictado(anioForm, cuatrimestreDelAnioForm)))

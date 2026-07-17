@@ -69,3 +69,6 @@ Este archivo consolida todas las tareas pendientes, deudas técnicas y ajustes d
 
 ---
 *Nota: La arquitectura base, el API Gateway, la seguridad JWT y los microservicios core ya se encuentran desarrollados (Fase 1 y 2 completadas).*
+
+## 🟡 Mejoras de UX a implementar
+- [x] **Buscador de Materias en Dialogs:** `SelectMateriaBuscable` (`frontend/components/materias/select-materia-buscable.tsx`) — `Input` de búsqueda + lista scrolleable de radios (mismo patrón visual que correlativas/tribunal), filtro sin acentos (`lib/texto.ts`), opción seleccionada siempre visible aunque no matchee el filtro, valor real viaja en un `<input type="hidden">` para Server Actions. Integrado en `NuevaMesaDialog`, `AgregarMateriaDialog` (vía `opcionesExtra` con botón "+ Crear materia nueva") y `EditarMateriaPlanDialog`. Como `hidden required` no bloquea el submit nativo, se agregó guard manual (`if (!materiaId) toast.error(...)`) en los 3 `handleSubmit`.

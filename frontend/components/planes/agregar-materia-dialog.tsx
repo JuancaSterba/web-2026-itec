@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 import { createMateriaPlan } from "@/app/actions/materia-plan-actions"
 import { createMateria } from "@/app/actions/materia-actions"
 import { calcularCuatrimestreDictado } from "@/lib/cuatrimestre-carrera"
@@ -119,6 +120,11 @@ export default function AgregarMateriaDialog({
   }
 
   async function handleSubmit(formData: FormData) {
+    if (!materiaId) {
+      toast.error("Seleccioná una materia")
+      return
+    }
+
     const anio = Number(formData.get("anio"))
     const cuatrimestreDelAnio = Number(formData.get("cuatrimestreDelAnio"))
     formData.set("cuatrimestreDictado", String(calcularCuatrimestreDictado(anio, cuatrimestreDelAnio)))
@@ -152,10 +158,17 @@ export default function AgregarMateriaDialog({
               materias={materias}
               value={materiaId}
               onValueChange={handleSelectMateria}
-              placeholder="Seleccioná una materia"
               required
               opcionesExtra={
-                <option value={OPCION_NUEVA_MATERIA}>+ Crear materia nueva...</option>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-primary"
+                  onClick={() => handleSelectMateria(OPCION_NUEVA_MATERIA)}
+                >
+                  + Crear materia nueva...
+                </Button>
               }
             />
             {creandoMateria && (

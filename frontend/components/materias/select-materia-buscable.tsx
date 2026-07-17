@@ -15,7 +15,6 @@ export default function SelectMateriaBuscable({
   materias,
   value,
   onValueChange,
-  placeholder,
   opcionesExtra,
   required,
 }: {
@@ -51,31 +50,29 @@ export default function SelectMateriaBuscable({
           if (e.key === "Enter") e.preventDefault()
         }}
       />
-      <select
-        id={id}
-        name={name}
-        required={required}
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {materiasOrdenadas.length === 0 && !placeholder ? (
-          <option value="" disabled>
-            Sin resultados
-          </option>
+      <div className="max-h-48 space-y-1 overflow-y-auto rounded-md border border-input p-2 mt-2">
+        {materiasOrdenadas.length === 0 ? (
+          <p className="px-2 py-1.5 text-sm text-muted-foreground">Sin resultados</p>
         ) : (
           materiasOrdenadas.map((materia) => (
-            <option key={materia.id} value={materia.id}>
+            <label
+              key={materia.id}
+              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
+            >
+              <input
+                type="radio"
+                name={`radio-${id}`}
+                checked={value === String(materia.id)}
+                onChange={() => onValueChange(String(materia.id))}
+                className="size-4"
+              />
               {materia.nombre}
-            </option>
+            </label>
           ))
         )}
         {opcionesExtra}
-      </select>
-      {materiasOrdenadas.length === 0 && placeholder && (
-        <p className="text-sm text-muted-foreground">Sin resultados</p>
-      )}
+      </div>
+      <input type="hidden" id={id} name={name} required={required} value={value} />
     </div>
   )
 }

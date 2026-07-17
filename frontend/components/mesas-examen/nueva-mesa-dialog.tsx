@@ -62,6 +62,11 @@ export default function NuevaMesaDialog({
   }
 
   async function handleSubmit(formData: FormData) {
+    if (!materiaPlanId) {
+      toast.error("Seleccioná una materia")
+      return
+    }
+
     const tribunalIds = profesoresDisponibles
       .filter((profesor) => formData.get(`tribunal_${profesor.userId}`) === "on")
       .map((profesor) => profesor.userId)
