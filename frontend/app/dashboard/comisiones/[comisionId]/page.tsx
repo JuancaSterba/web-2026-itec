@@ -332,7 +332,10 @@ export default async function ComisionDetallePage({
         {esAdmin && (
           <TabsContent value="docentes" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
             <div className="flex justify-end">
-              <AsignarProfesorDialog comisionId={Number(comisionId)} profesoresDisponibles={profesores ?? []} />
+              <AsignarProfesorDialog
+                comisionId={Number(comisionId)}
+                profesoresDisponibles={(profesores ?? []).filter(p => !(docentesDeLaComision ?? []).some(cp => cp.profesorId === p.id))}
+              />
             </div>
             {docentesDeLaComision === null ? (
               <p className="text-destructive">No se pudo obtener los docentes asignados.</p>
