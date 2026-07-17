@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Pencil } from "lucide-react"
+import { toast } from "sonner"
 import { updateMateriaPlan } from "@/app/actions/materia-plan-actions"
 import { anioYCuatrimestre, calcularCuatrimestreDictado } from "@/lib/cuatrimestre-carrera"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import SelectMateriaBuscable from "@/components/materias/select-materia-buscable"
 
 interface MateriaDisponible {
   id: number
@@ -61,7 +63,13 @@ export default function EditarMateriaPlanDialog({
   const [correlativasElegidas, setCorrelativasElegidas] = useState<Set<number>>(
     new Set(materiaPlan.correlativaIds)
   )
+  const [materiaId, setMateriaId] = useState(String(materiaPlan.materiaId))
   const { anio, cuatrimestreDelAnio } = anioYCuatrimestre(materiaPlan.cuatrimestreDictado)
+
+  function handleOpenChange(value: boolean) {
+    setOpen(value)
+    if (!value) setMateriaId(String(materiaPlan.materiaId))
+  }
 
   function toggleCorrelativa(id: number) {
     setCorrelativasElegidas((prev) => {
@@ -73,6 +81,11 @@ export default function EditarMateriaPlanDialog({
   }
 
   async function handleSubmit(formData: FormData) {
+    if (!materiaId) {
+      toast.error("Seleccioná una materia")
+      return
+    }
+
     const anioForm = Number(formData.get("anio"))
     const cuatrimestreDelAnioForm = Number(formData.get("cuatrimestreDelAnio"))
     formData.set("cuatrimestreDictado", String(calcularCuatrimestreDictado(anioForm, cuatrimestreDelAnioForm)))
@@ -83,7 +96,7 @@ export default function EditarMateriaPlanDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button type="button" variant="ghost" size="icon" title="Editar">
           <Pencil className="size-4" />
@@ -96,19 +109,14 @@ export default function EditarMateriaPlanDialog({
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="materiaId">Materia</Label>
-            <select
+            <SelectMateriaBuscable
               id="materiaId"
               name="materiaId"
+              materias={materiasDisponibles}
+              value={materiaId}
+              onValueChange={setMateriaId}
               required
-              defaultValue={materiaPlan.materiaId}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              {materiasDisponibles.map((materia) => (
-                <option key={materia.id} value={materia.id}>
-                  {materia.nombre}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

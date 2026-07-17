@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 import { createMateriaPlan } from "@/app/actions/materia-plan-actions"
 import { createMateria } from "@/app/actions/materia-actions"
 import { calcularCuatrimestreDictado } from "@/lib/cuatrimestre-carrera"
@@ -18,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import SelectMateriaBuscable from "@/components/materias/select-materia-buscable"
 
 const OPCION_NUEVA_MATERIA = "__crear_nueva__"
 
@@ -63,8 +65,6 @@ export default function AgregarMateriaDialog({
   useEffect(() => {
     setMaterias(materiasDisponibles)
   }, [materiasDisponibles])
-
-  const materiasOrdenadas = [...materias].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
 
   function toggleCorrelativa(id: number) {
     setCorrelativasElegidas((prev) => {
@@ -120,6 +120,11 @@ export default function AgregarMateriaDialog({
   }
 
   async function handleSubmit(formData: FormData) {
+    if (!materiaId) {
+      toast.error("Seleccioná una materia")
+      return
+    }
+
     const anio = Number(formData.get("anio"))
     const cuatrimestreDelAnio = Number(formData.get("cuatrimestreDelAnio"))
     formData.set("cuatrimestreDictado", String(calcularCuatrimestreDictado(anio, cuatrimestreDelAnio)))
@@ -147,22 +152,25 @@ export default function AgregarMateriaDialog({
         <form ref={formRef} action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="materiaId">Materia</Label>
-            <select
+            <SelectMateriaBuscable
               id="materiaId"
               name="materiaId"
-              required
+              materias={materias}
               value={materiaId}
-              onChange={(e) => handleSelectMateria(e.target.value)}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Seleccioná una materia</option>
-              {materiasOrdenadas.map((materia) => (
-                <option key={materia.id} value={materia.id}>
-                  {materia.nombre}
-                </option>
-              ))}
-              <option value={OPCION_NUEVA_MATERIA}>+ Crear materia nueva...</option>
-            </select>
+              onValueChange={handleSelectMateria}
+              required
+              opcionesExtra={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-primary"
+                  onClick={() => handleSelectMateria(OPCION_NUEVA_MATERIA)}
+                >
+                  + Crear materia nueva...
+                </Button>
+              }
+            />
             {creandoMateria && (
               <div className="space-y-2 rounded-md border border-border p-3">
                 <div className="space-y-2">
