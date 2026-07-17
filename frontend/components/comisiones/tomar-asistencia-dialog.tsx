@@ -65,14 +65,15 @@ export default function TomarAsistenciaDialog({
       }
     })
 
-    try {
-      await saveAsistenciasMasivas(comisionId, fecha, registros)
-      formRef.current?.reset()
-      setOpen(false)
-      toast.success("Asistencia guardada correctamente")
-    } catch (error: any) {
-      toast.error(error.message)
+    const result = await saveAsistenciasMasivas(comisionId, fecha, registros)
+    if (result?.error) {
+      toast.error(result.error)
+      return
     }
+
+    formRef.current?.reset()
+    setOpen(false)
+    toast.success("Asistencia guardada correctamente")
   }
 
   return (
