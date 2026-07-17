@@ -15,6 +15,8 @@ import EliminarBoton from "@/components/shared/eliminar-boton"
 import { deleteCursada } from "@/app/actions/cursada-actions"
 import { deleteComisionProfesor } from "@/app/actions/comision-profesor-actions"
 import NuevaInstanciaDialog from "@/components/comisiones/nueva-instancia-dialog"
+import AgregarHorarioDialog from "@/components/comisiones/agregar-horario-dialog"
+import { deleteHorarioClase } from "@/app/actions/horario-actions"
 
 interface ComisionResponse {
   id: number
@@ -82,6 +84,32 @@ interface ComisionProfesorResponse {
   rol: string
 }
 
+interface ModuloHorarioResponse {
+  id: number
+  numero: number
+  horaInicio: string
+  horaFin: string
+}
+
+interface HorarioClaseResponse {
+  id: number
+  diaSemana: string
+  comisionId: number
+  materiaNombre: string
+  modulos: ModuloHorarioResponse[]
+  proximaFecha: string | null
+}
+
+const DIAS_SEMANA_ES: Record<string, string> = {
+  MONDAY: "Lunes",
+  TUESDAY: "Martes",
+  WEDNESDAY: "Miércoles",
+  THURSDAY: "Jueves",
+  FRIDAY: "Viernes",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
+}
+
 export default async function ComisionDetallePage({
   params,
 }: {
@@ -89,14 +117,17 @@ export default async function ComisionDetallePage({
 }) {
   const { comisionId } = await params
 
-  const [comisiones, materiasPlan, cursadas, alumnos, profesores, comisionesProfesores] = await Promise.all([
-    fetchCore<ComisionResponse>(`/comisiones/${comisionId}`),
-    fetchCore<MateriaPlanResponse>("/materias-plan"),
-    fetchCore<CursadaResponse>("/cursadas"),
-    fetchCore<AlumnoResponse>("/alumnos"),
-    fetchCore<ProfesorResponse>("/profesores"),
-    fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
-  ])
+  const [comisiones, materiasPlan, cursadas, alumnos, profesores, comisionesProfesores, horariosClase, modulosHorario] =
+    await Promise.all([
+      fetchCore<ComisionResponse>(`/comisiones/${comisionId}`),
+      fetchCore<MateriaPlanResponse>("/materias-plan"),
+      fetchCore<CursadaResponse>("/cursadas"),
+      fetchCore<AlumnoResponse>("/alumnos"),
+      fetchCore<ProfesorResponse>("/profesores"),
+      fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
+      fetchCore<HorarioClaseResponse>(`/horarios/comision/${comisionId}`),
+      fetchCore<ModuloHorarioResponse>("/modulos"),
+    ])
 
   const usuario = await getUsuarioActual()
   const esAdmin = !!usuario?.roles.some((rol) => rol === "ADMIN" || rol === "ADMINISTRATIVO")
@@ -129,6 +160,8 @@ export default async function ComisionDetallePage({
   const alumnoPorId = new Map((alumnos ?? []).map((a) => [a.id, a]))
   const profesorPorId = new Map((profesores ?? []).map((p) => [p.id, p]))
   const docentesDeLaComision = comisionesProfesores?.filter((cp) => String(cp.comisionId) === comisionId) ?? null
+  const horariosDeLaComision = horariosClase ?? null
+  const modulosDisponibles = modulosHorario ?? []
 
   const cursadasParaAsistencia = (cursadasDeLaComision ?? []).map((cursada) => {
     const alumno = alumnoPorId.get(cursada.alumnoId)
@@ -228,6 +261,7 @@ export default async function ComisionDetallePage({
           <TabsTrigger value="general">Información General</TabsTrigger>
           <TabsTrigger value="alumnos">Alumnos Inscritos</TabsTrigger>
           {esAdmin && <TabsTrigger value="docentes">Docentes</TabsTrigger>}
+          {esAdmin && <TabsTrigger value="horarios">Horarios de Clase</TabsTrigger>}
           <TabsTrigger value="asistencias">Asistencias</TabsTrigger>
           <TabsTrigger value="calificaciones">Calificaciones</TabsTrigger>
         </TabsList>
@@ -332,6 +366,50 @@ export default async function ComisionDetallePage({
                       </TableRow>
                     )
                   })}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+        )}
+
+        {esAdmin && (
+          <TabsContent value="horarios" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
+            <div className="flex justify-end">
+              <AgregarHorarioDialog comisionId={Number(comisionId)} modulos={modulosDisponibles} />
+            </div>
+            {horariosDeLaComision === null ? (
+              <p className="text-destructive">No se pudo obtener los horarios de clase.</p>
+            ) : horariosDeLaComision.length === 0 ? (
+              <p className="text-muted-foreground">No hay horarios de clase asignados a esta comisión.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Día</TableHead>
+                    <TableHead>Módulos</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {horariosDeLaComision.map((horario) => (
+                    <TableRow key={horario.id}>
+                      <TableCell>{DIAS_SEMANA_ES[horario.diaSemana] ?? horario.diaSemana}</TableCell>
+                      <TableCell>
+                        {[...(horario.modulos ?? [])]
+                          .sort((a, b) => a.numero - b.numero)
+                          .map((modulo) => `Módulo ${modulo.numero} (${modulo.horaInicio.slice(0, 5)} - ${modulo.horaFin.slice(0, 5)})`)
+                          .join(", ")}
+                      </TableCell>
+                      <TableCell className="flex justify-end">
+                        {usuario?.roles.includes("ADMIN") && (
+                          <EliminarBoton
+                            accion={deleteHorarioClase.bind(null, horario.id)}
+                            entidadLabel="este horario"
+                          />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             )}
