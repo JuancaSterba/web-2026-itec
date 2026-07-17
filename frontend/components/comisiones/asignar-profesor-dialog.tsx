@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
+import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 import { createComisionProfesor } from "@/app/actions/comision-profesor-actions"
 import { Button } from "@/components/ui/button"
@@ -15,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { ProfesorFormDialog } from "@/components/profesores/profesor-form-dialog"
 
 interface ProfesorDisponible {
   id: number
@@ -39,7 +41,9 @@ export default function AsignarProfesorDialog({
   comisionId: number
   profesoresDisponibles: ProfesorDisponible[]
 }) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [showCrearProfesor, setShowCrearProfesor] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(formData: FormData) {
@@ -49,46 +53,65 @@ export default function AsignarProfesorDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          disabled={profesoresDisponibles.length === 0}
-          title={profesoresDisponibles.length === 0 ? "No hay profesores disponibles para asignar" : undefined}
-        >
-          <Plus className="size-4" />
-          Asignar Profesor
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Asignar Profesor a la Comisión</DialogTitle>
-        </DialogHeader>
-        <form ref={formRef} action={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="profesorId">Profesor</Label>
-            <select
-              id="profesorId"
-              name="profesorId"
-              required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Seleccioná un profesor</option>
-              {profesoresDisponibles.map((profesor) => (
-                <option key={profesor.id} value={profesor.id}>
-                  {profesor.nombre} {profesor.apellido} — DNI {profesor.dni}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="rol">Rol</Label>
-            <Input id="rol" name="rol" placeholder="Titular" />
-          </div>
-          <DialogFooter>
-            <BotonGuardar />
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            disabled={profesoresDisponibles.length === 0}
+            title={profesoresDisponibles.length === 0 ? "No hay profesores disponibles para asignar" : undefined}
+          >
+            <Plus className="size-4" />
+            Asignar Profesor
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Asignar Profesor a la Comisión</DialogTitle>
+          </DialogHeader>
+          <form ref={formRef} action={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="profesorId">Profesor</Label>
+              <select
+                id="profesorId"
+                name="profesorId"
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="">Seleccioná un profesor</option>
+                {profesoresDisponibles.map((profesor) => (
+                  <option key={profesor.id} value={profesor.id}>
+                    {profesor.nombre} {profesor.apellido} — DNI {profesor.dni}
+                  </option>
+                ))}
+              </select>
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0"
+                onClick={() => setShowCrearProfesor(true)}
+              >
+                + Crear profesor nuevo
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rol">Rol</Label>
+              <Input id="rol" name="rol" placeholder="Titular" />
+            </div>
+            <DialogFooter>
+              <BotonGuardar />
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <ProfesorFormDialog
+        open={showCrearProfesor}
+        onOpenChange={(nuevoOpen) => {
+          setShowCrearProfesor(nuevoOpen)
+          if (!nuevoOpen) router.refresh()
+        }}
+        profesor={null}
+      />
+    </>
   )
 }
