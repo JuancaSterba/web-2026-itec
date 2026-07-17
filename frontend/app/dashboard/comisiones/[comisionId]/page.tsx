@@ -32,6 +32,7 @@ interface MateriaPlanResponse {
   materiaNombre: string
   cuatrimestreDictado: number
   cargaHoraria: number
+  modalidadEvaluacion?: string
 }
 
 interface CursadaResponse {
@@ -121,7 +122,9 @@ export default async function ComisionDetallePage({
   }
 
   const comision = comisiones?.[0] ?? null
-  const materiaNombre = materiasPlan?.find((mp) => mp.id === comision?.materiaPlanId)?.materiaNombre
+  const materiaPlanDeLaComision = materiasPlan?.find((mp) => mp.id === comision?.materiaPlanId)
+  const materiaNombre = materiaPlanDeLaComision?.materiaNombre
+  const esPromocional = materiaPlanDeLaComision?.modalidadEvaluacion === "PROMOCIONAL"
   const cursadasDeLaComision = cursadas?.filter((c) => String(c.comisionId) === comisionId) ?? null
   const alumnoPorId = new Map((alumnos ?? []).map((a) => [a.id, a]))
   const profesorPorId = new Map((profesores ?? []).map((p) => [p.id, p]))
@@ -185,6 +188,32 @@ export default async function ComisionDetallePage({
       return <Badge variant="destructive">{estado}</Badge>
     }
     return <Badge variant="secondary">{estado}</Badge>
+  }
+
+  const NOTA_MINIMA_REGULAR = 4
+  const NOTA_MINIMA_PROMOCION = 7
+  const TOTAL_PARCIALES = 3
+
+  function celdaPromedio(promedio: number | null, completo: boolean, promocional: boolean) {
+    if (promedio === null) return "—"
+    if (!completo) {
+      return <span className="text-muted-foreground">{promedio.toFixed(2)} (provisorio)</span>
+    }
+    if (promedio < NOTA_MINIMA_REGULAR) {
+      return (
+        <Badge variant="destructive">
+          Libre · {promedio.toFixed(2)}
+        </Badge>
+      )
+    }
+    if (promocional && promedio >= NOTA_MINIMA_PROMOCION) {
+      return (
+        <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
+          Promociona · {promedio.toFixed(2)}
+        </Badge>
+      )
+    }
+    return promedio.toFixed(2)
   }
 
   return (
@@ -370,7 +399,7 @@ export default async function ComisionDetallePage({
                   {instancias.map((instancia) => (
                     <TableHead key={instancia}>{instancia}</TableHead>
                   ))}
-                  <TableHead>Promedio</TableHead>
+                  <TableHead>Promedio Parciales</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -379,9 +408,10 @@ export default async function ComisionDetallePage({
                   const calificaciones = calificacionesPorCursada!.get(cursada.id) ?? []
                   const parcialesDeLaCursada = calificaciones
                   const promedio =
-                    parcialesDeLaCursada.length === 3
-                      ? parcialesDeLaCursada.reduce((suma, c) => suma + c.nota, 0) / 3
+                    parcialesDeLaCursada.length > 0
+                      ? parcialesDeLaCursada.reduce((suma, c) => suma + c.nota, 0) / parcialesDeLaCursada.length
                       : null
+                  const completo = parcialesDeLaCursada.length === TOTAL_PARCIALES
                   return (
                     <TableRow key={cursada.id}>
                       <TableCell>{alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}</TableCell>
@@ -399,7 +429,7 @@ export default async function ComisionDetallePage({
                           </TableCell>
                         )
                       })}
-                      <TableCell className="font-medium">{promedio !== null ? promedio.toFixed(2) : "—"}</TableCell>
+                      <TableCell className="font-medium">{celdaPromedio(promedio, completo, esPromocional)}</TableCell>
                     </TableRow>
                   )
                 })}
