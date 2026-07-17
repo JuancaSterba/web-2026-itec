@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { ClipboardCheck } from "lucide-react"
+import { toast } from "sonner"
 import { saveAsistenciasMasivas } from "@/app/actions/asistencia-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -64,9 +65,14 @@ export default function TomarAsistenciaDialog({
       }
     })
 
-    await saveAsistenciasMasivas(comisionId, fecha, registros)
-    formRef.current?.reset()
-    setOpen(false)
+    try {
+      await saveAsistenciasMasivas(comisionId, fecha, registros)
+      formRef.current?.reset()
+      setOpen(false)
+      toast.success("Asistencia guardada correctamente")
+    } catch (error: any) {
+      toast.error(error.message)
+    }
   }
 
   return (

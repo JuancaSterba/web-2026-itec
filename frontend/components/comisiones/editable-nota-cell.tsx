@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { saveCalificacion } from "@/app/actions/nota-actions"
 import { Input } from "@/components/ui/input"
 
@@ -41,6 +42,8 @@ export default function EditableNotaCell({
     setIsSaving(true)
     try {
       await saveCalificacion(cursadaId, comisionId, instancia, nota, calificacionId)
+    } catch (error: any) {
+      toast.error(error.message)
     } finally {
       setIsSaving(false)
     }
