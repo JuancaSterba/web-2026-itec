@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 import { saveCalificacionesMasivas } from "@/app/actions/nota-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,9 +45,14 @@ export default function NuevaInstanciaDialog({ comisionId, cursadas }: { comisio
       .filter((r) => r.notaRaw !== "")
       .map((r) => ({ cursadaId: r.cursadaId, nota: Number(r.notaRaw) }))
 
-    await saveCalificacionesMasivas(comisionId, instancia, registros)
-    formRef.current?.reset()
-    setOpen(false)
+    try {
+      await saveCalificacionesMasivas(comisionId, instancia, registros)
+      formRef.current?.reset()
+      setOpen(false)
+      toast.success("Instancia creada correctamente")
+    } catch (error: any) {
+      toast.error(error.message)
+    }
   }
 
   return (
