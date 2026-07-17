@@ -36,8 +36,11 @@ export async function saveAsistenciasMasivas(
       respuestas.filter((r) => !r.ok).map((r) => r.json().catch(() => null))
     )
     const mensajes = cuerpos.map((b) => b?.errors?.[0]?.description).filter(Boolean)
-    throw new Error(mensajes.length > 0 ? mensajes.join(" / ") : "No se pudo guardar la lista de asistencias completa")
+    return {
+      error: mensajes.length > 0 ? mensajes.join(" / ") : "No se pudo guardar la lista de asistencias completa",
+    }
   }
 
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
+  return { success: true }
 }
