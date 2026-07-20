@@ -72,7 +72,7 @@ export async function createMesaExamen(payload: {
     }
   }
 
-  revalidatePath("/dashboard/mesas-examen")
+  revalidatePath("/dashboard/mesas-examen", "page")
 }
 
 export async function inscribirAlumnoEnMesa(
