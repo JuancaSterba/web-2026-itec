@@ -48,6 +48,13 @@ interface CicloLectivoResponse {
   anio: number
 }
 
+interface PlanEstudioResponse {
+  id: number
+  cohorte: string
+  resolucion: string
+  carreraNombre: string
+}
+
 interface ProfesorResponse {
   id: number
   userId: number
@@ -85,21 +92,26 @@ export default async function MesaExamenDetallePage({
   const { id } = await params
   const mesaId = Number(id)
 
-  const [mesaData, inscripciones, materiasPlan, periodos, profesores, alumnos] = await Promise.all([
+  const [mesaData, inscripciones, materiasPlan, periodos, profesores, alumnos, planes] = await Promise.all([
     fetchCore<MesaExamenResponse>(`/mesas-examen/${mesaId}`),
     fetchCore<InscripcionMesaResponse>(`/mesas-examen/${mesaId}/inscripciones`),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
     fetchCore<CicloLectivoResponse>("/ciclos-lectivos"),
     fetchCore<ProfesorResponse>("/profesores"),
     fetchCore<AlumnoResponse>("/alumnos"),
+    fetchCore<PlanEstudioResponse>("/planes-estudio"),
   ])
 
   const mesa = mesaData?.[0]
   if (!mesa) notFound()
 
-  const materiaNombre =
-    (materiasPlan ?? []).find((m) => m.id === mesa.materiaPlanId)?.materiaNombre ??
-    `Materia #${mesa.materiaPlanId}`
+  const materiaPlan = (materiasPlan ?? []).find((m) => m.id === mesa.materiaPlanId)
+  const planEstudio = (planes ?? []).find((p) => p.id === materiaPlan?.planEstudioId)
+  
+  let materiaNombre = materiaPlan?.materiaNombre ?? `Materia #${mesa.materiaPlanId}`
+  if (planEstudio) {
+    materiaNombre = `${materiaNombre} - ${planEstudio.carreraNombre} (Res. ${planEstudio.resolucion})`
+  }
   const cicloNombre =
     (periodos ?? []).find((c) => c.id === mesa.cicloLectivoId)?.anio.toString() ??
     `Ciclo #${mesa.cicloLectivoId}`

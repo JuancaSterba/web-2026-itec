@@ -40,6 +40,13 @@ interface ProfesorResponse {
   activo: boolean
 }
 
+interface PlanEstudioResponse {
+  id: number
+  cohorte: string
+  resolucion: string
+  carreraNombre: string
+}
+
 function formatearFechaHora(fechaHora: string) {
   return new Date(fechaHora).toLocaleString("es-AR", {
     dateStyle: "medium",
@@ -48,21 +55,33 @@ function formatearFechaHora(fechaHora: string) {
 }
 
 export default async function MesasExamenPage() {
-  const [mesas, materiasPlan, ciclos, profesores] = await Promise.all([
+  const [mesas, materiasPlan, ciclos, profesores, planes] = await Promise.all([
     fetchCore<MesaExamenResponse>("/mesas-examen"),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
     fetchCore<CicloLectivoResponse>("/ciclos-lectivos"),
     fetchCore<ProfesorResponse>("/profesores"),
+    fetchCore<PlanEstudioResponse>("/planes-estudio"),
   ])
 
-  const materiaPorId = new Map((materiasPlan ?? []).map((m) => [m.id, m.materiaNombre]))
+  const planPorId = new Map(
+    (planes ?? []).map((p) => [p.id, `${p.carreraNombre} (Res. ${p.resolucion})`])
+  )
+  
+  const getNombreCompletoMateria = (m: MateriaPlanResponse) => {
+    const infoPlan = planPorId.get(m.planEstudioId)
+    return infoPlan ? `${m.materiaNombre} - ${infoPlan}` : m.materiaNombre
+  }
+
+  const materiaPorId = new Map(
+    (materiasPlan ?? []).map((m) => [m.id, getNombreCompletoMateria(m)])
+  )
   const profesorPorUserId = new Map(
     (profesores ?? []).map((p) => [p.userId, `${p.apellido}, ${p.nombre}`])
   )
 
   const materiasDisponibles = (materiasPlan ?? []).map((m) => ({
     id: m.id,
-    nombre: m.materiaNombre,
+    nombre: getNombreCompletoMateria(m),
   }))
   const ciclosDisponibles = (ciclos ?? []).map((c) => ({ id: c.id, anio: c.anio }))
   const profesoresDisponibles = (profesores ?? [])

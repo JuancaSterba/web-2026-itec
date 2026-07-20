@@ -45,7 +45,15 @@ interface CalificacionMesaResponse {
 
 interface MateriaPlanResponse {
   id: number
+  planEstudioId: number
   materiaNombre: string
+}
+
+interface PlanEstudioResponse {
+  id: number
+  cohorte: string
+  resolucion: string
+  carreraNombre: string
 }
 
 interface AlumnoResponse {
@@ -80,21 +88,26 @@ export default async function MisMesasDetallePage({
   const profesor = await getProfesorActual()
   if (!profesor) notFound()
 
-  const [mesaData, inscripciones, calificaciones, materiasPlan, alumnos] = await Promise.all([
+  const [mesaData, inscripciones, calificaciones, materiasPlan, alumnos, planes] = await Promise.all([
     fetchCore<MesaExamenResponse>(`/mesas-examen/${mesaId}`),
     fetchCore<InscripcionMesaResponse>(`/mesas-examen/${mesaId}/inscripciones`),
     fetchGateway<CalificacionMesaResponse>(`/api/notas/mesas?mesaExamenId=${mesaId}`),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
     fetchCore<AlumnoResponse>("/alumnos"),
+    fetchCore<PlanEstudioResponse>("/planes-estudio"),
   ])
 
   const mesa = mesaData?.[0]
   // Ownership: el profesor solo puede operar mesas donde integra el tribunal.
   if (!mesa || !mesa.tribunalIds.includes(profesor.userId)) notFound()
 
-  const materiaNombre =
-    (materiasPlan ?? []).find((m) => m.id === mesa.materiaPlanId)?.materiaNombre ??
-    `Materia #${mesa.materiaPlanId}`
+  const materiaPlan = (materiasPlan ?? []).find((m) => m.id === mesa.materiaPlanId)
+  const planEstudio = (planes ?? []).find((p) => p.id === materiaPlan?.planEstudioId)
+  
+  let materiaNombre = materiaPlan?.materiaNombre ?? `Materia #${mesa.materiaPlanId}`
+  if (planEstudio) {
+    materiaNombre = `${materiaNombre} - ${planEstudio.carreraNombre} (Res. ${planEstudio.resolucion})`
+  }
   const alumnoPorUserId = new Map((alumnos ?? []).map((a) => [a.userId, a]))
   const calificacionPorAlumno = new Map((calificaciones ?? []).map((c) => [c.alumnoId, c]))
 

@@ -14,7 +14,9 @@ import {
 interface MesaExamenResponse {
   id: number
   materiaPlanId: number
-  periodoAcademicoId: number
+  cicloLectivoId: number
+  turno: "PRIMER_TURNO" | "SEGUNDO_TURNO" | "TERCER_TURNO" | null
+  tipo: "ORDINARIA_1ER_LLAMADO" | "ORDINARIA_2DO_LLAMADO" | "ESPECIAL"
   fechaHora: string
   estado: "PROGRAMADA" | "CERRADA"
   tribunalIds: number[]
@@ -22,12 +24,20 @@ interface MesaExamenResponse {
 
 interface MateriaPlanResponse {
   id: number
+  planEstudioId: number
   materiaNombre: string
 }
 
-interface PeriodoAcademicoResponse {
+interface CicloLectivoResponse {
   id: number
-  nombre: string
+  anio: number
+}
+
+interface PlanEstudioResponse {
+  id: number
+  cohorte: string
+  resolucion: string
+  carreraNombre: string
 }
 
 function formatearFechaHora(fechaHora: string) {
@@ -48,14 +58,26 @@ export default async function MisMesasPage() {
     )
   }
 
-  const [mesas, materiasPlan, periodos] = await Promise.all([
+  const [mesas, materiasPlan, ciclos, planes] = await Promise.all([
     fetchCore<MesaExamenResponse>(`/mesas-examen?tribunalUserId=${profesor.userId}`),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
-    fetchCore<PeriodoAcademicoResponse>("/periodos-academicos"),
+    fetchCore<CicloLectivoResponse>("/ciclos-lectivos"),
+    fetchCore<PlanEstudioResponse>("/planes-estudio"),
   ])
 
-  const materiaPorId = new Map((materiasPlan ?? []).map((m) => [m.id, m.materiaNombre]))
-  const periodoPorId = new Map((periodos ?? []).map((p) => [p.id, p.nombre]))
+  const planPorId = new Map(
+    (planes ?? []).map((p) => [p.id, `${p.carreraNombre} (Res. ${p.resolucion})`])
+  )
+  
+  const getNombreCompletoMateria = (m: MateriaPlanResponse) => {
+    const infoPlan = planPorId.get(m.planEstudioId)
+    return infoPlan ? `${m.materiaNombre} - ${infoPlan}` : m.materiaNombre
+  }
+
+  const materiaPorId = new Map(
+    (materiasPlan ?? []).map((m) => [m.id, getNombreCompletoMateria(m)])
+  )
+  const cicloPorId = new Map((ciclos ?? []).map((c) => [c.id, c.anio.toString()]))
 
   return (
     <div className="space-y-6">
@@ -77,7 +99,8 @@ export default async function MisMesasPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Materia</TableHead>
-              <TableHead>Período</TableHead>
+              <TableHead>Ciclo Lectivo</TableHead>
+              <TableHead>Tipo</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Estado</TableHead>
             </TableRow>
@@ -94,7 +117,19 @@ export default async function MisMesasPage() {
                   </Link>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {periodoPorId.get(mesa.periodoAcademicoId) ?? `Período #${mesa.periodoAcademicoId}`}
+                  {cicloPorId.get(mesa.cicloLectivoId) ?? `Ciclo #${mesa.cicloLectivoId}`}
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium">
+                    {mesa.tipo === "ORDINARIA_1ER_LLAMADO" && "Ordinaria (1er Llamado)"}
+                    {mesa.tipo === "ORDINARIA_2DO_LLAMADO" && "Ordinaria (2do Llamado)"}
+                    {mesa.tipo === "ESPECIAL" && "Especial"}
+                  </span>
+                  {mesa.turno && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({mesa.turno.replace("_", " ").toLowerCase()})
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell>{formatearFechaHora(mesa.fechaHora)}</TableCell>
                 <TableCell>
