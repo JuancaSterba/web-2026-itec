@@ -14,6 +14,7 @@ import ar.edu.itec1misiones.model.MateriaPlan;
 import ar.edu.itec1misiones.repository.AlumnoRepository;
 import ar.edu.itec1misiones.repository.ComisionRepository;
 import ar.edu.itec1misiones.repository.CursadaRepository;
+import ar.edu.itec1misiones.repository.InscripcionMesaRepository;
 import ar.edu.itec1misiones.service.CursadaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class CursadaServiceImpl implements CursadaService {
     private final CursadaRepository cursadaRepository;
     private final AlumnoRepository alumnoRepository;
     private final ComisionRepository comisionRepository;
+    private final InscripcionMesaRepository inscripcionMesaRepository;
 
     @Override
     public CursadaResponse guardar(CursadaRequest request) {
@@ -95,9 +97,14 @@ public class CursadaServiceImpl implements CursadaService {
 
         List<Cursada> cursadasDelAlumno = cursadaRepository.findByAlumnoId(alumnoId);
         List<String> faltantes = materiaPlan.getCorrelativas().stream()
-                .filter(correlativa -> cursadasDelAlumno.stream().noneMatch(c ->
-                        c.getComision().getMateriaPlan().getId().equals(correlativa.getId())
-                                && esAprobada(c.getCondicionFinal())))
+                .filter(correlativa -> {
+                    boolean aprobadaEnCursada = cursadasDelAlumno.stream().anyMatch(c ->
+                            c.getComision().getMateriaPlan().getId().equals(correlativa.getId())
+                                    && esAprobada(c.getCondicionFinal()));
+                    boolean aprobadaEnFinal = inscripcionMesaRepository
+                            .existsByAlumnoIdAndMesaExamenMateriaPlanIdAndAprobadoTrue(alumnoId, correlativa.getId());
+                    return !aprobadaEnCursada && !aprobadaEnFinal;
+                })
                 .map(correlativa -> correlativa.getMateria().getNombre())
                 .toList();
 

@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
  * Inscripcion de un alumno a una MesaExamen, con la condicion academica
@@ -38,4 +39,9 @@ public class InscripcionMesa {
     private CondicionInscripcion condicionInscripcion;
 
     private LocalDateTime fechaInscripcion;
+
+    private BigDecimal notaDefinitiva;
+
+    @Builder.Default
+    private boolean aprobado = false;
 }
