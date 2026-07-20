@@ -59,3 +59,30 @@ export async function inscribirAlumnoEnMesa(
 
   revalidatePath("/dashboard/mesas-examen/[id]", "page")
 }
+
+export async function updateTribunalMesa(
+  mesaExamenId: number,
+  payload: { tribunalIds: number[] }
+) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const response = await fetch(
+    `${getApiBaseUrl()}/api/core/mesas-examen/${mesaExamenId}/tribunal`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(payload),
+    }
+  )
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo actualizar el tribunal")
+  }
+
+  revalidatePath("/dashboard/mesas-examen/[id]", "page")
+}
