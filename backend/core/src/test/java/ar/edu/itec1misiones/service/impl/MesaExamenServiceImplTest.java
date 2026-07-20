@@ -11,13 +11,13 @@ import ar.edu.itec1misiones.model.EstadoMesa;
 import ar.edu.itec1misiones.model.InscripcionMesa;
 import ar.edu.itec1misiones.model.MateriaPlan;
 import ar.edu.itec1misiones.model.MesaExamen;
-import ar.edu.itec1misiones.model.PeriodoAcademico;
+import ar.edu.itec1misiones.model.CicloLectivo;
 import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 import ar.edu.itec1misiones.repository.InscripcionMesaRepository;
 import ar.edu.itec1misiones.repository.MateriaPlanRepository;
 import ar.edu.itec1misiones.repository.MesaExamenRepository;
-import ar.edu.itec1misiones.repository.PeriodoAcademicoRepository;
+import ar.edu.itec1misiones.repository.CicloLectivoRepository;
 import ar.edu.itec1misiones.service.UserLookupPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,7 @@ class MesaExamenServiceImplTest {
     @Mock
     private MateriaPlanRepository materiaPlanRepository;
     @Mock
-    private PeriodoAcademicoRepository periodoAcademicoRepository;
+    private CicloLectivoRepository cicloLectivoRepository;
     @Mock
     private UserLookupPort userLookupPort;
 
@@ -62,7 +62,8 @@ class MesaExamenServiceImplTest {
     private MesaExamenRequest requestMesa(Set<Long> tribunalIds) {
         MesaExamenRequest request = new MesaExamenRequest();
         request.setMateriaPlanId(1L);
-        request.setPeriodoAcademicoId(2L);
+        request.setCicloLectivoId(2L);
+        request.setTipo(ar.edu.itec1misiones.model.TipoMesa.ESPECIAL);
         request.setFechaHora(LocalDateTime.of(2026, 11, 20, 18, 0));
         request.setTribunalIds(tribunalIds);
         return request;
@@ -72,8 +73,8 @@ class MesaExamenServiceImplTest {
     void crearMesaQuedaProgramadaConSuTribunal() {
         when(materiaPlanRepository.findById(1L))
                 .thenReturn(Optional.of(MateriaPlan.builder().id(1L).build()));
-        when(periodoAcademicoRepository.findById(2L))
-                .thenReturn(Optional.of(PeriodoAcademico.builder().id(2L).build()));
+        when(cicloLectivoRepository.findById(2L))
+                .thenReturn(Optional.of(CicloLectivo.builder().id(2L).build()));
         when(userLookupPort.findById(10L))
                 .thenReturn(Optional.of(userConRol(10L, Rol.PROFESOR)));
         when(mesaExamenRepository.save(any(MesaExamen.class))).thenAnswer(inv -> {
@@ -87,7 +88,8 @@ class MesaExamenServiceImplTest {
         assertEquals(50L, resultado.getId());
         assertEquals(EstadoMesa.PROGRAMADA, resultado.getEstado());
         assertEquals(1L, resultado.getMateriaPlanId());
-        assertEquals(2L, resultado.getPeriodoAcademicoId());
+        assertEquals(2L, resultado.getCicloLectivoId());
+        assertEquals(ar.edu.itec1misiones.model.TipoMesa.ESPECIAL, resultado.getTipo());
         assertEquals(java.util.List.of(10L), resultado.getTribunalIds());
     }
 
@@ -95,8 +97,8 @@ class MesaExamenServiceImplTest {
     void crearMesaRechazaTribunalSinRolProfesor() {
         when(materiaPlanRepository.findById(1L))
                 .thenReturn(Optional.of(MateriaPlan.builder().id(1L).build()));
-        when(periodoAcademicoRepository.findById(2L))
-                .thenReturn(Optional.of(PeriodoAcademico.builder().id(2L).build()));
+        when(cicloLectivoRepository.findById(2L))
+                .thenReturn(Optional.of(CicloLectivo.builder().id(2L).build()));
         when(userLookupPort.findById(10L))
                 .thenReturn(Optional.of(userConRol(10L, Rol.ALUMNO)));
 
@@ -109,7 +111,7 @@ class MesaExamenServiceImplTest {
         MesaExamen mesa = MesaExamen.builder()
                 .id(50L)
                 .materiaPlan(MateriaPlan.builder().id(1L).build())
-                .periodoAcademico(PeriodoAcademico.builder().id(2L).build())
+                .cicloLectivo(CicloLectivo.builder().id(2L).build())
                 .estado(EstadoMesa.PROGRAMADA)
                 .build();
         when(mesaExamenRepository.findByTribunalId(10L)).thenReturn(java.util.List.of(mesa));
@@ -125,7 +127,7 @@ class MesaExamenServiceImplTest {
         MesaExamen mesa = MesaExamen.builder()
                 .id(50L)
                 .materiaPlan(MateriaPlan.builder().id(1L).build())
-                .periodoAcademico(PeriodoAcademico.builder().id(2L).build())
+                .cicloLectivo(CicloLectivo.builder().id(2L).build())
                 .estado(EstadoMesa.PROGRAMADA)
                 .tribunal(Set.of())
                 .build();

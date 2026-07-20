@@ -8,18 +8,18 @@ import ar.edu.itec1misiones.dto.response.MesaExamenResponse;
 import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnMesaException;
 import ar.edu.itec1misiones.exception.MateriaPlanNotFoundException;
 import ar.edu.itec1misiones.exception.MesaExamenNotFoundException;
-import ar.edu.itec1misiones.exception.PeriodoAcademicoNotFoundException;
+import ar.edu.itec1misiones.exception.CicloLectivoNotFoundException;
 import ar.edu.itec1misiones.model.EstadoMesa;
 import ar.edu.itec1misiones.model.InscripcionMesa;
 import ar.edu.itec1misiones.model.MateriaPlan;
 import ar.edu.itec1misiones.model.MesaExamen;
-import ar.edu.itec1misiones.model.PeriodoAcademico;
+import ar.edu.itec1misiones.model.CicloLectivo;
 import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 import ar.edu.itec1misiones.repository.InscripcionMesaRepository;
 import ar.edu.itec1misiones.repository.MateriaPlanRepository;
 import ar.edu.itec1misiones.repository.MesaExamenRepository;
-import ar.edu.itec1misiones.repository.PeriodoAcademicoRepository;
+import ar.edu.itec1misiones.repository.CicloLectivoRepository;
 import ar.edu.itec1misiones.service.MesaExamenService;
 import ar.edu.itec1misiones.service.UserLookupPort;
 import lombok.RequiredArgsConstructor;
@@ -39,15 +39,15 @@ public class MesaExamenServiceImpl implements MesaExamenService {
     private final MesaExamenRepository mesaExamenRepository;
     private final InscripcionMesaRepository inscripcionMesaRepository;
     private final MateriaPlanRepository materiaPlanRepository;
-    private final PeriodoAcademicoRepository periodoAcademicoRepository;
+    private final CicloLectivoRepository cicloLectivoRepository;
     private final UserLookupPort userLookupPort;
 
     @Override
     public MesaExamenResponse crear(MesaExamenRequest request) {
         MateriaPlan materiaPlan = materiaPlanRepository.findById(request.getMateriaPlanId())
                 .orElseThrow(() -> new MateriaPlanNotFoundException(request.getMateriaPlanId()));
-        PeriodoAcademico periodo = periodoAcademicoRepository.findById(request.getPeriodoAcademicoId())
-                .orElseThrow(() -> new PeriodoAcademicoNotFoundException(request.getPeriodoAcademicoId()));
+        CicloLectivo ciclo = cicloLectivoRepository.findById(request.getCicloLectivoId())
+                .orElseThrow(() -> new CicloLectivoNotFoundException(request.getCicloLectivoId()));
 
         Set<User> tribunal = request.getTribunalIds().stream()
                 .map(this::buscarProfesor)
@@ -55,7 +55,9 @@ public class MesaExamenServiceImpl implements MesaExamenService {
 
         MesaExamen mesa = MesaExamen.builder()
                 .materiaPlan(materiaPlan)
-                .periodoAcademico(periodo)
+                .cicloLectivo(ciclo)
+                .turno(request.getTurno())
+                .tipo(request.getTipo())
                 .fechaHora(request.getFechaHora())
                 .estado(EstadoMesa.PROGRAMADA)
                 .tribunal(tribunal)
@@ -153,7 +155,9 @@ public class MesaExamenServiceImpl implements MesaExamenService {
         return MesaExamenResponse.builder()
                 .id(mesa.getId())
                 .materiaPlanId(mesa.getMateriaPlan().getId())
-                .periodoAcademicoId(mesa.getPeriodoAcademico().getId())
+                .cicloLectivoId(mesa.getCicloLectivo().getId())
+                .turno(mesa.getTurno())
+                .tipo(mesa.getTipo())
                 .fechaHora(mesa.getFechaHora())
                 .estado(mesa.getEstado())
                 .tribunalIds(mesa.getTribunal().stream().map(User::getId).sorted().toList())
