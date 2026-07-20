@@ -19,7 +19,9 @@ import { getUsuarioActual } from "@/lib/auth-server"
 interface MesaExamenResponse {
   id: number
   materiaPlanId: number
-  periodoAcademicoId: number
+  cicloLectivoId: number
+  turno: "PRIMER_TURNO" | "SEGUNDO_TURNO" | "TERCER_TURNO" | null
+  tipo: "ORDINARIA_1ER_LLAMADO" | "ORDINARIA_2DO_LLAMADO" | "ESPECIAL"
   fechaHora: string
   estado: "PROGRAMADA" | "CERRADA"
   tribunalIds: number[]
@@ -38,9 +40,9 @@ interface MateriaPlanResponse {
   materiaNombre: string
 }
 
-interface PeriodoAcademicoResponse {
+interface CicloLectivoResponse {
   id: number
-  nombre: string
+  anio: number
 }
 
 interface ProfesorResponse {
@@ -84,7 +86,7 @@ export default async function MesaExamenDetallePage({
     fetchCore<MesaExamenResponse>(`/mesas-examen/${mesaId}`),
     fetchCore<InscripcionMesaResponse>(`/mesas-examen/${mesaId}/inscripciones`),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
-    fetchCore<PeriodoAcademicoResponse>("/periodos-academicos"),
+    fetchCore<CicloLectivoResponse>("/ciclos-lectivos"),
     fetchCore<ProfesorResponse>("/profesores"),
     fetchCore<AlumnoResponse>("/alumnos"),
   ])
@@ -95,9 +97,9 @@ export default async function MesaExamenDetallePage({
   const materiaNombre =
     (materiasPlan ?? []).find((m) => m.id === mesa.materiaPlanId)?.materiaNombre ??
     `Materia #${mesa.materiaPlanId}`
-  const periodoNombre =
-    (periodos ?? []).find((p) => p.id === mesa.periodoAcademicoId)?.nombre ??
-    `Período #${mesa.periodoAcademicoId}`
+  const cicloNombre =
+    (periodos ?? []).find((c) => c.id === mesa.cicloLectivoId)?.anio.toString() ??
+    `Ciclo #${mesa.cicloLectivoId}`
   const profesorPorUserId = new Map((profesores ?? []).map((p) => [p.userId, p]))
   const tribunal = mesa.tribunalIds.map((userId) => {
     const profesor = profesorPorUserId.get(userId)
@@ -133,7 +135,12 @@ export default async function MesaExamenDetallePage({
         <div>
           <h1 className="font-display text-3xl font-semibold text-foreground">{materiaNombre}</h1>
           <p className="text-sm text-muted-foreground">
-            {periodoNombre} · {formatearFechaHora(mesa.fechaHora)}
+            {cicloNombre} ·{" "}
+            {mesa.tipo === "ORDINARIA_1ER_LLAMADO" && "Ordinaria (1er Llamado)"}
+            {mesa.tipo === "ORDINARIA_2DO_LLAMADO" && "Ordinaria (2do Llamado)"}
+            {mesa.tipo === "ESPECIAL" && "Especial"}
+            {mesa.turno && ` (${mesa.turno.replace("_", " ").toLowerCase()})`} ·{" "}
+            {formatearFechaHora(mesa.fechaHora)}
           </p>
         </div>
         <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
