@@ -75,15 +75,17 @@ export default function NuevaMesaDialog({
       .filter((profesor) => formData.get(`tribunal_${profesor.userId}`) === "on")
       .map((profesor) => profesor.userId)
 
+    const hora = formData.get("hora") as string
+
     try {
       await createMesaExamen({
         materiaPlanId: Number(formData.get("materiaPlanId")),
         cicloLectivoId: Number(formData.get("cicloLectivoId")),
         turno: tipoMesa === "ORDINARIA" ? (formData.get("turno") as string) : null,
         tipoMesa,
-        fechaHora1erLlamado: formData.get("fechaHora1erLlamado") ? `${formData.get("fechaHora1erLlamado")}:00` : undefined,
-        fechaHora2doLlamado: formData.get("fechaHora2doLlamado") ? `${formData.get("fechaHora2doLlamado")}:00` : undefined,
-        fechaHoraEspecial: formData.get("fechaHoraEspecial") ? `${formData.get("fechaHoraEspecial")}:00` : undefined,
+        fechaHora1erLlamado: formData.get("fecha1erLlamado") ? `${formData.get("fecha1erLlamado")}T${hora}:00` : undefined,
+        fechaHora2doLlamado: formData.get("fecha2doLlamado") ? `${formData.get("fecha2doLlamado")}T${hora}:00` : undefined,
+        fechaHoraEspecial: formData.get("fechaEspecial") ? `${formData.get("fechaEspecial")}T${hora}:00` : undefined,
         tribunalIds,
       })
       formRef.current?.reset()
@@ -172,21 +174,26 @@ export default function NuevaMesaDialog({
             )}
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="hora">Hora del Examen</Label>
+            <Input id="hora" name="hora" type="time" required />
+          </div>
+
           {tipoMesa === "ORDINARIA" ? (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="fechaHora1erLlamado">1er Llamado</Label>
-                <Input id="fechaHora1erLlamado" name="fechaHora1erLlamado" type="datetime-local" required />
+                <Label htmlFor="fecha1erLlamado">Fecha 1er Llamado</Label>
+                <Input id="fecha1erLlamado" name="fecha1erLlamado" type="date" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="fechaHora2doLlamado">2do Llamado</Label>
-                <Input id="fechaHora2doLlamado" name="fechaHora2doLlamado" type="datetime-local" required />
+                <Label htmlFor="fecha2doLlamado">Fecha 2do Llamado</Label>
+                <Input id="fecha2doLlamado" name="fecha2doLlamado" type="date" required />
               </div>
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="fechaHoraEspecial">Fecha y Hora</Label>
-              <Input id="fechaHoraEspecial" name="fechaHoraEspecial" type="datetime-local" required />
+              <Label htmlFor="fechaEspecial">Fecha</Label>
+              <Input id="fechaEspecial" name="fechaEspecial" type="date" required />
             </div>
           )}
 
