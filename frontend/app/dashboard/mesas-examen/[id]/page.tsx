@@ -13,6 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import InscribirAlumnoMesaDialog from "@/components/mesas-examen/inscribir-alumno-mesa-dialog"
+import EditarTribunalDialog from "@/components/mesas-examen/editar-tribunal-dialog"
+import { getUsuarioActual } from "@/lib/auth-server"
 
 interface MesaExamenResponse {
   id: number
@@ -108,6 +110,15 @@ export default async function MesaExamenDetallePage({
     .filter((a) => a.activo && a.userId != null && !userIdsInscriptos.has(a.userId))
     .map((a) => ({ userId: a.userId, nombre: a.nombre, apellido: a.apellido, dni: a.dni }))
 
+  const profesoresDisponiblesParaDialog = (profesores ?? []).map((p) => ({
+    userId: p.userId,
+    nombre: p.nombre,
+    apellido: p.apellido,
+  }))
+
+  const usuario = await getUsuarioActual()
+  const esAdmin = usuario?.roles.includes("ADMIN") || usuario?.roles.includes("ADMINISTRATIVO")
+
   return (
     <div className="space-y-6">
       <Link
@@ -131,8 +142,15 @@ export default async function MesaExamenDetallePage({
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base">Tribunal Docente</CardTitle>
+          {esAdmin && mesa.estado === "PROGRAMADA" && (
+            <EditarTribunalDialog
+              mesaExamenId={mesa.id}
+              profesoresDisponibles={profesoresDisponiblesParaDialog}
+              tribunalIdsActuales={mesa.tribunalIds}
+            />
+          )}
         </CardHeader>
         <CardContent>
           {tribunal.length === 0 ? (
