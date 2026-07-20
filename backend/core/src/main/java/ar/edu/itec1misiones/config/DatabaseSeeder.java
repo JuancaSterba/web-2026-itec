@@ -33,7 +33,6 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final CursadaRepository cursadaRepository;
     private final CoreUserRepository userRepository;
     private final HorarioClaseRepository horarioClaseRepository;
-    private final ModuloHorarioRepository moduloHorarioRepository;
 
     @Override
     public void run(String... args) {
@@ -151,28 +150,18 @@ public class DatabaseSeeder implements CommandLineRunner {
         // levante el entorno.
         DayOfWeek diaDeHoy = LocalDate.now().getDayOfWeek();
 
-        ModuloHorario moduloManiana = new ModuloHorario();
-        moduloManiana.setNumero(1);
-        moduloManiana.setHoraInicio(LocalTime.of(8, 0));
-        moduloManiana.setHoraFin(LocalTime.of(10, 0));
-        moduloManiana = moduloHorarioRepository.save(moduloManiana);
-
-        ModuloHorario moduloTarde = new ModuloHorario();
-        moduloTarde.setNumero(2);
-        moduloTarde.setHoraInicio(LocalTime.of(14, 0));
-        moduloTarde.setHoraFin(LocalTime.of(16, 0));
-        moduloTarde = moduloHorarioRepository.save(moduloTarde);
-
         HorarioClase horarioProg1 = new HorarioClase();
         horarioProg1.setDiaSemana(diaDeHoy);
         horarioProg1.setComision(comisionProg1);
-        horarioProg1.setModulos(List.of(moduloManiana));
+        horarioProg1.setHoraInicio(LocalTime.of(8, 0));
+        horarioProg1.setHoraFin(LocalTime.of(10, 0));
         horarioClaseRepository.save(horarioProg1);
 
         HorarioClase horarioLogica = new HorarioClase();
         horarioLogica.setDiaSemana(diaDeHoy);
         horarioLogica.setComision(comisionLogica);
-        horarioLogica.setModulos(List.of(moduloTarde));
+        horarioLogica.setHoraInicio(LocalTime.of(14, 0));
+        horarioLogica.setHoraFin(LocalTime.of(16, 0));
         horarioClaseRepository.save(horarioLogica);
 
         // --- Estudiantes ---

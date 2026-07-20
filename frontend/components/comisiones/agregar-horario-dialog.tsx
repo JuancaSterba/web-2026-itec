@@ -16,13 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-interface ModuloDisponible {
-  id: number
-  numero: number
-  horaInicio: string
-  horaFin: string
-}
-
+// Remove ModuloDisponible
 const DIAS_SEMANA = [
   { value: "MONDAY", label: "Lunes" },
   { value: "TUESDAY", label: "Martes" },
@@ -43,27 +37,28 @@ function BotonGuardar() {
 
 export default function AgregarHorarioDialog({
   comisionId,
-  modulos,
 }: {
   comisionId: number
-  modulos: ModuloDisponible[]
 }) {
   const [open, setOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(formData: FormData) {
     const diaSemana = formData.get("diaSemana") as string
-    const modulosIds = modulos
-      .filter((modulo) => formData.get(`modulo_${modulo.id}`) === "on")
-      .map((modulo) => modulo.id)
+    const horaInicio = formData.get("horaInicio") as string
+    const horaFin = formData.get("horaFin") as string
 
-    if (modulosIds.length === 0) {
-      toast.error("Seleccioná al menos un módulo")
+    if (!horaInicio || !horaFin) {
+      toast.error("Seleccioná la hora de inicio y de fin")
+      return
+    }
+    if (horaFin <= horaInicio) {
+      toast.error("La hora de fin debe ser posterior a la hora de inicio")
       return
     }
 
     try {
-      await createHorarioClase(comisionId, diaSemana, modulosIds)
+      await createHorarioClase(comisionId, diaSemana, horaInicio, horaFin)
       formRef.current?.reset()
       setOpen(false)
       toast.success("Horario agregado correctamente")
@@ -75,10 +70,7 @@ export default function AgregarHorarioDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          disabled={modulos.length === 0}
-          title={modulos.length === 0 ? "No hay módulos horarios cargados" : undefined}
-        >
+        <Button>
           <Plus className="size-4" />
           Agregar Horario
         </Button>
@@ -104,23 +96,27 @@ export default function AgregarHorarioDialog({
             </select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Módulos</Label>
-            {modulos.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No hay módulos horarios cargados.</p>
-            ) : (
-              <div className="max-h-48 space-y-1 overflow-y-auto rounded-md border border-input p-2">
-                {modulos.map((modulo) => (
-                  <label
-                    key={modulo.id}
-                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-accent"
-                  >
-                    <input type="checkbox" name={`modulo_${modulo.id}`} className="size-4" />
-                    Módulo {modulo.numero} ({modulo.horaInicio.slice(0, 5)} - {modulo.horaFin.slice(0, 5)})
-                  </label>
-                ))}
-              </div>
-            )}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="horaInicio">Hora de Inicio</Label>
+              <input
+                type="time"
+                id="horaInicio"
+                name="horaInicio"
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="horaFin">Hora de Fin</Label>
+              <input
+                type="time"
+                id="horaFin"
+                name="horaFin"
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
           </div>
 
           <DialogFooter>

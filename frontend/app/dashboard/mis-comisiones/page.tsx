@@ -35,19 +35,15 @@ interface CursadaResponse {
   comisionId: number
 }
 
-interface ModuloHorarioResponse {
-  id: number
-  numero: number
-  horaInicio: string
-  horaFin: string
-}
+// Remove ModuloHorarioResponse
 
 interface HorarioClaseResponse {
   id: number
   diaSemana: string
   comisionId: number
   materiaNombre: string
-  modulos: ModuloHorarioResponse[]
+  horaInicio: string
+  horaFin: string
   proximaFecha: string
 }
 
@@ -57,8 +53,7 @@ function formatearProximaClase(horarios: HorarioClaseResponse[]): string | null 
   const proximo = [...horarios].sort((a, b) => a.proximaFecha.localeCompare(b.proximaFecha))[0]
   const fecha = new Date(`${proximo.proximaFecha}T00:00:00`)
   const fechaTexto = new Intl.DateTimeFormat("es-AR", { weekday: "long", day: "numeric", month: "long" }).format(fecha)
-  const primerModulo = proximo.modulos[0]
-  const horaTexto = primerModulo ? ` · ${primerModulo.horaInicio.slice(0, 5)}hs` : ""
+  const horaTexto = proximo.horaInicio ? ` · ${proximo.horaInicio.slice(0, 5)}hs` : ""
 
   return `${fechaTexto}${horaTexto}`
 }

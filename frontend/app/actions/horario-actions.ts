@@ -7,7 +7,7 @@ function getApiBaseUrl() {
   return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 }
 
-export async function createHorarioClase(comisionId: number, diaSemana: string, modulosIds: number[]) {
+export async function createHorarioClase(comisionId: number, diaSemana: string, horaInicio: string, horaFin: string) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
@@ -17,7 +17,7 @@ export async function createHorarioClase(comisionId: number, diaSemana: string, 
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     },
-    body: JSON.stringify({ comisionId, diaSemana, modulosIds }),
+    body: JSON.stringify({ comisionId, diaSemana, horaInicio, horaFin }),
   })
 
   if (!response.ok) {

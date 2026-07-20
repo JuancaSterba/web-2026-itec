@@ -3,6 +3,7 @@ package ar.edu.itec1misiones.dto.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -14,6 +15,7 @@ public class HorarioClaseRequest {
     @NotNull(message = "El ID de la comisión es obligatorio")
     private Long comisionId;
 
-    @NotNull(message = "Los módulos son obligatorios")
-    private List<Long> modulosIds;
+    private LocalTime horaInicio;
+
+    private LocalTime horaFin;
 }
