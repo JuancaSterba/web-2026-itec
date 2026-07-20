@@ -14,7 +14,9 @@ import NuevaMesaDialog from "@/components/mesas-examen/nueva-mesa-dialog"
 interface MesaExamenResponse {
   id: number
   materiaPlanId: number
-  periodoAcademicoId: number
+  cicloLectivoId: number
+  turno: "PRIMER_TURNO" | "SEGUNDO_TURNO" | "TERCER_TURNO" | null
+  tipo: "ORDINARIA_1ER_LLAMADO" | "ORDINARIA_2DO_LLAMADO" | "ESPECIAL"
   fechaHora: string
   estado: "PROGRAMADA" | "CERRADA"
   tribunalIds: number[]
@@ -25,9 +27,9 @@ interface MateriaPlanResponse {
   materiaNombre: string
 }
 
-interface PeriodoAcademicoResponse {
+interface CicloLectivoResponse {
   id: number
-  nombre: string
+  anio: number
 }
 
 interface ProfesorResponse {
@@ -46,10 +48,10 @@ function formatearFechaHora(fechaHora: string) {
 }
 
 export default async function MesasExamenPage() {
-  const [mesas, materiasPlan, periodos, profesores] = await Promise.all([
+  const [mesas, materiasPlan, ciclos, profesores] = await Promise.all([
     fetchCore<MesaExamenResponse>("/mesas-examen"),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
-    fetchCore<PeriodoAcademicoResponse>("/periodos-academicos"),
+    fetchCore<CicloLectivoResponse>("/ciclos-lectivos"),
     fetchCore<ProfesorResponse>("/profesores"),
   ])
 
@@ -62,7 +64,7 @@ export default async function MesasExamenPage() {
     id: m.id,
     nombre: m.materiaNombre,
   }))
-  const periodosDisponibles = (periodos ?? []).map((p) => ({ id: p.id, nombre: p.nombre }))
+  const ciclosDisponibles = (ciclos ?? []).map((c) => ({ id: c.id, anio: c.anio }))
   const profesoresDisponibles = (profesores ?? [])
     .filter((p) => p.activo && p.userId != null)
     .map((p) => ({ userId: p.userId, nombre: p.nombre, apellido: p.apellido }))
@@ -78,7 +80,7 @@ export default async function MesasExamenPage() {
         </div>
         <NuevaMesaDialog
           materiasDisponibles={materiasDisponibles}
-          periodosDisponibles={periodosDisponibles}
+          ciclosDisponibles={ciclosDisponibles}
           profesoresDisponibles={profesoresDisponibles}
         />
       </div>
@@ -95,6 +97,7 @@ export default async function MesasExamenPage() {
             <TableRow>
               <TableHead>Materia</TableHead>
               <TableHead>Fecha</TableHead>
+              <TableHead>Tipo</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Tribunal</TableHead>
             </TableRow>
@@ -111,6 +114,18 @@ export default async function MesasExamenPage() {
                   </Link>
                 </TableCell>
                 <TableCell>{formatearFechaHora(mesa.fechaHora)}</TableCell>
+                <TableCell>
+                  <span className="text-sm font-medium">
+                    {mesa.tipo === "ORDINARIA_1ER_LLAMADO" && "Ordinaria (1er Llamado)"}
+                    {mesa.tipo === "ORDINARIA_2DO_LLAMADO" && "Ordinaria (2do Llamado)"}
+                    {mesa.tipo === "ESPECIAL" && "Especial"}
+                  </span>
+                  {mesa.turno && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({mesa.turno.replace("_", " ").toLowerCase()})
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
                     {mesa.estado === "PROGRAMADA" ? "Programada" : "Cerrada"}

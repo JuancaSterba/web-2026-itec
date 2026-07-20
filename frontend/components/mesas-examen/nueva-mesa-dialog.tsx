@@ -23,9 +23,9 @@ interface MateriaDisponible {
   nombre: string
 }
 
-interface PeriodoDisponible {
+interface CicloDisponible {
   id: number
-  nombre: string
+  anio: number
 }
 
 interface ProfesorDisponible {
@@ -45,20 +45,24 @@ function BotonGuardar() {
 
 export default function NuevaMesaDialog({
   materiasDisponibles,
-  periodosDisponibles,
+  ciclosDisponibles,
   profesoresDisponibles,
 }: {
   materiasDisponibles: MateriaDisponible[]
-  periodosDisponibles: PeriodoDisponible[]
+  ciclosDisponibles: CicloDisponible[]
   profesoresDisponibles: ProfesorDisponible[]
 }) {
   const [open, setOpen] = useState(false)
   const [materiaPlanId, setMateriaPlanId] = useState("")
+  const [tipoMesa, setTipoMesa] = useState<"ORDINARIA" | "ESPECIAL">("ORDINARIA")
   const formRef = useRef<HTMLFormElement>(null)
 
   function handleOpenChange(value: boolean) {
     setOpen(value)
-    if (!value) setMateriaPlanId("")
+    if (!value) {
+      setMateriaPlanId("")
+      setTipoMesa("ORDINARIA")
+    }
   }
 
   async function handleSubmit(formData: FormData) {
@@ -74,13 +78,17 @@ export default function NuevaMesaDialog({
     try {
       await createMesaExamen({
         materiaPlanId: Number(formData.get("materiaPlanId")),
-        periodoAcademicoId: Number(formData.get("periodoAcademicoId")),
-        // datetime-local devuelve "YYYY-MM-DDTHH:mm"; LocalDateTime lo acepta con segundos.
-        fechaHora: `${formData.get("fechaHora")}:00`,
+        cicloLectivoId: Number(formData.get("cicloLectivoId")),
+        turno: tipoMesa === "ORDINARIA" ? (formData.get("turno") as string) : null,
+        tipoMesa,
+        fechaHora1erLlamado: formData.get("fechaHora1erLlamado") ? `${formData.get("fechaHora1erLlamado")}:00` : undefined,
+        fechaHora2doLlamado: formData.get("fechaHora2doLlamado") ? `${formData.get("fechaHora2doLlamado")}:00` : undefined,
+        fechaHoraEspecial: formData.get("fechaHoraEspecial") ? `${formData.get("fechaHoraEspecial")}:00` : undefined,
         tribunalIds,
       })
       formRef.current?.reset()
       setMateriaPlanId("")
+      setTipoMesa("ORDINARIA")
       setOpen(false)
       toast.success("Mesa de examen creada correctamente")
     } catch (error) {
@@ -101,6 +109,20 @@ export default function NuevaMesaDialog({
           <DialogTitle>Nueva Mesa de Examen</DialogTitle>
         </DialogHeader>
         <form ref={formRef} action={handleSubmit} className="space-y-4">
+          
+          <div className="space-y-2">
+            <Label htmlFor="tipoMesa">Tipo de Mesa</Label>
+            <select
+              id="tipoMesa"
+              value={tipoMesa}
+              onChange={(e) => setTipoMesa(e.target.value as "ORDINARIA" | "ESPECIAL")}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="ORDINARIA">Ordinaria (con 1er y 2do Llamado)</option>
+              <option value="ESPECIAL">Especial (único llamado)</option>
+            </select>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="materiaPlanId">Materia</Label>
             <SelectMateriaBuscable
@@ -114,27 +136,59 @@ export default function NuevaMesaDialog({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="periodoAcademicoId">Período Académico</Label>
-            <select
-              id="periodoAcademicoId"
-              name="periodoAcademicoId"
-              required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="">Seleccioná un período</option>
-              {periodosDisponibles.map((periodo) => (
-                <option key={periodo.id} value={periodo.id}>
-                  {periodo.nombre}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cicloLectivoId">Ciclo Lectivo</Label>
+              <select
+                id="cicloLectivoId"
+                name="cicloLectivoId"
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="">Seleccionar</option>
+                {ciclosDisponibles.map((ciclo) => (
+                  <option key={ciclo.id} value={ciclo.id}>
+                    {ciclo.anio}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {tipoMesa === "ORDINARIA" && (
+              <div className="space-y-2">
+                <Label htmlFor="turno">Turno</Label>
+                <select
+                  id="turno"
+                  name="turno"
+                  required={tipoMesa === "ORDINARIA"}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="PRIMER_TURNO">1er Turno (Feb/Marzo)</option>
+                  <option value="SEGUNDO_TURNO">2do Turno (Julio)</option>
+                  <option value="TERCER_TURNO">3er Turno (Nov/Dic)</option>
+                </select>
+              </div>
+            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="fechaHora">Fecha y Hora</Label>
-            <Input id="fechaHora" name="fechaHora" type="datetime-local" required />
-          </div>
+          {tipoMesa === "ORDINARIA" ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fechaHora1erLlamado">1er Llamado</Label>
+                <Input id="fechaHora1erLlamado" name="fechaHora1erLlamado" type="datetime-local" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="fechaHora2doLlamado">2do Llamado</Label>
+                <Input id="fechaHora2doLlamado" name="fechaHora2doLlamado" type="datetime-local" required />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor="fechaHoraEspecial">Fecha y Hora</Label>
+              <Input id="fechaHoraEspecial" name="fechaHoraEspecial" type="datetime-local" required />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Tribunal Docente</Label>
