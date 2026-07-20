@@ -6,6 +6,7 @@ import ar.edu.itec1misiones.notas.repository.CalificacionMesaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ar.edu.itec1misiones.notas.client.MesaExamenClient;
 
 import java.util.List;
 
@@ -13,9 +14,11 @@ import java.util.List;
 public class CalificacionMesaService {
 
     private final CalificacionMesaRepository calificacionMesaRepository;
+    private final MesaExamenClient mesaExamenClient;
 
-    public CalificacionMesaService(CalificacionMesaRepository calificacionMesaRepository) {
+    public CalificacionMesaService(CalificacionMesaRepository calificacionMesaRepository, MesaExamenClient mesaExamenClient) {
         this.calificacionMesaRepository = calificacionMesaRepository;
+        this.mesaExamenClient = mesaExamenClient;
     }
 
     public CalificacionMesa crear(CalificacionMesaRequest request) {
@@ -25,6 +28,7 @@ public class CalificacionMesaService {
                     "El alumno " + request.getAlumnoId() + " ya tiene una calificación en la mesa "
                             + request.getMesaExamenId());
         }
+        validarMesaAbierta(request.getMesaExamenId());
 
         CalificacionMesa calificacion = new CalificacionMesa();
         aplicarRequest(calificacion, request);
@@ -39,6 +43,7 @@ public class CalificacionMesaService {
         CalificacionMesa calificacion = calificacionMesaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Calificación de mesa no encontrada: " + id));
+        validarMesaAbierta(request.getMesaExamenId());
         aplicarRequest(calificacion, request);
         return calificacionMesaRepository.save(calificacion);
     }
@@ -50,5 +55,12 @@ public class CalificacionMesaService {
         calificacion.setAusente(request.getAusente() != null && request.getAusente());
         calificacion.setLibro(request.getLibro());
         calificacion.setFolio(request.getFolio());
+    }
+
+    private void validarMesaAbierta(Long mesaExamenId) {
+        if (!mesaExamenClient.isMesaAbierta(mesaExamenId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La mesa de examen se encuentra cerrada, no se pueden modificar las notas.");
+        }
     }
 }
