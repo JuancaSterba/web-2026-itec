@@ -84,19 +84,15 @@ interface ComisionProfesorResponse {
   rol: string
 }
 
-interface ModuloHorarioResponse {
-  id: number
-  numero: number
-  horaInicio: string
-  horaFin: string
-}
+// Remove ModuloHorarioResponse
 
 interface HorarioClaseResponse {
   id: number
   diaSemana: string
   comisionId: number
   materiaNombre: string
-  modulos: ModuloHorarioResponse[]
+  horaInicio: string
+  horaFin: string
   proximaFecha: string | null
 }
 
@@ -117,7 +113,7 @@ export default async function ComisionDetallePage({
 }) {
   const { comisionId } = await params
 
-  const [comisiones, materiasPlan, cursadas, alumnos, profesores, comisionesProfesores, horariosClase, modulosHorario] =
+  const [comisiones, materiasPlan, cursadas, alumnos, profesores, comisionesProfesores, horariosClase] =
     await Promise.all([
       fetchCore<ComisionResponse>(`/comisiones/${comisionId}`),
       fetchCore<MateriaPlanResponse>("/materias-plan"),
@@ -126,7 +122,6 @@ export default async function ComisionDetallePage({
       fetchCore<ProfesorResponse>("/profesores"),
       fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
       fetchCore<HorarioClaseResponse>(`/horarios/comision/${comisionId}`),
-      fetchCore<ModuloHorarioResponse>("/modulos"),
     ])
 
   const usuario = await getUsuarioActual()
@@ -161,7 +156,7 @@ export default async function ComisionDetallePage({
   const profesorPorId = new Map((profesores ?? []).map((p) => [p.id, p]))
   const docentesDeLaComision = comisionesProfesores?.filter((cp) => String(cp.comisionId) === comisionId) ?? null
   const horariosDeLaComision = horariosClase ?? null
-  const modulosDisponibles = modulosHorario ?? []
+// modulosDisponibles removed
 
   const cursadasParaAsistencia = (cursadasDeLaComision ?? []).map((cursada) => {
     const alumno = alumnoPorId.get(cursada.alumnoId)
@@ -378,7 +373,7 @@ export default async function ComisionDetallePage({
         {esAdmin && (
           <TabsContent value="horarios" className="space-y-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground">
             <div className="flex justify-end">
-              <AgregarHorarioDialog comisionId={Number(comisionId)} modulos={modulosDisponibles} />
+              <AgregarHorarioDialog comisionId={Number(comisionId)} />
             </div>
             {horariosDeLaComision === null ? (
               <p className="text-destructive">No se pudo obtener los horarios de clase.</p>
@@ -398,10 +393,7 @@ export default async function ComisionDetallePage({
                     <TableRow key={horario.id}>
                       <TableCell>{DIAS_SEMANA_ES[horario.diaSemana] ?? horario.diaSemana}</TableCell>
                       <TableCell>
-                        {[...(horario.modulos ?? [])]
-                          .sort((a, b) => a.numero - b.numero)
-                          .map((modulo) => `Módulo ${modulo.numero} (${modulo.horaInicio.slice(0, 5)} - ${modulo.horaFin.slice(0, 5)})`)
-                          .join(", ")}
+                        {horario.horaInicio?.slice(0, 5)} - {horario.horaFin?.slice(0, 5)}
                       </TableCell>
                       <TableCell className="flex justify-end">
                         {usuario?.roles.includes("ADMIN") && (
