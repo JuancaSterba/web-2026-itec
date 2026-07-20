@@ -39,7 +39,13 @@ public class MesaExamen {
     private MateriaPlan materiaPlan;
 
     @ManyToOne
-    private PeriodoAcademico periodoAcademico;
+    private CicloLectivo cicloLectivo;
+
+    @Enumerated(EnumType.STRING)
+    private TurnoExamen turno;
+
+    @Enumerated(EnumType.STRING)
+    private TipoMesa tipo;
 
     private LocalDateTime fechaHora;
 
