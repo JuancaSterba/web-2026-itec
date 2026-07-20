@@ -2,6 +2,7 @@ package ar.edu.itec1misiones.service.impl;
 
 import ar.edu.itec1misiones.dto.request.InscripcionMesaRequest;
 import ar.edu.itec1misiones.dto.request.MesaExamenRequest;
+import ar.edu.itec1misiones.dto.request.MesaExamenUpdateRequest;
 import ar.edu.itec1misiones.dto.response.InscripcionMesaResponse;
 import ar.edu.itec1misiones.dto.response.MesaExamenResponse;
 import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnMesaException;
@@ -117,6 +118,29 @@ class MesaExamenServiceImplTest {
 
         assertEquals(1, resultado.size());
         assertEquals(50L, resultado.get(0).getId());
+    }
+
+    @Test
+    void actualizarTribunalModificaLosDocentesYGuardaLaMesa() {
+        MesaExamen mesa = MesaExamen.builder()
+                .id(50L)
+                .materiaPlan(MateriaPlan.builder().id(1L).build())
+                .periodoAcademico(PeriodoAcademico.builder().id(2L).build())
+                .estado(EstadoMesa.PROGRAMADA)
+                .tribunal(Set.of())
+                .build();
+        
+        when(mesaExamenRepository.findById(50L)).thenReturn(Optional.of(mesa));
+        when(userLookupPort.findById(20L)).thenReturn(Optional.of(userConRol(20L, Rol.PROFESOR)));
+        when(mesaExamenRepository.save(any(MesaExamen.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        MesaExamenUpdateRequest request = new MesaExamenUpdateRequest();
+        request.setTribunalIds(java.util.List.of(20L));
+
+        MesaExamenResponse resultado = service.actualizarTribunal(50L, request);
+
+        assertEquals(java.util.List.of(20L), resultado.getTribunalIds());
+        verify(mesaExamenRepository).save(mesa);
     }
 
     @Test

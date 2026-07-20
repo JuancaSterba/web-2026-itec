@@ -3,6 +3,7 @@ package ar.edu.itec1misiones.controller;
 import ar.edu.itec1misiones.dto.ApiResponse;
 import ar.edu.itec1misiones.dto.request.InscripcionMesaRequest;
 import ar.edu.itec1misiones.dto.request.MesaExamenRequest;
+import ar.edu.itec1misiones.dto.request.MesaExamenUpdateRequest;
 import ar.edu.itec1misiones.dto.response.InscripcionMesaResponse;
 import ar.edu.itec1misiones.dto.response.MesaExamenResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
@@ -68,6 +69,23 @@ public class MesaExamenController {
             HttpServletRequest httpRequest) {
 
         MesaExamenResponse mesa = mesaExamenService.buscarPorId(id);
+        return ResponseEntity.ok(
+                ApiResponse.<MesaExamenResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(mesa))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{id}/tribunal")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar el tribunal docente de una mesa de examen")
+    public ResponseEntity<ApiResponse<MesaExamenResponse>> actualizarTribunal(
+            @PathVariable Long id,
+            @RequestBody @Valid MesaExamenUpdateRequest request,
+            HttpServletRequest httpRequest) {
+
+        MesaExamenResponse mesa = mesaExamenService.actualizarTribunal(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<MesaExamenResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))

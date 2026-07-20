@@ -2,6 +2,7 @@ package ar.edu.itec1misiones.service.impl;
 
 import ar.edu.itec1misiones.dto.request.InscripcionMesaRequest;
 import ar.edu.itec1misiones.dto.request.MesaExamenRequest;
+import ar.edu.itec1misiones.dto.request.MesaExamenUpdateRequest;
 import ar.edu.itec1misiones.dto.response.InscripcionMesaResponse;
 import ar.edu.itec1misiones.dto.response.MesaExamenResponse;
 import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnMesaException;
@@ -84,6 +85,19 @@ public class MesaExamenServiceImpl implements MesaExamenService {
     public MesaExamenResponse buscarPorId(Long id) {
         return toResponse(mesaExamenRepository.findById(id)
                 .orElseThrow(() -> new MesaExamenNotFoundException(id)));
+    }
+
+    @Override
+    public MesaExamenResponse actualizarTribunal(Long id, MesaExamenUpdateRequest request) {
+        MesaExamen mesa = mesaExamenRepository.findById(id)
+                .orElseThrow(() -> new MesaExamenNotFoundException(id));
+
+        Set<User> tribunal = request.getTribunalIds().stream()
+                .map(this::buscarProfesor)
+                .collect(Collectors.toSet());
+
+        mesa.setTribunal(tribunal);
+        return toResponse(mesaExamenRepository.save(mesa));
     }
 
     @Override
