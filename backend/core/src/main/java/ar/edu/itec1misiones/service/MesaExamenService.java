@@ -16,4 +16,6 @@ public interface MesaExamenService {
     MesaExamenResponse actualizarTribunal(Long id, MesaExamenUpdateRequest request);
     InscripcionMesaResponse inscribirAlumno(Long mesaExamenId, InscripcionMesaRequest request);
     List<InscripcionMesaResponse> listarInscripciones(Long mesaExamenId);
+    MesaExamenResponse cerrarMesa(Long id);
+    byte[] generarActaPdf(Long id);
 }

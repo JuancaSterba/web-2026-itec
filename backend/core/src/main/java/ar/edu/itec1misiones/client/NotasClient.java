@@ -1,6 +1,7 @@
 package ar.edu.itec1misiones.client;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
+import ar.edu.itec1misiones.dto.response.CalificacionMesaResponse;
 import ar.edu.itec1misiones.dto.response.CalificacionParcialDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,6 +41,20 @@ public class NotasClient {
                 new ParameterizedTypeReference<ApiResponse<CalificacionParcialDto>>() {});
 
         ApiResponse<CalificacionParcialDto> body = response.getBody();
+        return body != null && body.getData() != null ? body.getData() : List.of();
+    }
+
+    public List<CalificacionMesaResponse> obtenerPorMesa(Long mesaExamenId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-User-Roles", "ADMIN");
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = notasApiUrl + "/api/notas/mesas?mesaExamenId=" + mesaExamenId;
+        ResponseEntity<ApiResponse<CalificacionMesaResponse>> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity,
+                new ParameterizedTypeReference<ApiResponse<CalificacionMesaResponse>>() {});
+
+        ApiResponse<CalificacionMesaResponse> body = response.getBody();
         return body != null && body.getData() != null ? body.getData() : List.of();
     }
 }

@@ -126,4 +126,30 @@ public class MesaExamenController {
                         .build()
         );
     }
+
+    @PostMapping("/{id}/cerrar")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Cerrar definitivamente el acta de la mesa de examen")
+    public ResponseEntity<ApiResponse<MesaExamenResponse>> cerrarMesa(
+            @PathVariable Long id,
+            HttpServletRequest httpRequest) {
+
+        MesaExamenResponse mesa = mesaExamenService.cerrarMesa(id);
+        return ResponseEntity.ok(
+                ApiResponse.<MesaExamenResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(List.of(mesa))
+                        .build()
+        );
+    }
+
+    @GetMapping(value = "/{id}/acta-pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Generar Acta Volante / Acta de Examen en PDF")
+    public ResponseEntity<byte[]> generarActaPdf(@PathVariable Long id) {
+        byte[] pdf = mesaExamenService.generarActaPdf(id);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"acta_mesa_" + id + ".pdf\"")
+                .body(pdf);
+    }
 }
