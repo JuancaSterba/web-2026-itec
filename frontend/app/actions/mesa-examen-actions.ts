@@ -128,3 +128,24 @@ export async function updateTribunalMesa(
 
   revalidatePath("/dashboard/mesas-examen/[id]", "page")
 }
+
+export async function cerrarMesaExamen(mesaId: number) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const response = await fetch(`${getApiBaseUrl()}/api/core/mesas-examen/${mesaId}/cerrar`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo cerrar el acta de la mesa")
+  }
+
+  revalidatePath("/dashboard/mesas-examen/[id]", "page")
+  revalidatePath("/dashboard/mesas-examen", "page")
+}

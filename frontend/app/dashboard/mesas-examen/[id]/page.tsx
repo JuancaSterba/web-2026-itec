@@ -14,7 +14,10 @@ import {
 } from "@/components/ui/table"
 import InscribirAlumnoMesaDialog from "@/components/mesas-examen/inscribir-alumno-mesa-dialog"
 import EditarTribunalDialog from "@/components/mesas-examen/editar-tribunal-dialog"
+import CerrarActaButton from "@/components/mesas-examen/cerrar-acta-button"
 import { getUsuarioActual } from "@/lib/auth-server"
+import { FileText } from "lucide-react"
+import { buttonVariants } from "@/components/ui/button"
 
 interface MesaExamenResponse {
   id: number
@@ -143,9 +146,21 @@ export default async function MesaExamenDetallePage({
             {formatearFechaHora(mesa.fechaHora)}
           </p>
         </div>
-        <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
-          {mesa.estado === "PROGRAMADA" ? "Programada" : "Cerrada"}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
+            {mesa.estado === "PROGRAMADA" ? "Programada" : "Cerrada"}
+          </Badge>
+          <a 
+            href={`/api/mesas-examen/${mesa.id}/acta-pdf`} 
+            target="_blank" 
+            rel="noreferrer"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <FileText className="mr-2 size-4" />
+            Descargar Acta
+          </a>
+          {esAdmin && <CerrarActaButton mesaId={mesa.id} estado={mesa.estado} />}
+        </div>
       </div>
 
       <Card>

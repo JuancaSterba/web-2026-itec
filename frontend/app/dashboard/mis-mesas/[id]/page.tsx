@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react"
 import { fetchCore, fetchGateway } from "@/lib/api-server"
 import { getProfesorActual } from "@/lib/profesor-actual"
 import { Badge } from "@/components/ui/badge"
+import { buttonVariants } from "@/components/ui/button"
+import { FileText } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -111,9 +113,20 @@ export default async function MisMesasDetallePage({
           <h1 className="font-display text-3xl font-semibold text-foreground">{materiaNombre}</h1>
           <p className="text-sm text-muted-foreground">{formatearFechaHora(mesa.fechaHora)}</p>
         </div>
-        <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
-          {mesa.estado === "PROGRAMADA" ? "Programada" : "Cerrada"}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
+            {mesa.estado === "PROGRAMADA" ? "Programada" : "Cerrada"}
+          </Badge>
+          <a 
+            href={`/api/mesas-examen/${mesa.id}/acta-pdf`} 
+            target="_blank" 
+            rel="noreferrer"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <FileText className="mr-2 size-4" />
+            Descargar Acta
+          </a>
+        </div>
       </div>
 
       {inscripciones === null ? (
@@ -145,6 +158,7 @@ export default async function MisMesasDetallePage({
                     mesaExamenId={mesa.id}
                     alumnoUserId={inscripcion.alumnoId}
                     calificacion={calificacionPorAlumno.get(inscripcion.alumnoId) ?? null}
+                    mesaEstado={mesa.estado}
                   />
                 </TableRow>
               )

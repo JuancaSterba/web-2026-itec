@@ -21,10 +21,12 @@ export default function CeldasNotaMesa({
   mesaExamenId,
   alumnoUserId,
   calificacion,
+  mesaEstado,
 }: {
   mesaExamenId: number
   alumnoUserId: number
   calificacion: CalificacionMesaExistente | null
+  mesaEstado?: string
 }) {
   const [nota, setNota] = useState(calificacion?.nota?.toString() ?? "")
   const [libro, setLibro] = useState(calificacion?.libro ?? "")
@@ -83,7 +85,7 @@ export default function CeldasNotaMesa({
           step={0.5}
           className="w-20 text-center"
           value={nota}
-          disabled={isSaving}
+          disabled={isSaving || mesaEstado === "CERRADA"}
           onChange={(e) => setNota(e.target.value)}
           onBlur={guardarSiCambio}
           onKeyDown={blurConEnter}
@@ -95,7 +97,7 @@ export default function CeldasNotaMesa({
             placeholder="Libro"
             className="w-20"
             value={libro}
-            disabled={isSaving}
+            disabled={isSaving || mesaEstado === "CERRADA"}
             onChange={(e) => setLibro(e.target.value)}
             onBlur={guardarSiCambio}
             onKeyDown={blurConEnter}
@@ -104,7 +106,7 @@ export default function CeldasNotaMesa({
             placeholder="Folio"
             className="w-20"
             value={folio}
-            disabled={isSaving}
+            disabled={isSaving || mesaEstado === "CERRADA"}
             onChange={(e) => setFolio(e.target.value)}
             onBlur={guardarSiCambio}
             onKeyDown={blurConEnter}
