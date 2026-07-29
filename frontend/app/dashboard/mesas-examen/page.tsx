@@ -80,6 +80,7 @@ export default async function MesasExamenPage() {
     const fechaHoraFormateada = new Date(m.fechaHora).toLocaleString("es-AR", {
       dateStyle: "medium",
       timeStyle: "short",
+      timeZone: "America/Argentina/Buenos_Aires",
     })
 
     return {
