@@ -6,6 +6,9 @@ import ar.edu.itec1misiones.dto.request.MesaExamenUpdateRequest;
 import ar.edu.itec1misiones.dto.response.InscripcionMesaResponse;
 import ar.edu.itec1misiones.dto.response.MesaExamenResponse;
 import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnMesaException;
+import ar.edu.itec1misiones.exception.InscripcionMesaCerradaException;
+import ar.edu.itec1misiones.exception.MateriaYaAprobadaException;
+import ar.edu.itec1misiones.model.CondicionFinal;
 import ar.edu.itec1misiones.model.CondicionInscripcion;
 import ar.edu.itec1misiones.model.EstadoMesa;
 import ar.edu.itec1misiones.model.InscripcionMesa;
@@ -14,6 +17,7 @@ import ar.edu.itec1misiones.model.MesaExamen;
 import ar.edu.itec1misiones.model.CicloLectivo;
 import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
+import ar.edu.itec1misiones.repository.CursadaRepository;
 import ar.edu.itec1misiones.repository.InscripcionMesaRepository;
 import ar.edu.itec1misiones.repository.MateriaPlanRepository;
 import ar.edu.itec1misiones.repository.MesaExamenRepository;
@@ -26,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,6 +51,8 @@ class MesaExamenServiceImplTest {
     private MateriaPlanRepository materiaPlanRepository;
     @Mock
     private CicloLectivoRepository cicloLectivoRepository;
+    @Mock
+    private CursadaRepository cursadaRepository;
     @Mock
     private UserLookupPort userLookupPort;
 
@@ -147,11 +154,20 @@ class MesaExamenServiceImplTest {
 
     @Test
     void inscribirAlumnoPersisteLaInscripcion() {
-        MesaExamen mesa = MesaExamen.builder().id(50L).estado(EstadoMesa.PROGRAMADA).build();
+        MateriaPlan materiaPlan = MateriaPlan.builder().id(100L).build();
+        MesaExamen mesa = MesaExamen.builder()
+                .id(50L)
+                .fechaHora(LocalDateTime.now().plusDays(5))
+                .materiaPlan(materiaPlan)
+                .estado(EstadoMesa.PROGRAMADA)
+                .build();
         when(mesaExamenRepository.findById(50L)).thenReturn(Optional.of(mesa));
         when(userLookupPort.findById(30L))
                 .thenReturn(Optional.of(userConRol(30L, Rol.ALUMNO)));
         when(inscripcionMesaRepository.existsByMesaExamenIdAndAlumnoId(50L, 30L)).thenReturn(false);
+        when(inscripcionMesaRepository.existsByAlumnoIdAndMesaExamenMateriaPlanIdAndAprobadoTrue(30L, 100L)).thenReturn(false);
+        when(cursadaRepository.existsByAlumnoIdAndComisionMateriaPlanIdAndCondicionFinalIn(
+                30L, 100L, List.of(CondicionFinal.PROMOCIONADA, CondicionFinal.APROBADA))).thenReturn(false);
         when(inscripcionMesaRepository.save(any(InscripcionMesa.class))).thenAnswer(inv -> {
             InscripcionMesa inscripcion = inv.getArgument(0);
             inscripcion.setId(7L);
@@ -173,7 +189,13 @@ class MesaExamenServiceImplTest {
 
     @Test
     void inscribirAlumnoDuplicadoLanzaConflicto() {
-        MesaExamen mesa = MesaExamen.builder().id(50L).estado(EstadoMesa.PROGRAMADA).build();
+        MateriaPlan materiaPlan = MateriaPlan.builder().id(100L).build();
+        MesaExamen mesa = MesaExamen.builder()
+                .id(50L)
+                .fechaHora(LocalDateTime.now().plusDays(5))
+                .materiaPlan(materiaPlan)
+                .estado(EstadoMesa.PROGRAMADA)
+                .build();
         when(mesaExamenRepository.findById(50L)).thenReturn(Optional.of(mesa));
         when(userLookupPort.findById(30L))
                 .thenReturn(Optional.of(userConRol(30L, Rol.ALUMNO)));
@@ -185,5 +207,74 @@ class MesaExamenServiceImplTest {
 
         assertThrows(AlumnoYaInscriptoEnMesaException.class, () -> service.inscribirAlumno(50L, request));
         verify(inscripcionMesaRepository, never()).save(any());
+    }
+
+    @Test
+    void inscribirAlumno_lanzaExcepcion_siFaltanMenosDe48Horas() {
+        MateriaPlan materiaPlan = MateriaPlan.builder().id(100L).build();
+        MesaExamen mesaPronto = MesaExamen.builder()
+                .id(1L)
+                .fechaHora(LocalDateTime.now().plusHours(24))
+                .estado(EstadoMesa.PROGRAMADA)
+                .materiaPlan(materiaPlan)
+                .build();
+        when(mesaExamenRepository.findById(1L)).thenReturn(Optional.of(mesaPronto));
+        when(userLookupPort.findById(10L)).thenReturn(Optional.of(userConRol(10L, Rol.ALUMNO)));
+
+        InscripcionMesaRequest request = new InscripcionMesaRequest();
+        request.setAlumnoId(10L);
+        request.setCondicionInscripcion(CondicionInscripcion.REGULAR);
+
+        assertThrows(InscripcionMesaCerradaException.class, () -> 
+            service.inscribirAlumno(1L, request)
+        );
+    }
+
+    @Test
+    void inscribirAlumno_lanzaExcepcion_siMateriaYaEstaAprobadaEnExamenFinal() {
+        MateriaPlan materiaPlan = MateriaPlan.builder().id(100L).build();
+        MesaExamen mesaFutura = MesaExamen.builder()
+                .id(1L)
+                .fechaHora(LocalDateTime.now().plusDays(5))
+                .estado(EstadoMesa.PROGRAMADA)
+                .materiaPlan(materiaPlan)
+                .build();
+        when(mesaExamenRepository.findById(1L)).thenReturn(Optional.of(mesaFutura));
+        when(userLookupPort.findById(10L)).thenReturn(Optional.of(userConRol(10L, Rol.ALUMNO)));
+        when(inscripcionMesaRepository.existsByMesaExamenIdAndAlumnoId(1L, 10L)).thenReturn(false);
+        when(inscripcionMesaRepository.existsByAlumnoIdAndMesaExamenMateriaPlanIdAndAprobadoTrue(10L, 100L)).thenReturn(true);
+
+        InscripcionMesaRequest request = new InscripcionMesaRequest();
+        request.setAlumnoId(10L);
+        request.setCondicionInscripcion(CondicionInscripcion.REGULAR);
+
+        assertThrows(MateriaYaAprobadaException.class, () -> 
+            service.inscribirAlumno(1L, request)
+        );
+    }
+
+    @Test
+    void inscribirAlumno_lanzaExcepcion_siMateriaYaEstaAprobadaPorCursada() {
+        MateriaPlan materiaPlan = MateriaPlan.builder().id(100L).build();
+        MesaExamen mesaFutura = MesaExamen.builder()
+                .id(1L)
+                .fechaHora(LocalDateTime.now().plusDays(5))
+                .estado(EstadoMesa.PROGRAMADA)
+                .materiaPlan(materiaPlan)
+                .build();
+        when(mesaExamenRepository.findById(1L)).thenReturn(Optional.of(mesaFutura));
+        when(userLookupPort.findById(10L)).thenReturn(Optional.of(userConRol(10L, Rol.ALUMNO)));
+        when(inscripcionMesaRepository.existsByMesaExamenIdAndAlumnoId(1L, 10L)).thenReturn(false);
+        when(inscripcionMesaRepository.existsByAlumnoIdAndMesaExamenMateriaPlanIdAndAprobadoTrue(10L, 100L)).thenReturn(false);
+        when(cursadaRepository.existsByAlumnoIdAndComisionMateriaPlanIdAndCondicionFinalIn(
+                10L, 100L, List.of(CondicionFinal.PROMOCIONADA, CondicionFinal.APROBADA))).thenReturn(true);
+
+        InscripcionMesaRequest request = new InscripcionMesaRequest();
+        request.setAlumnoId(10L);
+        request.setCondicionInscripcion(CondicionInscripcion.REGULAR);
+
+        assertThrows(MateriaYaAprobadaException.class, () -> 
+            service.inscribirAlumno(1L, request)
+        );
     }
 }

@@ -8,9 +8,12 @@ import ar.edu.itec1misiones.dto.response.CalificacionMesaResponse;
 import ar.edu.itec1misiones.dto.response.InscripcionMesaResponse;
 import ar.edu.itec1misiones.dto.response.MesaExamenResponse;
 import ar.edu.itec1misiones.exception.AlumnoYaInscriptoEnMesaException;
+import ar.edu.itec1misiones.exception.InscripcionMesaCerradaException;
 import ar.edu.itec1misiones.exception.MateriaPlanNotFoundException;
+import ar.edu.itec1misiones.exception.MateriaYaAprobadaException;
 import ar.edu.itec1misiones.exception.MesaExamenNotFoundException;
 import ar.edu.itec1misiones.exception.CicloLectivoNotFoundException;
+import ar.edu.itec1misiones.model.CondicionFinal;
 import ar.edu.itec1misiones.model.EstadoMesa;
 import ar.edu.itec1misiones.model.InscripcionMesa;
 import ar.edu.itec1misiones.model.MateriaPlan;
@@ -22,6 +25,7 @@ import ar.edu.itec1misiones.repository.InscripcionMesaRepository;
 import ar.edu.itec1misiones.repository.MateriaPlanRepository;
 import ar.edu.itec1misiones.repository.MesaExamenRepository;
 import ar.edu.itec1misiones.repository.CicloLectivoRepository;
+import ar.edu.itec1misiones.repository.CursadaRepository;
 import ar.edu.itec1misiones.service.MesaExamenService;
 import ar.edu.itec1misiones.service.UserLookupPort;
 import com.lowagie.text.Document;
@@ -52,6 +56,7 @@ public class MesaExamenServiceImpl implements MesaExamenService {
     private final InscripcionMesaRepository inscripcionMesaRepository;
     private final MateriaPlanRepository materiaPlanRepository;
     private final CicloLectivoRepository cicloLectivoRepository;
+    private final CursadaRepository cursadaRepository;
     private final UserLookupPort userLookupPort;
     private final NotasClient notasClient;
 
@@ -128,8 +133,28 @@ public class MesaExamenServiceImpl implements MesaExamenService {
                     "El usuario con id " + request.getAlumnoId() + " no tiene rol ALUMNO");
         }
 
+        // 1. Validar plazo de 48 hs antes del examen
+        if (mesa.getFechaHora() != null && LocalDateTime.now().isAfter(mesa.getFechaHora().minusHours(48))) {
+            throw new InscripcionMesaCerradaException("La inscripción cerró 48 horas antes de la fecha del examen.");
+        }
+
         if (inscripcionMesaRepository.existsByMesaExamenIdAndAlumnoId(mesaExamenId, alumno.getId())) {
             throw new AlumnoYaInscriptoEnMesaException(alumno.getId(), mesaExamenId);
+        }
+
+        // 2. Validar si ya aprobó la materia en un examen final previo
+        boolean yaAproboEnMesa = inscripcionMesaRepository
+                .existsByAlumnoIdAndMesaExamenMateriaPlanIdAndAprobadoTrue(alumno.getId(), mesa.getMateriaPlan().getId());
+        if (yaAproboEnMesa) {
+            throw new MateriaYaAprobadaException("El alumno ya aprobó esta materia en un examen final previo.");
+        }
+
+        // 3. Validar si ya promocionó/aprobó en cursada
+        boolean yaAproboEnCursada = cursadaRepository
+                .existsByAlumnoIdAndComisionMateriaPlanIdAndCondicionFinalIn(
+                        alumno.getId(), mesa.getMateriaPlan().getId(), List.of(CondicionFinal.PROMOCIONADA, CondicionFinal.APROBADA));
+        if (yaAproboEnCursada) {
+            throw new MateriaYaAprobadaException("El alumno ya tiene aprobada/promocionada esta materia por cursada.");
         }
 
         InscripcionMesa inscripcion = InscripcionMesa.builder()

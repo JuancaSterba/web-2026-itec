@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.repository;
 
+import ar.edu.itec1misiones.model.CondicionFinal;
 import ar.edu.itec1misiones.model.Cursada;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,4 +10,5 @@ public interface CursadaRepository extends JpaRepository<Cursada, Long> {
     boolean existsByAlumnoIdAndComisionId(Long alumnoId, Long comisionId);
     long countByComisionId(Long comisionId);
     List<Cursada> findByAlumnoId(Long alumnoId);
+    boolean existsByAlumnoIdAndComisionMateriaPlanIdAndCondicionFinalIn(Long alumnoId, Long materiaPlanId, List<CondicionFinal> condiciones);
 }
