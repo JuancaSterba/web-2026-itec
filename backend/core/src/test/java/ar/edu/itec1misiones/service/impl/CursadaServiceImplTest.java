@@ -32,6 +32,8 @@ class CursadaServiceImplTest {
     private AlumnoRepository alumnoRepository;
     @Mock
     private ComisionRepository comisionRepository;
+    @Mock
+    private ar.edu.itec1misiones.repository.InscripcionMesaRepository inscripcionMesaRepository;
 
     @InjectMocks
     private CursadaServiceImpl service;

@@ -274,6 +274,34 @@ public class CoreExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MateriaYaAprobadaException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMateriaYaAprobada(
+            MateriaYaAprobadaException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("MATERIA_YA_APROBADA", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(InscripcionMesaCerradaException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInscripcionMesaCerrada(
+            InscripcionMesaCerradaException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto("INSCRIPCION_MESA_CERRADA", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiResponse<Object>> handleResponseStatus(
             ResponseStatusException ex,
