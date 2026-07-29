@@ -1,15 +1,6 @@
-import Link from "next/link"
 import { fetchCore } from "@/lib/api-server"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import NuevaMesaDialog from "@/components/mesas-examen/nueva-mesa-dialog"
+import { MesasExamenTabla, type MesaExamenItem } from "@/components/mesas-examen/mesas-examen-tabla"
 
 interface MesaExamenResponse {
   id: number
@@ -48,13 +39,6 @@ interface PlanEstudioResponse {
   carreraNombre: string
 }
 
-function formatearFechaHora(fechaHora: string) {
-  return new Date(fechaHora).toLocaleString("es-AR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  })
-}
-
 export default async function MesasExamenPage() {
   const [mesas, materiasPlan, ciclos, profesores, planes] = await Promise.all([
     fetchCore<MesaExamenResponse>("/mesas-examen"),
@@ -76,6 +60,9 @@ export default async function MesasExamenPage() {
   const materiaPorId = new Map(
     (materiasPlan ?? []).map((m) => [m.id, getNombreCompletoMateria(m)])
   )
+  const cicloPorId = new Map(
+    (ciclos ?? []).map((c) => [c.id, c.anio])
+  )
   const profesorPorUserId = new Map(
     (profesores ?? []).map((p) => [p.userId, `${p.apellido}, ${p.nombre}`])
   )
@@ -88,6 +75,20 @@ export default async function MesasExamenPage() {
   const profesoresDisponibles = (profesores ?? [])
     .filter((p) => p.activo && p.userId != null)
     .map((p) => ({ userId: p.userId, nombre: p.nombre, apellido: p.apellido }))
+
+  const mesasEnriquecidas: MesaExamenItem[] = (mesas ?? []).map((m) => ({
+    id: m.id,
+    materiaNombre: materiaPorId.get(m.materiaPlanId) ?? `Materia #${m.materiaPlanId}`,
+    cicloAnio: cicloPorId.get(m.cicloLectivoId) ?? 0,
+    cicloLectivoId: m.cicloLectivoId,
+    turno: m.turno,
+    tipo: m.tipo,
+    fechaHora: m.fechaHora,
+    estado: m.estado,
+    tribunalNombres: (m.tribunalIds ?? []).map(
+      (userId) => profesorPorUserId.get(userId) ?? `Docente #${userId}`
+    ),
+  }))
 
   return (
     <div className="space-y-6">
@@ -112,56 +113,7 @@ export default async function MesasExamenPage() {
       ) : mesas.length === 0 ? (
         <p className="text-sm text-muted-foreground">Todavía no hay mesas de examen creadas.</p>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Materia</TableHead>
-              <TableHead>Fecha</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Tribunal</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mesas.map((mesa) => (
-              <TableRow key={mesa.id}>
-                <TableCell>
-                  <Link
-                    href={`/dashboard/mesas-examen/${mesa.id}`}
-                    className="font-medium text-foreground hover:underline"
-                  >
-                    {materiaPorId.get(mesa.materiaPlanId) ?? `Materia #${mesa.materiaPlanId}`}
-                  </Link>
-                </TableCell>
-                <TableCell>{formatearFechaHora(mesa.fechaHora)}</TableCell>
-                <TableCell>
-                  <span className="text-sm font-medium">
-                    {mesa.tipo === "ORDINARIA_1ER_LLAMADO" && "Ordinaria (1er Llamado)"}
-                    {mesa.tipo === "ORDINARIA_2DO_LLAMADO" && "Ordinaria (2do Llamado)"}
-                    {mesa.tipo === "ESPECIAL" && "Especial"}
-                  </span>
-                  {mesa.turno && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      ({mesa.turno.replace("_", " ").toLowerCase()})
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={mesa.estado === "PROGRAMADA" ? "default" : "secondary"}>
-                    {mesa.estado === "PROGRAMADA" ? "Programada" : "Cerrada"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {mesa.tribunalIds.length === 0
-                    ? "Sin tribunal asignado"
-                    : mesa.tribunalIds
-                        .map((userId) => profesorPorUserId.get(userId) ?? `Docente #${userId}`)
-                        .join(" · ")}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <MesasExamenTabla mesas={mesasEnriquecidas} ciclosDisponibles={ciclosDisponibles} />
       )}
     </div>
   )
