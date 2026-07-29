@@ -22,6 +22,7 @@ export interface MesaExamenItem {
   turno: "PRIMER_TURNO" | "SEGUNDO_TURNO" | "TERCER_TURNO" | null
   tipo: "ORDINARIA_1ER_LLAMADO" | "ORDINARIA_2DO_LLAMADO" | "ESPECIAL"
   fechaHora: string
+  fechaHoraFormateada: string
   estado: "PROGRAMADA" | "CERRADA"
   tribunalNombres: string[]
 }
@@ -31,12 +32,7 @@ interface Props {
   ciclosDisponibles: { id: number; anio: number }[]
 }
 
-function formatearFechaHora(fechaHora: string) {
-  return new Date(fechaHora).toLocaleString("es-AR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  })
-}
+
 
 export function MesasExamenTabla({ mesas, ciclosDisponibles }: Props) {
   const [busqueda, setBusqueda] = useState("")
@@ -178,7 +174,7 @@ export function MesasExamenTabla({ mesas, ciclosDisponibles }: Props) {
                     {mesa.cicloAnio ? `Ciclo ${mesa.cicloAnio}` : "-"}
                   </span>
                 </TableCell>
-                <TableCell>{formatearFechaHora(mesa.fechaHora)}</TableCell>
+                <TableCell>{mesa.fechaHoraFormateada}</TableCell>
                 <TableCell>
                   <span className="text-sm font-medium">
                     {mesa.tipo === "ORDINARIA_1ER_LLAMADO" && "Ordinaria (1er Llamado)"}

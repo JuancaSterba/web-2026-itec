@@ -76,19 +76,27 @@ export default async function MesasExamenPage() {
     .filter((p) => p.activo && p.userId != null)
     .map((p) => ({ userId: p.userId, nombre: p.nombre, apellido: p.apellido }))
 
-  const mesasEnriquecidas: MesaExamenItem[] = (mesas ?? []).map((m) => ({
-    id: m.id,
-    materiaNombre: materiaPorId.get(m.materiaPlanId) ?? `Materia #${m.materiaPlanId}`,
-    cicloAnio: cicloPorId.get(m.cicloLectivoId) ?? 0,
-    cicloLectivoId: m.cicloLectivoId,
-    turno: m.turno,
-    tipo: m.tipo,
-    fechaHora: m.fechaHora,
-    estado: m.estado,
-    tribunalNombres: (m.tribunalIds ?? []).map(
-      (userId) => profesorPorUserId.get(userId) ?? `Docente #${userId}`
-    ),
-  }))
+  const mesasEnriquecidas: MesaExamenItem[] = (mesas ?? []).map((m) => {
+    const fechaHoraFormateada = new Date(m.fechaHora).toLocaleString("es-AR", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    })
+
+    return {
+      id: m.id,
+      materiaNombre: materiaPorId.get(m.materiaPlanId) ?? `Materia #${m.materiaPlanId}`,
+      cicloAnio: cicloPorId.get(m.cicloLectivoId) ?? 0,
+      cicloLectivoId: m.cicloLectivoId,
+      turno: m.turno,
+      tipo: m.tipo,
+      fechaHora: m.fechaHora,
+      fechaHoraFormateada,
+      estado: m.estado,
+      tribunalNombres: (m.tribunalIds ?? []).map(
+        (userId) => profesorPorUserId.get(userId) ?? `Docente #${userId}`
+      ),
+    }
+  })
 
   return (
     <div className="space-y-6">
