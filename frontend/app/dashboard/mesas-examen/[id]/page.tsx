@@ -40,6 +40,7 @@ interface InscripcionMesaResponse {
 
 interface MateriaPlanResponse {
   id: number
+  planEstudioId?: number
   materiaNombre: string
 }
 
@@ -197,7 +198,11 @@ export default async function MesaExamenDetallePage({
 
       <div className="flex items-center justify-between">
         <h2 className="font-display text-xl font-semibold text-foreground">Alumnos Inscriptos</h2>
-        <InscribirAlumnoMesaDialog mesaExamenId={mesa.id} alumnosDisponibles={alumnosDisponibles} />
+        <InscribirAlumnoMesaDialog
+          mesaExamenId={mesa.id}
+          fechaHoraMesa={mesa.fechaHora}
+          alumnosDisponibles={alumnosDisponibles}
+        />
       </div>
 
       {inscripciones === null ? (

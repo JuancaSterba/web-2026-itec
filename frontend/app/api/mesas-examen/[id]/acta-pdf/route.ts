@@ -7,9 +7,9 @@ function getApiBaseUrl() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const mesaId = params.id
+  const { id: mesaId } = await context.params
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 

@@ -166,9 +166,9 @@ export default function NuevaMesaDialog({
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="">Seleccionar</option>
-                  <option value="PRIMER_TURNO">1er Turno (Feb/Marzo)</option>
-                  <option value="SEGUNDO_TURNO">2do Turno (Julio)</option>
-                  <option value="TERCER_TURNO">3er Turno (Nov/Dic)</option>
+                  <option value="PRIMER_TURNO">1er Turno (Junio/Julio)</option>
+                  <option value="SEGUNDO_TURNO">2do Turno (Noviembre/Diciembre)</option>
+                  <option value="TERCER_TURNO">3er Turno (Febrero/Marzo)</option>
                 </select>
               </div>
             )}

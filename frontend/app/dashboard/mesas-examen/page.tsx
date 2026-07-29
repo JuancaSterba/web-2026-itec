@@ -24,6 +24,7 @@ interface MesaExamenResponse {
 
 interface MateriaPlanResponse {
   id: number
+  planEstudioId?: number
   materiaNombre: string
 }
 
