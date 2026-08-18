@@ -1,101 +1,79 @@
-# 🎓 Backoffice Académico ITEC - Backend
+# 🎓 Backoffice Académico ITEC — Backend Core
 
-> **Nota importante:** Este proyecto forma parte de un **repositorio modular (monorepo)**. El código y documentación que ves aquí corresponden exclusivamente al **Backend**. Para ver el frontend o la vista general del proyecto, por favor dirígete a la [raíz del repositorio](../README.md).
+> **Nota de Ecosistema:** Este módulo es el núcleo maestro del monorepo ITEC 2026. Para una visión general de la arquitectura completa, consulta el [README principal](../README.md).
+
+---
 
 ## 📌 Descripción
-spring.profiles.active=dev
 
-Este proyecto corresponde al trabajo final de la carrera de Desarrollo de Software del ITEC N°1.  
-El objetivo es desarrollar un sistema de **gestión académica centralizada** para docentes y administrativos, que facilite la administración de alumnos, materias, asistencias, calificaciones y validaciones académicas, garantizando escalabilidad mediante una arquitectura moderna.
+El **Backend Core** es el servicio central de gestión académica y autenticación. Administra las entidades maestras institucionales, las matrículas e inscripciones, y actúa como proveedor de identidad emitiendo tokens JWT.
 
----
-
-## 🧩 Funcionalidades principales
-
-- Login seguro con roles diferenciados: Docente, Administrativo, Alumno, Administrador.
-- Gestión de alumnos, profesores y materias.
-- Registro de asistencias.
-- Control de regularidad (Cálculo automático del 70% de asistencia obligatoria).
-- Gestión de calificaciones (exámenes, parciales y finales).
-- Validación automática de materias correlativas al inscribirse.
-- Generación de reportes académicos.
+### Funcionalidades Principales
+- 🔐 **Autenticación y Autorización:** Emisión y validación de tokens JWT (Roles: `ADMIN`, `DIRECTIVO`, `PRECEPTOR`, `DOCENTE`, `ESTUDIANTE`).
+- 👥 **Gestión de Personas:** Alumnos, Profesores, Administrativos, Directivos.
+- 🏛️ **Catálogo Académico:** Sedes, Carreras, Planes de Estudio, Materias, Aulas y Horarios.
+- 📋 **Inscripciones y Comisiones:** Ciclos lectivos, apertura de comisiones, inscripciones de alumnos y control de correlatividades.
+- 📑 **Mesas de Examen:** Gestión de actas de examen final y turnos de examen.
 
 ---
 
-## 🧱 Arquitectura y tecnologías
+## 🗺️ Mapa de Relaciones en el Monorepo
 
-- 🧠 **Backend:** Java 17 + Spring Boot
-- 🐳 **Despliegue y Orquestación:** Docker + Docker Compose (Arquitectura basada en Microservicios)
-- 💾 **Base de datos:** Relacional (MySQL/PostgreSQL)
-- 🔐 **Seguridad:** JWT con Spring Security
-- ☁️ **Patrón:** Modelo-Vista-Controlador (MVC) y diseño en multicapas.
-- 🗃️ **Versionado:** Git + GitHub + Git Flow
+| Componente | Carpeta | Relación / Comunicación |
+|---|---|---|
+| 🚪 **API Gateway** | [api-gateway](../api-gateway/README.md) | Enruta el tráfico externo hacia los endpoints de este Core (`/api/v1/auth/**`, `/api/v1/alumnos/**`, etc.). |
+| 🖥️ **Frontend** | [frontend](../frontend/README.md) | Consume las APIs a través del Gateway (puerto 8080). |
+| 📅 **MS Asistencias** | [ms-asistencias](../ms-asistencias/README.md) | Consulta a Core (`HorarioClient`) para validar horarios y comisiones vigentes. |
+| 📊 **MS Notas** | [ms-notas](../ms-notas/README.md) | Core consulta a Notas (`NotasClient`) para cálculos de condición final de alumnos. |
+| 📚 **Docs** | [docs](../docs/INDEX.md) | Diagramas de Clases, DER, Secuencia y Reglas de Negocio centralizadas. |
+| 📌 **Tareas / Memoria** | [.remember](../.remember/PENDIENTES.md) | Única fuente de verdad de backlog y deudas técnicas. |
 
 ---
 
-## 🗂️ Estructura del proyecto (Modular Maven / Docker)
+## 🧱 Estructura del Módulo
 
-El proyecto adopta un patrón de microservicios para aislar lógicas críticas. La estructura de Maven se alinea con los contenedores Docker definidos:
-
-```bash
+```
 /backend
-├── pom.xml (POM padre)
-├── /commons                      # Librería compartida (DTOs, Enums, Utils). Sin contenedor.
-├── /security                     # Librería compartida (Configuración JWT, Filtros). Sin contenedor.
-├── /core                         # App Principal (Contenedor 3) - CRUD general e inscripciones.
-├── /microservicio-asistencias    # Servicio dedicado a Asistencias (Contenedor 4).
-└── /microservicio-calificaciones # Servicio dedicado a Notas y Evaluaciones (Contenedor 5).
+├── pom.xml                   # POM padre multi-módulo
+├── commons/                  # DTOs comunes, Enums, ApiResponse, excepciones globales
+├── security/                 # Librería compartida de configuración JWT y filtros
+└── core/                     # Aplicación Spring Boot ejecutable (Entidades, Repositorios, Servicios, Controllers)
 ```
 
 ---
 
-## 🧾 Documentación y Diagramas
+## ⚙️ Variables de Entorno Clave
 
-Toda la documentación arquitectónica, técnica y de negocio generada se encuentra en la carpeta raíz `/docs`. Puedes consultar los siguientes diagramas (en formato Mermaid) para comprender a fondo el sistema:
-
-1. 🏛️ **[Diagrama de Arquitectura](../docs/Diagrama_Arquitectura.md)**: Contenedores y orquestación.
-2. 📦 **[Diagrama de Clases](../docs/Diagrama_Clases.md)**: Diseño Orientado a Objetos (Modelos).
-3. 🔄 **[Diagrama de Secuencia (Inscripciones)](../docs/Diagrama_Secuencia_Inscripciones.md)**: Flujos de negocio para anotar alumnos a carreras y materias.
-4. 🔄 **[Diagrama de Secuencia (Asistencias)](../docs/Diagrama_Secuencia_Asistencia.md)**: Flujo de validación automática de inasistencias y pérdida de regularidad.
-5. 🚥 **[Diagrama de Estados](../docs/Diagrama_Estados.md)**: Transición del estado académico del alumno (Inscripto, Regular, Libre, etc.).
-6. 🗄️ **[Modelo de Datos (DER)](../docs/Modelo_Datos.md)**: Estructura relacional de las tablas.
-7. 🔍 **[Análisis del Modelo](../docs/Analisis_Modelo.md)**: Recomendaciones técnicas y puntos de negocio clave a revisar en el desarrollo.
+| Variable | Valor Local (Dev) | Valor Docker (Prod) | Descripción |
+|---|---|---|---|
+| `APP_PORT` | `8082` | `8082` (o `8081`) | Puerto del servidor Spring Boot |
+| `SPRING_PROFILES_ACTIVE` | `local` | `prod` | Perfil de configuración activo |
+| `DB_URL` | `jdbc:mysql://localhost:3306/backoffice_itec` | `jdbc:mysql://mysql-db:3306/backoffice_itec` | Conexión a la base de datos principal |
+| `JWT_SECRET` | *(Clave simétrica)* | *(Clave simétrica)* | Secreto para firma de JWT (compartido con Gateway) |
+| `NOTAS_API_URL` | `http://localhost:8084` | `http://ms-notas:8084` | Endpoint del microservicio de notas |
 
 ---
 
-## 🧪 Cómo ejecutar
+## 🚀 Ejecución
 
-1. Cloná el repositorio:
+### Desarrollo Local (Maven)
 ```bash
-git clone https://github.com/usuario/backoffice-itec.git
-cd backoffice-itec
+cd backend
+mvn clean install
+cd core
+mvn spring-boot:run
 ```
 
-2. Levantá la infraestructura con Docker Compose (desde la raíz del proyecto):
+### Con Docker Compose
+Desde la raíz del monorepo:
 ```bash
-docker-compose up --build
+docker compose up --build backend-app
 ```
-*(Alternativamente, para desarrollar en local sin Docker, ejecuta `mvn clean install` y luego corre `mvn spring-boot:run` en el directorio de cada aplicación ejecutable).*
 
 ---
 
-## 🧬 Git Flow y buenas prácticas
-
-- Todas las funcionalidades nuevas se desarrollan en ramas `feature/*`
-- Ramas base:
-    - `main` / `master`: Versión estable, refleja lo que está en producción.
-    - `develop`: Integración en progreso.
-- Ejemplo de nombre de commit:
-  ```
-  feat: US-ALU-01 Agrega endpoint para alta de alumnos
-  ```
-
----
-
-## 📋 Evaluación
-
-Cada integrante será evaluado individualmente. El sistema será presentado en la mesa de examen, junto con este repositorio y su documentación. Se deberá poder explicar y defender las decisiones técnicas y de arquitectura adoptadas (MVC, POO, Persistencia, Docker).
-
----
-
-> 💬 Para dudas, contactarse con el docente asignado.
+## 📚 Enlaces a Documentación Relevante
+- 🗄️ [Modelo de Datos (DER)](../docs/02.00-Modelo_Datos.md)
+- 📦 [Diagrama de Clases](../docs/02.10-Diagrama_Clases.md)
+- 🔄 [Diagrama de Secuencia de Inscripciones](../docs/03.10-Diagrama_Secuencia_Inscripciones.md)
+- 📜 [Reglas de Negocio](../docs/01.00-Reglas_de_Negocio.md)

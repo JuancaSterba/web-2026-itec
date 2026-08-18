@@ -1,113 +1,80 @@
-# Backoffice ITEC — Frontend
+# 🖥️ Backoffice ITEC — Frontend Web
 
-> **Nota importante:** Este proyecto forma parte de un **repositorio modular (monorepo)**. El código y documentación que ves aquí corresponden exclusivamente al **Frontend**. Para ver el backend o la vista general del proyecto, por favor dirígete a la [raíz del repositorio](../README.md).
+> **Nota de Ecosistema:** Este módulo es la aplicación web cliente del monorepo ITEC 2026. Para una visión completa de la arquitectura y el backend, consulta el [README principal](../README.md).
 
-Panel de administración académica para el Instituto ITEC. Permite gestionar alumnos, profesores, materias, comisiones, asistencia, calificaciones, reportes y certificados.
+---
 
-## Tech Stack
+## 📌 Descripción
 
-- **Next.js 14** (App Router)
-- **React 18** + **TypeScript 5**
-- **Tailwind CSS** + **shadcn/ui**
-- **Lucide React** (iconografía)
-- **Sonner** (notificaciones toast)
+El **Frontend** es el portal web de administración académica para directivos, administrativos, docentes y estudiantes del Instituto ITEC. Desarrollado con **Next.js 14** (App Router), **React 18** y **TypeScript**.
 
-## Requisitos
+---
 
-- Node.js 18+
-- npm 9+
-- Backend corriendo en `http://localhost:8081` (configurable vía `.env.local`)
+## 🗺️ Mapa de Relaciones en el Monorepo
 
-## Instalación
+| Componente | Carpeta | Relación / Comunicación |
+|---|---|---|
+| 🚪 **API Gateway** | [api-gateway](../api-gateway/README.md) | **Único punto de entrada HTTP**. Todas las peticiones van a `http://localhost:8080` (en Docker `http://api-gateway:8080`). Nunca conectarse directo a puertos internos. |
+| 🧠 **Backend Core** | [backend](../backend/README.md) | Provee autenticación, ABMs maestros, inscripciones y catálogo. |
+| 📅 **MS Asistencias** | [ms-asistencias](../ms-asistencias/README.md) | Provee endpoints de registro y consulta de presentismo. |
+| 📊 **MS Notas** | [ms-notas](../ms-notas/README.md) | Provee carga de calificaciones, actas y estado de regularidad. |
+| 📚 **Docs UX/UI** | [docs/05.00-Diseno_UX_UI.md](../docs/05.00-Diseno_UX_UI.md) | Guías de diseño, accesibilidad, paleta institucional y componentes. |
+| 📌 **Tareas / Memoria** | [.remember](../.remember/PENDIENTES.md) | Única fuente de verdad del backlog y deudas técnicas. |
 
-```bash
-npm install --legacy-peer-deps
-```
+---
 
-> **Nota:** Se requiere usar `--legacy-peer-deps` debido a conflictos de dependencias (peer dependencies) con algunas librerías como `react-use` al utilizar React 18.
+## 🧱 Tech Stack
 
-## Variables de entorno
+- **Framework:** Next.js 14 (App Router)
+- **Lenguaje / Tipado:** TypeScript 5
+- **Estilos:** Tailwind CSS + shadcn/ui
+- **Iconografía:** Lucide React
+- **Feedback:** Sonner (Toast notifications)
 
-Crear un archivo `.env.local` en la raíz del proyecto:
+---
+
+## ⚙️ Variables de Entorno
+
+Crear un archivo `.env.local` en esta carpeta (`frontend/`):
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8081
+# URL alcanzable por el navegador del usuario hacia el API Gateway
+NEXT_PUBLIC_API_URL=http://localhost:8080
+
+# URL interna usada por Server Components / SSR dentro de Docker (opcional en local)
+API_URL=http://localhost:8080
 ```
 
-## Comandos
+---
+
+## 🚀 Comandos
 
 ```bash
-# Desarrollo
+# Instalación de dependencias (se requiere --legacy-peer-deps por compatibilidad React 18)
+npm install --legacy-peer-deps
+
+# Servidor de desarrollo (puerto 3000)
 npm run dev
 
-# Build de producción
+# Compilación para producción
 npm run build
 
-# Servidor de producción
+# Iniciar servidor de producción
 npm start
 ```
 
-La aplicación corre por defecto en `http://localhost:3000`.
+---
 
-## Estructura del proyecto
+## 🔐 Autenticación y Rutas Protegidas
 
-```
-├── app/
-│   ├── layout.tsx              # Layout raíz con AuthProvider
-│   ├── page.tsx                # Redirección según autenticación
-│   ├── login/                  # Página de login
-│   └── dashboard/
-│       ├── layout.tsx          # Layout con sidebar y header
-│       ├── page.tsx            # Dashboard principal
-│       └── students/           # Gestión de alumnos
-├── components/
-│   ├── auth/                   # Formulario de login
-│   ├── dashboard/              # Widgets del dashboard (stats, gráficos, actividad)
-│   ├── layout/                 # Header y sidebar
-│   ├── students/               # Tabla de alumnos
-│   └── ui/                     # Componentes base (shadcn/ui)
-├── hooks/
-│   ├── use-auth.tsx            # Contexto y lógica de autenticación
-│   ├── use-mobile.tsx          # Detección de dispositivo móvil
-│   └── use-toast.ts            # Hook de notificaciones
-├── lib/
-│   ├── api-client.ts           # Cliente HTTP centralizado
-│   ├── types.ts                # Interfaces TypeScript
-│   └── utils.ts                # Utilidades generales
-└── middleware.ts               # Protección de rutas autenticadas
-```
+El cliente maneja autenticación JWT coordinada con el [API Gateway](../api-gateway/README.md) y el [Backend Core](../backend/README.md):
+- **Almacenamiento:** Token JWT en cookies y `localStorage`.
+- **Interceptors:** Centralizados en `lib/api-client.ts`.
+- **Middleware:** `middleware.ts` protege las vistas `/dashboard/*` redirigiendo al `/login` si no existe sesión válida.
 
-## Autenticación
+---
 
-El sistema de auth usa JWT almacenado en `localStorage` y cookies.
-
-- `POST /auth/login` — Obtiene el token
-- `GET /auth/validate` — Valida el token y devuelve el usuario
-
-Las rutas bajo `/dashboard/*` están protegidas por el middleware de Next.js. Los usuarios no autenticados son redirigidos a `/login`.
-
-## Roles
-
-El sidebar muestra opciones según el rol del usuario autenticado:
-
-| Rol | Acceso |
-|---|---|
-| `ADMIN` | Acceso completo |
-| `PRECEPTOR` | Alumnos, asistencia, comisiones |
-| `PROFESOR` | Materias, calificaciones |
-| `ALUMNO` | Vista de sus propios datos |
-
-## Páginas disponibles
-
-| Ruta | Estado |
-|---|---|
-| `/login` | Implementada |
-| `/dashboard` | Implementada |
-| `/dashboard/students` | Implementada |
-| `/dashboard/teachers` | Pendiente |
-| `/dashboard/subjects` | Pendiente |
-| `/dashboard/commissions` | Pendiente |
-| `/dashboard/attendance` | Pendiente |
-| `/dashboard/grades` | Pendiente |
-| `/dashboard/reports` | Pendiente |
-| `/dashboard/certificates` | Pendiente |
+## 📚 Enlaces de Interés
+- 🎨 [Diseño UX / UI](../docs/05.00-Diseno_UX_UI.md)
+- 🧭 [Arquitectura de Navegación](../docs/04.10-Arquitectura_Navegacion.md)
+- 📋 [Única Fuente de Verdad (Tareas)](../.remember/PENDIENTES.md)
