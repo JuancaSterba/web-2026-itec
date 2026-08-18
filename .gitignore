@@ -2,7 +2,6 @@
 # Al no tener una barra (/) adelante, se ignoran en cualquier subcarpeta del proyecto.
 
 # Archivos específicos de instrucciones para IAs
-CLAUDE.md
 GEMINI.md
 CURSOR.md
 AGENTS.md
@@ -11,7 +10,6 @@ AGENTS.md
 # Carpetas destinadas a guardar prompts o historiales de agentes
 agentes/
 .agents/
-.claude/
 .ai/
 prompts/
 .gemini/
