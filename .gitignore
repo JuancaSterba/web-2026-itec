@@ -8,7 +8,6 @@ CURSOR.md
 
 # Carpetas destinadas a guardar prompts o historiales de agentes
 agentes/
-.agents/
 .ai/
 prompts/
 .gemini/
