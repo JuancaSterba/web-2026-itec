@@ -4,7 +4,6 @@
 # Archivos específicos de instrucciones para IAs
 GEMINI.md
 CURSOR.md
-AGENTS.md
 .cursorrules
 
 # Carpetas destinadas a guardar prompts o historiales de agentes
