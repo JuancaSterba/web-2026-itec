@@ -44,12 +44,25 @@ export default function AsignarProfesorDialog({
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [showCrearProfesor, setShowCrearProfesor] = useState(false)
+  const [profesoresCreados, setProfesoresCreados] = useState<ProfesorDisponible[]>([])
+  const [selectedProfesorId, setSelectedProfesorId] = useState<string>("")
   const formRef = useRef<HTMLFormElement>(null)
+
+  const todosLosProfesores = [
+    ...profesoresDisponibles,
+    ...profesoresCreados.filter((pc) => !profesoresDisponibles.some((pd) => pd.id === pc.id)),
+  ]
 
   async function handleSubmit(formData: FormData) {
     await createComisionProfesor(formData, comisionId)
     formRef.current?.reset()
+    setSelectedProfesorId("")
     setOpen(false)
+  }
+
+  function handleProfesorCreado(nuevoProfesor: ProfesorDisponible) {
+    setProfesoresCreados((prev) => [...prev, nuevoProfesor])
+    setSelectedProfesorId(nuevoProfesor.id.toString())
   }
 
   return (
@@ -57,8 +70,8 @@ export default function AsignarProfesorDialog({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
-            disabled={profesoresDisponibles.length === 0}
-            title={profesoresDisponibles.length === 0 ? "No hay profesores disponibles para asignar" : undefined}
+            disabled={todosLosProfesores.length === 0}
+            title={todosLosProfesores.length === 0 ? "No hay profesores disponibles para asignar" : undefined}
           >
             <Plus className="size-4" />
             Asignar Profesor
@@ -75,10 +88,12 @@ export default function AsignarProfesorDialog({
                 id="profesorId"
                 name="profesorId"
                 required
+                value={selectedProfesorId}
+                onChange={(e) => setSelectedProfesorId(e.target.value)}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <option value="">Seleccioná un profesor</option>
-                {profesoresDisponibles.map((profesor) => (
+                {todosLosProfesores.map((profesor) => (
                   <option key={profesor.id} value={profesor.id}>
                     {profesor.nombre} {profesor.apellido} — DNI {profesor.dni}
                   </option>
@@ -111,6 +126,7 @@ export default function AsignarProfesorDialog({
           if (!nuevoOpen) router.refresh()
         }}
         profesor={null}
+        onProfesorCreated={handleProfesorCreado}
       />
     </>
   )

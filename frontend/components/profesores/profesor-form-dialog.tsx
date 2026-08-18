@@ -22,6 +22,7 @@ interface ProfesorFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   profesor: Profesor | null
+  onProfesorCreated?: (profesor: Profesor) => void
 }
 
 const emptyForm = {
@@ -34,7 +35,7 @@ const emptyForm = {
   telefonoSecundario: "",
 }
 
-export function ProfesorFormDialog({ open, onOpenChange, profesor }: ProfesorFormDialogProps) {
+export function ProfesorFormDialog({ open, onOpenChange, profesor, onProfesorCreated }: ProfesorFormDialogProps) {
   const isEditing = !!profesor
   const [form, setForm] = useState(emptyForm)
   const [activo, setActivo] = useState(true)
@@ -146,10 +147,11 @@ export function ProfesorFormDialog({ open, onOpenChange, profesor }: ProfesorFor
         await updateProfesor(profesor!.id, formData, activo)
         toast.success("Profesor actualizado correctamente")
       } else {
-        await createProfesor(formData)
+        const nuevoProfesor = await createProfesor(formData)
         toast.success("Profesor creado correctamente", {
           description: `Usuario autogenerado: ${form.dni} / Contraseña: ${form.dni}`,
         })
+        onProfesorCreated?.(nuevoProfesor)
       }
       onOpenChange(false)
     } catch (err: any) {
