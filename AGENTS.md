@@ -11,8 +11,22 @@
 7. **Strict Git Flow (Feature Branches):** ALL new features, modifications, or stages MUST be developed in a new, separate branch (e.g., `feature/...`). Changes must be implemented in a granular way, making small, atomic commits. Once tested, the feature branch is merged into `develop` and then deleted. Direct commits to `develop` are forbidden.
 8. **Flujo de Trabajo de Generación:** Para la ejecución y escritura de código delegada a un agente, el prompt debe requerir explícitamente que el agente *primero verifique si los archivos/clases ya existen* para no sobrescribirlos innecesariamente, y que *revise y valide su propio trabajo* (linting, consistencia) antes de dar el paso por finalizado.
 
-## Agent Roles
-Role-based agent definitions live in `/.agents` (`architect.md`, `backend.md`, `frontend.md`, `reviewer.md`, `tester.md`, `devops.md`). Use them when delegating work to a specific role.
+## Agent Roles & Protocolo de Delegación (`/.agents`)
+Role-based agent definitions live in `/.agents` (`architect.md`, `backend.md`, `frontend.md`, `reviewer.md`, `tester.md`, `devops.md`). Cuando una tarea requiera trabajo especializado, el agente debe adoptar o delegar el rol correspondiente:
+
+1. 🏛️ **Decisiones Estructurales (`architect.md`):**
+   - **Cuándo usar:** Si la tarea introduce nuevas tablas/entidades, nuevos endpoints entre microservicios, o cambios en flujos de datos.
+   - **Acción obligatoria:** Validar consistencia contra `docs/` y actualizar los diagramas pertinentes antes de codificar.
+2. 🧠 / 🖥️ **Implementación Especializada (`backend.md` / `frontend.md` / `devops.md`):**
+   - **Backend (`backend.md`):** Para lógica Spring Boot, DTOs de `commons`, persistencia y clientes HTTP internos.
+   - **Frontend (`frontend.md`):** Para páginas Next.js, componentes shadcn/ui, hooks y consumo del Gateway.
+   - **DevOps (`devops.md`):** Para cambios en `docker-compose.yml`, Dockerfiles, variables `.env` y networking.
+3. 🧪 **Fase de Verificación (`tester.md`):**
+   - **Cuándo usar:** Al finalizar cualquier implementación de código o corrección de bugs.
+   - **Acción obligatoria:** Ejecutar `mvn test` (en el módulo respectivo) o `npm test` y confirmar que no existan regresiones.
+4. 🧐 **Fase de Auditoría (`reviewer.md`):**
+   - **Cuándo usar:** Antes de mergear cualquier rama `feature/...` a `develop`.
+   - **Acción obligatoria:** Revisar el diff en modo solo lectura, asegurando que no se rompa el aislamiento de bases de datos y que los tipos del Frontend coincidan con los DTOs del Backend.
 
 ## graphify
 
