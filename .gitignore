@@ -1,0 +1,15 @@
+# Secretos (C4.2): solo se versionan los .env.example
+.env
+.env.*
+!.env.example
+
+# Claude Code: se versionan commands/, agents/, skills/ y settings.json;
+# se ignora lo propio de cada máquina
+.claude/settings.local.json
+.claude/worktrees/
+
+# IDE y sistema operativo
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
