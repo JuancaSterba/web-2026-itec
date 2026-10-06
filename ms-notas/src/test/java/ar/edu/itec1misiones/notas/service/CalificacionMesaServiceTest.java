@@ -1,5 +1,6 @@
 package ar.edu.itec1misiones.notas.service;
 
+import ar.edu.itec1misiones.notas.client.MesaExamenClient;
 import ar.edu.itec1misiones.notas.dto.CalificacionMesaRequest;
 import ar.edu.itec1misiones.notas.model.CalificacionMesa;
 import ar.edu.itec1misiones.notas.repository.CalificacionMesaRepository;
@@ -27,6 +28,9 @@ class CalificacionMesaServiceTest {
     @Mock
     private CalificacionMesaRepository repository;
 
+    @Mock
+    private MesaExamenClient mesaExamenClient;
+
     @InjectMocks
     private CalificacionMesaService service;
 
@@ -40,6 +44,7 @@ class CalificacionMesaServiceTest {
 
     @Test
     void crearPersisteLaNotaDeLaMesa() {
+        when(mesaExamenClient.isMesaAbierta(50L)).thenReturn(true);
         when(repository.existsByMesaExamenIdAndAlumnoId(50L, 30L)).thenReturn(false);
         when(repository.save(any(CalificacionMesa.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -53,6 +58,7 @@ class CalificacionMesaServiceTest {
 
     @Test
     void crearAusenteSinNotaEsValido() {
+        when(mesaExamenClient.isMesaAbierta(50L)).thenReturn(true);
         when(repository.existsByMesaExamenIdAndAlumnoId(50L, 30L)).thenReturn(false);
         when(repository.save(any(CalificacionMesa.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -78,6 +84,7 @@ class CalificacionMesaServiceTest {
 
     @Test
     void actualizarModificaNotaYActa() {
+        when(mesaExamenClient.isMesaAbierta(50L)).thenReturn(true);
         CalificacionMesa existente = new CalificacionMesa(7L, 50L, 30L, null, true, null, null);
         when(repository.findById(7L)).thenReturn(Optional.of(existente));
         when(repository.save(any(CalificacionMesa.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -92,6 +99,18 @@ class CalificacionMesaServiceTest {
         assertFalse(resultado.getAusente());
         assertEquals("L1", resultado.getLibro());
         assertEquals("F42", resultado.getFolio());
+    }
+
+    @Test
+    void crearEnMesaCerradaDevuelve400() {
+        when(repository.existsByMesaExamenIdAndAlumnoId(50L, 30L)).thenReturn(false);
+        when(mesaExamenClient.isMesaAbierta(50L)).thenReturn(false);
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> service.crear(request(50L, 30L, 7.0)));
+
+        assertEquals(400, ex.getStatusCode().value());
+        verify(repository, never()).save(any());
     }
 
     @Test

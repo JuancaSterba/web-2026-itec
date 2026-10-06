@@ -120,16 +120,17 @@ class UserAdminServiceImplTest {
     @Test
     void crear_asignaAmbosRoles_siSeSeleccionanAdminYAdministrativoJuntos() {
         CrearAdministradorRequest request = buildCrearRequest(Rol.ADMIN, Rol.ADMINISTRATIVO);
-        User despuesDeAdmin = buildUser(1L, "30111222", Rol.ADMIN, true);
-        User despuesDeAmbos = buildUser(1L, "30111222", Rol.ADMIN, true);
-        despuesDeAmbos.setRoles(new java.util.HashSet<>(Set.of(Rol.ADMIN, Rol.ADMINISTRATIVO)));
+        // Igual que el puerto real: cada llamada adjunta el rol al mismo User,
+        // sin depender del orden de iteracion del Set<Rol> del request.
+        User user = buildUser(1L, "30111222", Rol.ADMIN, true);
+        user.setRoles(new java.util.HashSet<>());
 
         when(userLookupPort.crearConCredencialesPorDni(
-                "Ana", "Gómez", "30111222", "ana@itec.edu.ar", "3760000000", null, Rol.ADMIN))
-                .thenReturn(despuesDeAdmin);
-        when(userLookupPort.crearConCredencialesPorDni(
-                "Ana", "Gómez", "30111222", "ana@itec.edu.ar", "3760000000", null, Rol.ADMINISTRATIVO))
-                .thenReturn(despuesDeAmbos);
+                eq("Ana"), eq("Gómez"), eq("30111222"), eq("ana@itec.edu.ar"), eq("3760000000"), isNull(), any(Rol.class)))
+                .thenAnswer(inv -> {
+                    user.getRoles().add(inv.getArgument(6));
+                    return user;
+                });
 
         UsuarioAdminResponse response = service.crear(request);
 
