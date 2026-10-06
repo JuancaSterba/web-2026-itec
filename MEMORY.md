@@ -6,11 +6,14 @@
 ## Estado actual
 - MVP funcional: ABM académicos, inscripciones, comisiones, horarios, asistencias, notas parciales, mesas de examen (turnos/llamados, regla de 48 h) y cierre de actas con PDF.
 - Roles operativos: ADMIN, ADMINISTRATIVO, PROFESOR (vistas `mis-comisiones`, `mis-mesas`). ALUMNO sin portal propio.
-- Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), test flaky de roles (#23), docs desactualizados (#31).
+- Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), JWT en `localStorage` (#36).
+- `develop` verificado (tests Java en verde, E2E en Docker) y listo para PR a `main`, que quedó en el PR #3 (2026-06-29). No hay CI.
 - Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo, diagrama interactivo.
 
 ## Decisiones arquitectónicas
 - **Dominio DDD** (Carrera → PlanEstudio → MateriaPlan → Comisión → Cursada; CicloLectivo → PeriodoAcademico independiente): el modelo viejo atado a carrera no soportaba planes ni ciclos compartidos. Fuente: `docs/02.00-Modelo_Datos.md`.
+- **Contrato público `/api/v1/<recurso>`** (lo exige el enunciado, `docs/00.10`): el Gateway rutea por recurso (auth, asistencias, notas/calificaciones-parciales, resto → Core) y quita el `/v1`; los servicios y sus llamadas internas siguen en `/api/**`. El cliente no conoce qué servicio atiende cada recurso. Regla C2.7 de la constitución (aprobada 2026-10-06).
+- **Login sin enumeración de usuarios** (C4.9, aprobada 2026-10-06): un 500 o un mensaje distinto para usuario inexistente revelaba qué usuarios existen.
 - **JWT validado en el Gateway** (token offloading); los MS no tienen Spring Security propio y usan `RoleGuard.exigirRol` (`backend/commons`): un único punto de autenticación con autorización mínima por rol.
 - **BD aislada por servicio** en una sola instancia MySQL: aislamiento lógico sin costo operativo extra.
 - **Flyway + MySQL único** (`ddl-auto: validate`, sin H2): evitar divergencias entre el schema de dev y el de prod.
@@ -32,3 +35,6 @@
 - Usuarios creados desde la UI deben quedar `enabled=true` para todos los roles.
 - Frontend sin `npm test`: verificar con `npm run build` (+ `tsc`). E2E real: `docker compose up --build -d` y curl contra el Gateway.
 - Al agregar un campo a una entidad, revisar también `DatabaseSeeder` y los DTOs de `commons`.
+- Al inyectar un client HTTP nuevo en un service, mockearlo en sus tests: sin CI, `ms-notas` quedó 3 meses en rojo por eso.
+- Login: usuario inexistente y password incorrecta dan el mismo 401 (`BadCredentialsException`); una excepción sin handler propio cae en el genérico y devuelve 500.
+- Cada iteración cierra revisando `MEMORY.md`, `AGENTS.md` y `docs/constitution.md`.
