@@ -18,6 +18,7 @@
 - **Frontend con Server Actions + RSC** (sin `apiClient` del lado del cliente): un patrón único y sin el bug 401 de inyección de JWT en CSR.
 - **Mesas desacopladas de la cursada** (ligadas a CicloLectivo + `TurnoExamen`/`TipoMesa`); el cálculo de cursada devuelve solo LIBRE/REGULAR/PROMOCIONADA: los finales tienen su propio ciclo de vida.
 - **Horarios con `horaInicio`/`horaFin` libres** (se eliminó `ModuloHorario`): los módulos fijos no cubrían superposiciones reales.
+- **SDD con Claude Code nativo** (`.claude/` en la raíz: 4 agentes, comandos `/sdd-*`, skill `sdd`; specs en `specs/NNN-nombre/`): una sola herramienta y la IA siempre corre desde la raíz, donde está el versionado; por eso no hay archivos de agentes en subcarpetas.
 - **Acta cerrada = inmutable**: `ms-notas` consulta el estado de la mesa al Core antes de guardar notas.
 
 ## Aprendizajes / errores a evitar
