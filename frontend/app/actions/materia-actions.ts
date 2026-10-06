@@ -17,7 +17,7 @@ export async function createMateria(formData: FormData) {
     descripcion: formData.get("descripcion"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/materias`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -46,7 +46,7 @@ export async function updateMateria(id: number, formData: FormData) {
     descripcion: formData.get("descripcion"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/materias/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export async function deleteMateria(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/materias/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias/${id}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

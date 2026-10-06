@@ -18,7 +18,7 @@ export async function createCursada(formData: FormData, comisionId: number) {
     condicionFinal: "REGULAR",
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/cursadas`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export async function createCursadasMasivas(alumnoId: number, comisionIds: numbe
 
   const respuestas = await Promise.all(
     comisionIds.map((comisionId) =>
-      fetch(`${getApiBaseUrl()}/api/core/cursadas`, {
+      fetch(`${getApiBaseUrl()}/api/v1/cursadas`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export async function updateCursada(formData: FormData, cursadaId: number, alumn
     notaCierre: notaCierreRaw ? Number(notaCierreRaw) : null,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/cursadas/${cursadaId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas/${cursadaId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -100,7 +100,7 @@ export async function cerrarCursada(cursadaId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/cursadas/${cursadaId}/cerrar`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas/${cursadaId}/cerrar`, {
     method: "POST",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -119,7 +119,7 @@ export async function deleteCursada(cursadaId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/cursadas/${cursadaId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas/${cursadaId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

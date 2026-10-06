@@ -14,7 +14,7 @@ export async function GET(
   const token = cookieStore.get("auth-token")?.value
 
   try {
-    const response = await fetch(`${getApiBaseUrl()}/api/core/mesas-examen/${mesaId}/acta-pdf`, {
+    const response = await fetch(`${getApiBaseUrl()}/api/v1/mesas-examen/${mesaId}/acta-pdf`, {
       method: "GET",
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),

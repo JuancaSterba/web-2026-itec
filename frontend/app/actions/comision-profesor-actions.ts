@@ -17,7 +17,7 @@ export async function createComisionProfesor(formData: FormData, comisionId: num
     rol: formData.get("rol"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/comisiones-profesores`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones-profesores`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export async function updateComisionProfesor(formData: FormData, comisionProfeso
     rol: formData.get("rol"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/comisiones-profesores/${comisionProfesorId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones-profesores/${comisionProfesorId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export async function deleteComisionProfesor(comisionProfesorId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/comisiones-profesores/${comisionProfesorId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones-profesores/${comisionProfesorId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

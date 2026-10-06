@@ -18,7 +18,7 @@ export async function createPeriodo(formData: FormData, cicloId: number) {
     cicloLectivoId: cicloId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/periodos-academicos`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/periodos-academicos`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function updatePeriodo(formData: FormData, periodoId: number, ciclo
     cicloLectivoId: cicloId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/periodos-academicos/${periodoId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/periodos-academicos/${periodoId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export async function deletePeriodo(periodoId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/periodos-academicos/${periodoId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/periodos-academicos/${periodoId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

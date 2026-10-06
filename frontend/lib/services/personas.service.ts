@@ -14,7 +14,7 @@ export interface PersonaResumen {
 // UI, es el caso esperado de "persona nueva" en el formulario de alta.
 export async function buscarPersonaPorDni(dni: string): Promise<PersonaResumen | null> {
   try {
-    const response = await apiClient.get<PersonaResumen[]>(`/api/core/personas/dni/${dni}`)
+    const response = await apiClient.get<PersonaResumen[]>(`/api/v1/personas/dni/${dni}`)
     return response.data[0] ?? null
   } catch (err: any) {
     if (err?.status === 404) {

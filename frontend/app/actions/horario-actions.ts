@@ -11,7 +11,7 @@ export async function createHorarioClase(comisionId: number, diaSemana: string, 
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/horarios`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/horarios`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function deleteHorarioClase(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/horarios/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/horarios/${id}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

@@ -179,8 +179,8 @@ export default async function ComisionDetallePage({
     const resultados = await Promise.all(
       cursadasDeLaComision.map((cursada) =>
         Promise.all([
-          fetchGateway<CalificacionParcialResponse>(`/api/calificaciones-parciales?cursadaId=${cursada.id}`),
-          fetchGateway<AsistenciaResponse>(`/api/asistencias?cursadaId=${cursada.id}`),
+          fetchGateway<CalificacionParcialResponse>(`/api/v1/calificaciones-parciales?cursadaId=${cursada.id}`),
+          fetchGateway<AsistenciaResponse>(`/api/v1/asistencias?cursadaId=${cursada.id}`),
         ])
       )
     )

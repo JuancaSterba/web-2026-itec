@@ -18,7 +18,7 @@ export async function createCarrera(formData: FormData) {
     cupoActual: cupoActual ? Number(cupoActual) : null,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/carreras`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/carreras`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function updateCarrera(id: number, formData: FormData) {
     cupoActual: cupoActual ? Number(cupoActual) : null,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/carreras/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/carreras/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export async function deleteCarrera(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/carreras/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/carreras/${id}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

@@ -26,8 +26,8 @@ export async function saveCalificacion(
   }
 
   const url = calificacionId
-    ? `${getApiBaseUrl()}/api/calificaciones-parciales/${calificacionId}`
-    : `${getApiBaseUrl()}/api/calificaciones-parciales`
+    ? `${getApiBaseUrl()}/api/v1/calificaciones-parciales/${calificacionId}`
+    : `${getApiBaseUrl()}/api/v1/calificaciones-parciales`
 
   const response = await fetch(url, {
     method: calificacionId ? "PUT" : "POST",
@@ -57,7 +57,7 @@ export async function saveCalificacionesMasivas(
 
   const respuestas = await Promise.all(
     registros.map((registro) =>
-      fetch(`${getApiBaseUrl()}/api/calificaciones-parciales`, {
+      fetch(`${getApiBaseUrl()}/api/v1/calificaciones-parciales`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

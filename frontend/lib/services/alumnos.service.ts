@@ -17,7 +17,7 @@ export interface Alumno {
   telefonoSecundario: string
 }
 
-// POST /api/core/alumnos ahora es un alta de un solo paso: el Core crea el
+// POST /api/v1/alumnos ahora es un alta de un solo paso: el Core crea el
 // Usuario (username=DNI, password=DNI encriptada, rol=ALUMNO) y el Alumno en
 // la misma transaccion (ver docs/Reglas_de_Negocio.md y AlumnoRegistroDTO).
 // El legajo ya no se pide: el Core lo autogenera como AAAA-DNI.

@@ -20,7 +20,7 @@ export async function createAlumno(formData: FormData) {
     telefonoSecundario: formData.get("telefonoSecundario"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/alumnos`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/alumnos`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export async function updateAlumno(id: number, formData: FormData, activo: boole
     telefonoSecundario: formData.get("telefonoSecundario"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/alumnos/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/alumnos/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export async function deleteAlumno(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/alumnos/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/alumnos/${id}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

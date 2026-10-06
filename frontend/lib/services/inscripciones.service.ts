@@ -25,7 +25,7 @@ export interface InscripcionMateriaInput {
   comisionMateriaId: number
 }
 
-const BASE_PATH = "/api/core/inscripciones-materias"
+const BASE_PATH = "/api/v1/inscripciones-materias"
 
 // No hay filtro por comisionMateriaId en el Core todavia: se trae todo y se
 // filtra en el cliente (mismo patron que ms-asistencias, que tampoco filtra).

@@ -91,7 +91,7 @@ export default async function MisMesasDetallePage({
   const [mesaData, inscripciones, calificaciones, materiasPlan, alumnos, planes] = await Promise.all([
     fetchCore<MesaExamenResponse>(`/mesas-examen/${mesaId}`),
     fetchCore<InscripcionMesaResponse>(`/mesas-examen/${mesaId}/inscripciones`),
-    fetchGateway<CalificacionMesaResponse>(`/api/notas/mesas?mesaExamenId=${mesaId}`),
+    fetchGateway<CalificacionMesaResponse>(`/api/v1/notas/mesas?mesaExamenId=${mesaId}`),
     fetchCore<MateriaPlanResponse>("/materias-plan"),
     fetchCore<AlumnoResponse>("/alumnos"),
     fetchCore<PlanEstudioResponse>("/planes-estudio"),

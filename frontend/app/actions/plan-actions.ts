@@ -18,7 +18,7 @@ export async function createPlan(formData: FormData, carreraId: number) {
     carreraId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/planes-estudio`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/planes-estudio`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function updatePlan(formData: FormData, planId: number, carreraId: 
     carreraId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/planes-estudio/${planId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/planes-estudio/${planId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export async function deletePlan(planId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/planes-estudio/${planId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/planes-estudio/${planId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

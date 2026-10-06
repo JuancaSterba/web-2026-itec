@@ -19,7 +19,7 @@ export async function buscarPersonaPorDniAction(dni: string): Promise<PersonaRes
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/personas/dni/${dni}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/personas/dni/${dni}`, {
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),
     },

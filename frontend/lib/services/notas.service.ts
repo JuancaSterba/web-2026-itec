@@ -29,7 +29,7 @@ export interface NotaInput {
 }
 
 const EXAMENES_PATH = "/api/examenes"
-const NOTAS_PATH = "/api/notas"
+const NOTAS_PATH = "/api/v1/notas"
 
 // Sin filtro por comisionId en el microservicio todavia: se trae todo y se
 // filtra en el cliente (mismo patron que asistencias.service.ts).

@@ -21,7 +21,7 @@ export async function createProfesor(formData: FormData) {
     telefonoSecundario: formData.get("telefonoSecundario"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/profesores`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/profesores`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export async function updateProfesor(id: number, formData: FormData, activo: boo
     activo,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/profesores/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/profesores/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export async function deleteProfesor(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/profesores/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/profesores/${id}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

@@ -58,7 +58,7 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
       if (existente) {
         return { id: existente.id, paridad: periodo.paridad }
       }
-      const response = await fetch(`${getApiBaseUrl()}/api/core/periodos-academicos`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/v1/periodos-academicos`, {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({
@@ -106,7 +106,7 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
 
   const respuestas = await Promise.all(
     comisionesACrear.map((item) =>
-      fetch(`${getApiBaseUrl()}/api/core/comisiones`, {
+      fetch(`${getApiBaseUrl()}/api/v1/comisiones`, {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({

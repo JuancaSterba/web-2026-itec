@@ -17,7 +17,7 @@ export async function createComisionesMasivas(
 
   const respuestas = await Promise.all(
     seleccion.map((item) =>
-      fetch(`${getApiBaseUrl()}/api/core/comisiones`, {
+      fetch(`${getApiBaseUrl()}/api/v1/comisiones`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export async function updateComision(formData: FormData, comisionId: number, per
     periodoAcademicoId: periodoId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/comisiones/${comisionId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones/${comisionId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export async function deleteComision(comisionId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/comisiones/${comisionId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones/${comisionId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

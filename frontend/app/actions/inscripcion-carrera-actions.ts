@@ -22,7 +22,7 @@ export async function createInscripcionCarrera(formData: FormData): Promise<Insc
     estado: "ACTIVA",
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/inscripciones-carreras`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export async function crearAlumnoEInscribir(formData: FormData): Promise<Inscrip
     telefonoSecundario: formData.get("telefonoSecundario") ?? "",
   }
 
-  const respuestaAlumno = await fetch(`${getApiBaseUrl()}/api/core/alumnos`, {
+  const respuestaAlumno = await fetch(`${getApiBaseUrl()}/api/v1/alumnos`, {
     method: "POST",
     headers: authHeaders,
     body: JSON.stringify(payloadAlumno),
@@ -81,7 +81,7 @@ export async function crearAlumnoEInscribir(formData: FormData): Promise<Inscrip
     estado: "ACTIVA",
   }
 
-  const respuestaInscripcion = await fetch(`${getApiBaseUrl()}/api/core/inscripciones-carreras`, {
+  const respuestaInscripcion = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras`, {
     method: "POST",
     headers: authHeaders,
     body: JSON.stringify(payloadInscripcion),
@@ -107,7 +107,7 @@ export async function updateInscripcionCarrera(formData: FormData, inscripcionId
     estado: formData.get("estado"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/inscripciones-carreras/${inscripcionId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras/${inscripcionId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -127,7 +127,7 @@ export async function deleteInscripcionCarrera(inscripcionId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/inscripciones-carreras/${inscripcionId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras/${inscripcionId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

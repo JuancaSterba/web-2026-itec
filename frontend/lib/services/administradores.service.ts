@@ -18,7 +18,7 @@ export interface Administrador {
   enabled: boolean
 }
 
-// POST /api/core/administradores: alta de un solo paso, username=DNI,
+// POST /api/v1/administradores: alta de un solo paso, username=DNI,
 // password=DNI encriptada (BCrypt), enabled=true (a diferencia de Alumno/
 // Profesor, este rol si tiene login inmediato).
 export interface CrearAdministradorInput {
