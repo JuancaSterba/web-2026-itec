@@ -3,13 +3,15 @@
 Única fuente de verdad de tareas abiertas, deuda técnica y funcionalidades diferidas.
 
 - Solo ítems **abiertos**. Al cerrar uno, se borra de este archivo: lo realizado queda en el historial de git.
-- Los números son estables (se citan desde otros docs). Un ítem nuevo usa el siguiente número libre: **#39**.
+- Los números son estables (se citan desde otros docs). Un ítem nuevo usa el siguiente número libre: **#41**.
 
 ## Deuda técnica
 - **#22 [Arquitectura] Acoplamiento sincrónico Core ↔ MS** *(baja prioridad)* — dependencia circular en runtime por HTTP REST: el Core depende de `ms-notas` para cerrar cursadas y los MS dependen del Core para validar horarios. A futuro, evaluar comunicación asincrónica por eventos (RabbitMQ/Kafka). Cambiarlo requiere enmendar C1.4 de `constitution.md`.
 - **#23 [Testing] Test flaky en security** — `UserAdminServiceImplTest.crear_asignaAmbosRoles_siSeSeleccionanAdminYAdministrativoJuntos` falla al azar por iterar un `Set<Rol>` sin orden determinístico.
 - **#31 [Documentación] Revisar `docs/`** — confirmar que los documentos reflejan el código actual tras los refactors de DDD, Mesas de Examen y horarios/asistencias.
 - **#36 [Seguridad] JWT y datos personales en `localStorage`** — `frontend/hooks/use-auth.tsx` hace el login desde el cliente con `apiClient` y guarda `token` en `localStorage` además de la cookie; `frontend/app/perfil/page.tsx` lee nombre/DNI/roles de `localStorage`. Viola C2.4/C4.5 de `constitution.md`. Migrar el login a una Server Action que setee una cookie `httpOnly` y leer el perfil del lado del servidor.
+- **#39 [API] Login con usuario inexistente devuelve 500** — `AuthServiceImpl` lanza `UsernameNotFoundException`, que cae en `SecurityExceptionHandler.handleGenericException` (`INTERNAL_ERROR`). Debe responder 401 con el mismo mensaje que una contraseña incorrecta (no revelar si el usuario existe). Reproducir: `POST /api/core/auth/login` con `{}` vía Gateway.
+- **#40 [Documentación] Rutas del Gateway en `AGENTS.md`** — indica `/api/v1/**`, pero las rutas reales son `/api/core/**` (incl. `/api/core/auth/**`), `/api/asistencias/**` y `/api/notas/**` / `/api/calificaciones-parciales/**`.
 
 ## Funcionalidad pendiente
 - **#37 Regularidad por asistencia (70 %)** — el cálculo del 70 % y la notificación MS Asistencias → Core para que el alumno pierda la regularidad no están implementados (ver `02.20-Diagrama_Estados.md` y `03.20-Diagrama_Secuencia_Asistencia.md`).
