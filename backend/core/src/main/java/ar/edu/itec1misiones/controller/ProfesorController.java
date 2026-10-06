@@ -1,11 +1,13 @@
 package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
-import ar.edu.itec1misiones.dto.request.ProfesorRequest;
+import ar.edu.itec1misiones.dto.request.ProfesorRegistroDTO;
 import ar.edu.itec1misiones.dto.request.ProfesorUpdateRequest;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.dto.response.ProfesorResponse;
 import ar.edu.itec1misiones.service.ProfesorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/profesores")
+@Tag(name = "Profesores", description = "Gestión de profesores y búsqueda por DNI")
 public class ProfesorController {
 
     private final ProfesorService profesorService;
@@ -27,11 +30,12 @@ public class ProfesorController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear un nuevo profesor (alta de un solo paso: crea el Usuario y el Profesor)")
     public ResponseEntity<ApiResponse<ProfesorResponse>> crear(
-            @RequestBody @Valid ProfesorRequest request,
+            @RequestBody @Valid ProfesorRegistroDTO request,
             HttpServletRequest httpRequest) {
 
-        ProfesorResponse profesor = profesorService.crear(request);
+        ProfesorResponse profesor = profesorService.crearConUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<ProfesorResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
@@ -41,6 +45,8 @@ public class ProfesorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Listar todos los profesores activos")
     public ResponseEntity<ApiResponse<ProfesorResponse>> listar(HttpServletRequest httpRequest) {
         List<ProfesorResponse> profesores = profesorService.listarActivos();
         return ResponseEntity.ok(
@@ -52,6 +58,8 @@ public class ProfesorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Obtener un profesor por ID")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -66,6 +74,8 @@ public class ProfesorController {
     }
 
     @GetMapping("/dni/{dni}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Buscar profesor por DNI")
     public ResponseEntity<ApiResponse<ProfesorResponse>> buscarPorDni(
             @PathVariable String dni,
             HttpServletRequest httpRequest) {
@@ -81,6 +91,7 @@ public class ProfesorController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar datos de un profesor")
     public ResponseEntity<ApiResponse<ProfesorResponse>> actualizar(
             @PathVariable Long id,
             @RequestBody @Valid ProfesorUpdateRequest request,
@@ -97,6 +108,7 @@ public class ProfesorController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar un profesor (baja lógica)")
     public ResponseEntity<ApiResponse<String>> desactivar(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {

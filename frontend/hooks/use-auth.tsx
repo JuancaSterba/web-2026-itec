@@ -11,6 +11,7 @@ import apiClient from "@/lib/api-client"
 export type AuthUser = {
   username: string
   role: string
+  roles?: string[]
   nombres?: string
   apellido?: string
   dni?: string
@@ -24,12 +25,15 @@ type AuthContextType = {
   login: (username: string, password: string) => Promise<void>
   logout: () => void
   setUser: (user: AuthUser | null) => void
+  switchRole: (rol: string) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useLocalStorage<string | null>("token", null)
+  // raw:true evita que el hook guarde el token con JSON.stringify (le agrega
+  // comillas), lo que rompe el Authorization: Bearer que arma api-client.ts.
+  const [token, setToken] = useLocalStorage<string | null>("token", null, true)
   const [user, setUser] = useState<AuthUser | null>(null)
   const router = useRouter()
 
@@ -41,9 +45,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const storedUsername = localStorage.getItem("username")
 
       if (storedToken && storedRole && storedUsername) {
+        let storedRoles: string[] | undefined
+        try {
+          const parsed = JSON.parse(localStorage.getItem("roles") || "[]")
+          storedRoles = Array.isArray(parsed) ? parsed : undefined
+        } catch {
+          storedRoles = undefined
+        }
+
         setUser({
           username: storedUsername,
           role: storedRole,
+          roles: storedRoles,
           nombres: localStorage.getItem("nombres") || undefined,
           apellido: localStorage.getItem("apellido") || undefined,
           dni: localStorage.getItem("dni") || undefined,
@@ -68,7 +81,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = useCallback(
     async (username: string, password: string) => {
       const payload: LoginRequest = { username, password }
-      const response = await apiClient.post<LoginResponse[]>("/auth/login", payload)
+      // /api/v1/auth/login: ruta del Gateway (core-auth), nunca /auth/login
+      // directo contra el Core -- ver criterios de aceptacion del plan de frontend.
+      // skipAuthRedirect: credenciales invalidas tambien devuelven 401, y no
+      // es una sesion expirada -- no debe forzar un redirect a /login.
+      const response = await apiClient.post<LoginResponse[]>(
+        "/api/v1/auth/login",
+        payload,
+        { skipAuthRedirect: true }
+      )
 
       if (!response.data || response.data.length === 0) {
         throw new Error("Token no recibido")
@@ -130,8 +151,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.replace("/login")
   }, [setToken, router])
 
+  // Cambia el rol activo de un usuario multi-rol sin volver a loguearse: el
+  // JWT ya trae todos los roles (localStorage "roles"), esto solo cambia
+  // cual es el activo (localStorage "user-role" + contexto).
+  // Si prev es null (primer switch tras un login multi-rol, donde login()
+  // redirige a /seleccionar-rol sin llamar setUser), arma el user desde
+  // localStorage en vez de descartar el cambio.
+  const switchRole = useCallback((rol: string) => {
+    localStorage.setItem("user-role", rol)
+    setUser((prev) => {
+      if (prev) return { ...prev, role: rol }
+
+      let roles: string[] | undefined
+      try {
+        const parsed = JSON.parse(localStorage.getItem("roles") || "[]")
+        roles = Array.isArray(parsed) ? parsed : undefined
+      } catch {
+        roles = undefined
+      }
+
+      return {
+        username: localStorage.getItem("username") || "",
+        role: rol,
+        roles,
+        nombres: localStorage.getItem("nombres") || undefined,
+        apellido: localStorage.getItem("apellido") || undefined,
+        dni: localStorage.getItem("dni") || undefined,
+        email: localStorage.getItem("email") || undefined,
+        telefono: localStorage.getItem("telefono") || undefined,
+      }
+    })
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, setUser }}>
+    <AuthContext.Provider value={{ token, user, login, logout, setUser, switchRole }}>
       {children}
     </AuthContext.Provider>
   )

@@ -7,9 +7,12 @@ import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.security.constants.ExceptionConstants;
 import ar.edu.itec1misiones.security.constants.SecurityConstants;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// @Order(LOWEST_PRECEDENCE): esta clase tiene un catch-all de Exception.class,
+// que sin esto se evalua antes que los handlers especificos de otros
+// @ControllerAdvice (ej. CoreExceptionHandler) y los tapa devolviendo siempre
+// 500 INTERNAL_ERROR en vez del status especifico de cada excepcion.
+@Order(Ordered.LOWEST_PRECEDENCE)
 @ControllerAdvice
 public class SecurityExceptionHandler {
 
@@ -29,6 +37,21 @@ public class SecurityExceptionHandler {
         ErrorDto errorDto = new ErrorDto(ExceptionConstants.ERROR_AUTH, ExceptionConstants.MSG_CREDENTIALS_INVALID);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.builder()
+                        .meta(new Meta(request.getMethod(), request.getRequestURI()))
+                        .errors(List.of(errorDto))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDisabledAccount(
+            DisabledException ex,
+            HttpServletRequest request) {
+
+        ErrorDto errorDto = new ErrorDto("ACCOUNT_DISABLED", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                 ApiResponse.builder()
                         .meta(new Meta(request.getMethod(), request.getRequestURI()))
                         .errors(List.of(errorDto))
@@ -136,6 +159,68 @@ public class SecurityExceptionHandler {
         ErrorDto error = new ErrorDto("ACCESS_DENIED", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AdministradorNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAdministradorNotFound(
+            AdministradorNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_ADMIN_NOT_FOUND, ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AdministradorDatosDuplicadosException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAdministradorDatosDuplicados(
+            AdministradorDatosDuplicadosException ex,
+            HttpServletRequest request) {
+
+        List<ErrorDto> errores = ex.getErrores().stream()
+                .map(msg -> new ErrorDto(ExceptionConstants.ERROR_DUPLICATED_FIELD, msg))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(errores)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(SelfActionNotAllowedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSelfActionNotAllowed(
+            SelfActionNotAllowedException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_SELF_ACTION_FORBIDDEN, ex.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(RolNoGestionableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRolNoGestionable(
+            RolNoGestionableException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_ROL_INVALIDO, ex.getMessage());
+
+        return ResponseEntity.badRequest().body(
                 ApiResponse.builder()
                         .meta(MetaBuilderHelper.buildMeta(request))
                         .errors(List.of(error))

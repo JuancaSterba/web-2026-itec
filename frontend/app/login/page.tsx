@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { LogIn, Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
+import { LogIn, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,18 +25,28 @@ export default function LoginPage() {
     setError(null)
     try {
       await login(username, password) // setea cookie + storage + redirige
+      toast.success("¡Bienvenido!")
     } catch (err: any) {
       console.error("Error login:", err)
-      setError(err?.message || "Credenciales inválidas")
+      const message = err?.message || "Credenciales inválidas"
+      setError(message)
+      toast.error(message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <Card className="w-full max-w-sm">
+    <div className="flex justify-center items-center min-h-screen bg-background">
+      <Card glass className="w-full max-w-sm">
         <CardHeader>
+          <Link
+            href="/"
+            className="mb-2 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            Volver al inicio
+          </Link>
           <CardTitle className="flex items-center gap-2">
             <LogIn className="w-5 h-5" />
             Iniciar Sesión
@@ -80,6 +92,7 @@ export default function LoginPage() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="size-4 animate-spin" />}
               {loading ? "Ingresando..." : "Iniciar Sesión"}
             </Button>
           </form>

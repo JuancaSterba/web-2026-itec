@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { useRouter, usePathname } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,50 +11,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User } from "lucide-react"
+import { LogOut, User, ChevronRight, Repeat } from "lucide-react"
+import { navigation } from "@/components/layout/sidebar"
+import { useAuth } from "@/hooks/use-auth"
+
+const flatNavigation = navigation.flatMap((section) => section.items)
+
+function getSectionLabel(pathname: string) {
+  const exact = flatNavigation.find((item) => item.href === pathname)
+  if (exact) return exact.name
+
+  const parent = flatNavigation
+    .filter((item) => item.href !== "/dashboard" && pathname.startsWith(item.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]
+
+  return parent?.name ?? "Inicio"
+}
+
+function getInitials(nombres: string, apellido: string) {
+  const a = nombres?.trim()?.[0] ?? ""
+  const b = apellido?.trim()?.[0] ?? ""
+  return (a + b).toUpperCase() || "US"
+}
 
 export default function Header() {
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)
-  const [userData, setUserData] = useState({
-    username: "",
-    nombres: "",
-    apellido: "",
-    email: "",
-    role: "",
-  })
-
-  useEffect(() => {
-    setMounted(true)
-    const activeRole = localStorage.getItem("user-role")
-    const roles = JSON.parse(localStorage.getItem("roles") || "[]")
-    const fallbackRole = roles.length > 0 ? roles[0] : "SIN ROL"
-
-    setUserData({
-      username: localStorage.getItem("username") || "Usuario",
-      nombres: localStorage.getItem("nombres") || "Usuario",
-      apellido: localStorage.getItem("apellido") || "Desconocido",
-      email: localStorage.getItem("email") || "Desconocido",
-      role: activeRole || fallbackRole,
-    })
-  }, [])
-
-  if (!mounted) {
-    return (
-      <header className="border-b bg-white px-6 py-3 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900">Cargando...</h1>
-        </div>
-      </header>
-    )
-  }
+  const pathname = usePathname()
+  const { user, switchRole, logout } = useAuth()
 
   const handleLogout = () => {
-    // limpiar storage
-    localStorage.clear()
-    // borrar cookie (mismos atributos con los que fue creada)
-    document.cookie = "auth-token=; Path=/; Max-Age=0; SameSite=Lax"
-    router.push("/login")
+    logout()
+  }
+
+  const handleSwitchRole = (rol: string) => {
+    switchRole(rol)
+    router.push("/dashboard")
   }
 
   const getRoleBadgeVariant = (role: string) => {
@@ -73,34 +63,63 @@ export default function Header() {
     }
   }
 
-  return (
-    <header className="border-b bg-white px-6 py-3 shadow-sm">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">
-          Bienvenido/a, {userData.nombres} {userData.apellido}
-        </h1>
+  const sectionLabel = getSectionLabel(pathname)
 
-        <div className="flex items-center space-x-4">
-          <Badge variant={getRoleBadgeVariant(userData.role)}>
-            <span className="hidden md:inline">ROL: {userData.role}</span>
+  if (!user) {
+    return <header className="h-[65px] border-b border-border bg-card/60 backdrop-blur-xl" />
+  }
+
+  const otrosRoles = (user.roles ?? []).filter((rol) => rol !== user.role)
+
+  return (
+    <header className="border-b border-border bg-card/60 px-6 py-3 backdrop-blur-xl">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <span>Backoffice</span>
+          <ChevronRight className="size-3.5" />
+          <span className="font-medium text-foreground">{sectionLabel}</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Badge variant={getRoleBadgeVariant(user.role)} className="hidden sm:inline-flex">
+            {user.role}
           </Badge>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                <User className="h-4 w-4" />
-                <span className="hidden md:inline">Usuario: {userData.username}</span>
-              </Button>
+              <button className="flex items-center gap-2 rounded-full p-1 pr-3 transition-colors hover:bg-accent">
+                <Avatar className="size-8">
+                  <AvatarFallback className="bg-primary text-xs font-semibold text-primary-foreground">
+                    {getInitials(user.nombres ?? "", user.apellido ?? "")}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden text-sm font-medium md:inline">
+                  {user.nombres} {user.apellido}
+                </span>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push("/perfil")}>
-                <User className="mr-2 h-4 w-4" />
+                <User className="mr-2 size-4" />
                 Perfil
               </DropdownMenuItem>
+              {otrosRoles.length > 0 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Cambiar rol</DropdownMenuLabel>
+                  {otrosRoles.map((rol) => (
+                    <DropdownMenuItem key={rol} onClick={() => handleSwitchRole(rol)}>
+                      <Repeat className="mr-2 size-4" />
+                      Modo: {rol}
+                    </DropdownMenuItem>
+                  ))}
+                </>
+              )}
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 size-4" />
                 Cerrar Sesión
               </DropdownMenuItem>
             </DropdownMenuContent>

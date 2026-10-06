@@ -1,6 +1,6 @@
 package ar.edu.itec1misiones.service.impl;
 
-import ar.edu.itec1misiones.dto.request.AlumnoRequest;
+import ar.edu.itec1misiones.dto.request.AlumnoRegistroDTO;
 import ar.edu.itec1misiones.dto.request.AlumnoUpdateRequest;
 import ar.edu.itec1misiones.dto.response.AlumnoResponse;
 import ar.edu.itec1misiones.exception.AlumnoNotFoundException;
@@ -38,26 +38,17 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public AlumnoResponse crear(AlumnoRequest request) {
-        User user = userLookupPort.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Usuario no encontrado con id: " + request.getUserId()));
-
-        if (!user.getRoles().contains(Rol.ALUMNO)) {
-            throw new IllegalArgumentException("El usuario no tiene el rol ALUMNO");
-        }
-        if (alumnoRepository.findByUserId(request.getUserId()).isPresent()) {
-            throw new IllegalArgumentException(
-                    "El usuario ya tiene un alumno asociado");
-        }
-        if (alumnoRepository.existsByLegajo(request.getLegajo())) {
-            throw new IllegalArgumentException(
-                    "El legajo '" + request.getLegajo() + "' ya está en uso");
-        }
+    public AlumnoResponse crearConUsuario(AlumnoRegistroDTO dto) {
+        // Si esto falla (DNI/email duplicado), la transaccion completa
+        // se revierte -- no queda un Usuario huerfano sin Alumno asociado.
+        // Si el DNI ya existe (persona con otro rol), userLookupPort le
+        // adjunta el rol ALUMNO en vez de crear un Usuario nuevo.
+        User user = userLookupPort.crearConCredencialesPorDni(
+                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(),
+                dto.getTelefono(), dto.getTelefonoSecundario(), Rol.ALUMNO);
 
         Alumno alumno = new Alumno();
         alumno.setUser(user);
-        alumno.setLegajo(request.getLegajo());
         alumno.setActivo(true);
 
         return toResponse(alumnoRepository.save(alumno));
@@ -81,7 +72,7 @@ public class AlumnoServiceImpl implements AlumnoService {
     @Override
     @Transactional(readOnly = true)
     public AlumnoResponse buscarPorLegajo(String legajo) {
-        return toResponse(alumnoRepository.findByLegajo(legajo)
+        return toResponse(alumnoRepository.findByUserLegajo(legajo)
                 .orElseThrow(() -> new AlumnoNotFoundException("legajo", legajo)));
     }
 
@@ -97,12 +88,12 @@ public class AlumnoServiceImpl implements AlumnoService {
         Alumno alumno = alumnoRepository.findById(id)
                 .orElseThrow(() -> new AlumnoNotFoundException(id));
 
-        if (alumnoRepository.existsByLegajoAndIdNot(request.getLegajo(), id)) {
-            throw new IllegalArgumentException(
-                    "El legajo '" + request.getLegajo() + "' ya está en uso");
-        }
-
-        alumno.setLegajo(request.getLegajo());
+        User user = alumno.getUser();
+        userLookupPort.actualizarDniSiCambio(user, request.getDni());
+        userLookupPort.actualizarEmailSiCambio(user, request.getEmail());
+        user.setNombre(request.getNombre());
+        user.setApellido(request.getApellido());
+        user.setTelefonoSecundario(request.getTelefonoSecundario());
         alumno.setActivo(request.isActivo());
 
         return toResponse(alumnoRepository.save(alumno));
@@ -114,13 +105,16 @@ public class AlumnoServiceImpl implements AlumnoService {
                 .orElseThrow(() -> new AlumnoNotFoundException(id));
         alumno.setActivo(false);
         alumnoRepository.save(alumno);
+        // La baja tambien revoca el acceso, por si esta cuenta llegara a
+        // estar habilitada (ver docs/Reglas_de_Negocio.md).
+        userLookupPort.deshabilitar(alumno.getUser().getId());
     }
 
     private AlumnoResponse toResponse(Alumno alumno) {
         User user = alumno.getUser();
         return AlumnoResponse.builder()
                 .id(alumno.getId())
-                .legajo(alumno.getLegajo())
+                .legajo(user.getLegajo())
                 .activo(alumno.isActivo())
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -129,6 +123,7 @@ public class AlumnoServiceImpl implements AlumnoService {
                 .dni(user.getDni())
                 .email(user.getEmail())
                 .telefono(user.getTelefono())
+                .telefonoSecundario(user.getTelefonoSecundario())
                 .build();
     }
 }

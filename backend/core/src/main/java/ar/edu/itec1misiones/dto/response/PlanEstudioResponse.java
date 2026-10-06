@@ -13,10 +13,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class PlanEstudioResponse {
     private Long id;
-    private String validez;
+    private String cohorte;
     private String resolucion;
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
+    private LocalDate fechaImplementacion;
     private boolean activo;
     private Long carreraId;
     private String carreraNombre;

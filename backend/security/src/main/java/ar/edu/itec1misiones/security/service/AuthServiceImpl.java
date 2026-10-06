@@ -9,8 +9,8 @@ import ar.edu.itec1misiones.security.service.impl.AuthService;
 import ar.edu.itec1misiones.service.UsuarioCallback;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,11 +37,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(String username, String password) {
+        // Mismo error que una password incorrecta: no revelar si el usuario existe.
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(SecurityConstants.MSG_USER_NOT_FOUND));
+                .orElseThrow(() -> new BadCredentialsException(SecurityConstants.MSG_CREDENTIALS_INVALID));
 
         if (!passwordEncoder.matches(password, user.getPassword()))
             throw new BadCredentialsException(SecurityConstants.MSG_CREDENTIALS_INVALID);
+
+        // El login no pasa por AuthenticationManager/DaoAuthenticationProvider
+        // (matchea la password a mano arriba), asi que isEnabled() no se
+        // valida solo -- hay que chequearlo explicitamente aca.
+        if (!user.isEnabled()) {
+            throw new DisabledException("La cuenta está deshabilitada");
+        }
 
         Map<String, Object> extraClaims = usuarioCallback.obtenerDatosUsuario(user);
         return jwtServiceImpl.generateToken(user, extraClaims);

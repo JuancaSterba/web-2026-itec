@@ -5,6 +5,8 @@ import ar.edu.itec1misiones.dto.request.HorarioClaseRequest;
 import ar.edu.itec1misiones.dto.response.HorarioClaseResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.service.HorarioClaseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +20,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/horarios")
 @RequiredArgsConstructor
+@Tag(name = "Horarios de Clase", description = "Gestión de horarios de clase por comisión y módulo horario")
 public class HorarioClaseController {
 
     private final HorarioClaseService horarioClaseService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Listar todos los horarios de clase")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getAll(HttpServletRequest httpRequest) {
         List<HorarioClaseResponse> horarios = horarioClaseService.getAll();
         return ResponseEntity.ok(
@@ -34,6 +39,8 @@ public class HorarioClaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Obtener un horario de clase por ID")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getById(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -48,6 +55,8 @@ public class HorarioClaseController {
     }
 
     @GetMapping("/comision/{comisionId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Listar horarios de clase de una comisión")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> getByComisionId(
             @PathVariable Long comisionId,
             HttpServletRequest httpRequest) {
@@ -63,6 +72,7 @@ public class HorarioClaseController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear un nuevo horario de clase")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> create(
             @RequestBody @Valid HorarioClaseRequest request,
             HttpServletRequest httpRequest) {
@@ -78,6 +88,7 @@ public class HorarioClaseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar un horario de clase existente")
     public ResponseEntity<ApiResponse<HorarioClaseResponse>> update(
             @PathVariable Long id,
             @RequestBody @Valid HorarioClaseRequest request,
@@ -94,6 +105,7 @@ public class HorarioClaseController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Eliminar un horario de clase")
     public ResponseEntity<ApiResponse<String>> delete(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {

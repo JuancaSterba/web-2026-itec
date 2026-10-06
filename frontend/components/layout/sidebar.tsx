@@ -4,34 +4,56 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import {
   Home,
   Users,
   GraduationCap,
-  BookOpen,
   Calendar,
+  ClipboardList,
   ClipboardCheck,
-  BarChart3,
-  Settings,
   ChevronLeft,
   ChevronRight,
-  UserCheck,
-  FileText,
+  BookOpen,
+  ShieldCheck,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR", "ALUMNO"] },
-  { name: "Alumnos", href: "/dashboard/alumnos", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Profesores", href: "/dashboard/profesores", icon: GraduationCap, roles: ["ADMIN"] },
-  { name: "Materias", href: "/dashboard/materias", icon: BookOpen, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Comisiones", href: "/dashboard/comisiones", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Asistencias", href: "/dashboard/asistencias", icon: UserCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"] },
-  { name: "Calificaciones", href: "/dashboard/calificaciones", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO", "PROFESOR"], },
-  { name: "Reportes", href: "/dashboard/reportes", icon: BarChart3, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Certificados", href: "/dashboard/certificados", icon: FileText, roles: ["ADMIN", "ADMINISTRATIVO"] },
-  { name: "Configuración", href: "/dashboard/configuraciones", icon: Settings, roles: ["ADMIN"] },
+const ALL_ROLES = ["ADMIN", "ADMINISTRATIVO", "PROFESOR", "ALUMNO"]
+
+export const navigation = [
+  {
+    group: null,
+    items: [{ name: "Inicio", href: "/dashboard", icon: Home, roles: ALL_ROLES }],
+  },
+  {
+    group: "Institución",
+    items: [
+      { name: "Catálogo de Materias", href: "/dashboard/materias", icon: BookOpen, roles: ["ADMIN", "ADMINISTRATIVO"] },
+    ],
+  },
+  {
+    group: "Catálogo Académico",
+    items: [
+      { name: "Carreras y Planes", href: "/dashboard/carreras", icon: GraduationCap, roles: ["ADMIN", "ADMINISTRATIVO"] },
+    ],
+  },
+  {
+    group: "Gestión Académica",
+    items: [
+      { name: "Ciclos Lectivos", href: "/dashboard/ciclos", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
+      { name: "Mesas de Examen", href: "/dashboard/mesas-examen", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO"] },
+      { name: "Mis Clases", href: "/dashboard/mis-comisiones", icon: ClipboardList, roles: ["PROFESOR"] },
+      { name: "Mis Mesas de Examen", href: "/dashboard/mis-mesas", icon: ClipboardCheck, roles: ["PROFESOR"] },
+    ],
+  },
+  {
+    group: "Personas",
+    items: [
+      { name: "Estudiantes", href: "/dashboard/alumnos", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
+      { name: "Profesores", href: "/dashboard/profesores", icon: Users, roles: ["ADMIN", "ADMINISTRATIVO"] },
+      { name: "Administradores", href: "/dashboard/administradores", icon: ShieldCheck, roles: ["ADMIN"] },
+    ],
+  },
 ]
 
 export default function Sidebar() {
@@ -39,40 +61,69 @@ export default function Sidebar() {
   const pathname = usePathname()
   const { user } = useAuth()
 
-  const filteredNavigation = navigation.filter((item) => user?.role && item.roles.includes(user.role))
+  const filteredNavigation = navigation
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => user?.role && item.roles.includes(user.role)),
+    }))
+    .filter((section) => section.items.length > 0)
 
   return (
-    <div className={cn("bg-white shadow-lg transition-all duration-300 ease-in-out", collapsed ? "w-16" : "w-64")}>
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b">
-          {!collapsed && (
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">ITEC N°1</h2>
-              <p className="text-sm text-gray-500">Backoffice</p>
-            </div>
-          )}
-          <Button variant="ghost" size="sm" onClick={() => setCollapsed(!collapsed)} className="p-2">
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-2">
-          {filteredNavigation.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link key={item.name} href={item.href}>
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  className={cn("w-full justify-start", collapsed ? "px-2" : "px-4")}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {!collapsed && <span className="ml-3">{item.name}</span>}
-                </Button>
-              </Link>
-            )
-          })}
-        </nav>
+    <aside
+      className={cn(
+        "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out",
+        collapsed ? "w-16" : "w-64"
+      )}
+    >
+      <div className="flex items-center justify-between gap-2 border-b border-sidebar-border p-4">
+        {!collapsed && (
+          <div className="min-w-0">
+            <h2 className="truncate font-display text-lg font-semibold text-sidebar-foreground">
+              ITEC N°1
+            </h2>
+            <p className="truncate text-xs text-sidebar-foreground/60">Backoffice Académico</p>
+          </div>
+        )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
+          className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+        </button>
       </div>
-    </div>
+
+      <nav className="flex-1 space-y-4 overflow-y-auto p-3">
+        {filteredNavigation.map((section) => (
+          <div key={section.group ?? "root"} className="space-y-1">
+            {section.group && !collapsed && (
+              <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                {section.group}
+              </p>
+            )}
+            {section.items.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  title={collapsed ? item.name : undefined}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    collapsed && "justify-center px-2",
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-glow"
+                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  <item.icon className="size-5 shrink-0" />
+                  {!collapsed && <span className="truncate">{item.name}</span>}
+                </Link>
+              )
+            })}
+          </div>
+        ))}
+      </nav>
+    </aside>
   )
 }

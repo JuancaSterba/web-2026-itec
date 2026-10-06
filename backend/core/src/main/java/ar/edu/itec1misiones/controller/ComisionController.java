@@ -5,8 +5,11 @@ import ar.edu.itec1misiones.dto.request.ComisionRequest;
 import ar.edu.itec1misiones.dto.response.ComisionResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.service.ComisionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,21 +19,20 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/comisiones")
+@RequiredArgsConstructor
+@Tag(name = "Comisiones", description = "Gestión de comisiones por periodo académico y materia de plan")
 public class ComisionController {
 
     private final ComisionService comisionService;
 
-    public ComisionController(ComisionService comisionService) {
-        this.comisionService = comisionService;
-    }
-
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
-    public ResponseEntity<ApiResponse<ComisionResponse>> crear(
+    @Operation(summary = "Crear una nueva comisión")
+    public ResponseEntity<ApiResponse<ComisionResponse>> guardar(
             @RequestBody @Valid ComisionRequest request,
             HttpServletRequest httpRequest) {
 
-        ComisionResponse comision = comisionService.crear(request);
+        ComisionResponse comision = comisionService.guardar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<ComisionResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
@@ -40,8 +42,10 @@ public class ComisionController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<ComisionResponse>> listar(HttpServletRequest httpRequest) {
-        List<ComisionResponse> comisiones = comisionService.listarActivas();
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Listar todas las comisiones")
+    public ResponseEntity<ApiResponse<ComisionResponse>> buscarTodos(HttpServletRequest httpRequest) {
+        List<ComisionResponse> comisiones = comisionService.buscarTodos();
         return ResponseEntity.ok(
                 ApiResponse.<ComisionResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
@@ -51,6 +55,8 @@ public class ComisionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Obtener una comisión por ID")
     public ResponseEntity<ApiResponse<ComisionResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -64,50 +70,9 @@ public class ComisionController {
         );
     }
 
-    @GetMapping("/materia/{materiaId}")
-    public ResponseEntity<ApiResponse<ComisionResponse>> listarPorMateria(
-            @PathVariable Long materiaId,
-            HttpServletRequest httpRequest) {
-
-        List<ComisionResponse> comisiones = comisionService.listarPorMateria(materiaId);
-        return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
-                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(comisiones)
-                        .build()
-        );
-    }
-
-    @GetMapping("/cuatrimestre/{cuatrimestreId}")
-    public ResponseEntity<ApiResponse<ComisionResponse>> listarPorCuatrimestre(
-            @PathVariable Long cuatrimestreId,
-            HttpServletRequest httpRequest) {
-
-        List<ComisionResponse> comisiones = comisionService.listarPorCuatrimestre(cuatrimestreId);
-        return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
-                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(comisiones)
-                        .build()
-        );
-    }
-
-    @GetMapping("/profesor/{profesorId}")
-    public ResponseEntity<ApiResponse<ComisionResponse>> listarPorProfesor(
-            @PathVariable Long profesorId,
-            HttpServletRequest httpRequest) {
-
-        List<ComisionResponse> comisiones = comisionService.listarPorProfesor(profesorId);
-        return ResponseEntity.ok(
-                ApiResponse.<ComisionResponse>builder()
-                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
-                        .data(comisiones)
-                        .build()
-        );
-    }
-
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar una comisión existente")
     public ResponseEntity<ApiResponse<ComisionResponse>> actualizar(
             @PathVariable Long id,
             @RequestBody @Valid ComisionRequest request,
@@ -124,6 +89,7 @@ public class ComisionController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar una comisión (baja lógica)")
     public ResponseEntity<ApiResponse<String>> desactivar(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {

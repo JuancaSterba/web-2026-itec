@@ -6,16 +6,18 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: ${DB_DDL_AUTO:validate}
+      ddl-auto: validate
     show-sql: false
     database-platform: org.hibernate.dialect.MySQL8Dialect
+  flyway:
+    enabled: true
 
 logging:
   level:
     root: info
 
 server:
-  port: 8080
+  port: 8081
 
 admin:
   username: ${ADMIN_USERNAME}

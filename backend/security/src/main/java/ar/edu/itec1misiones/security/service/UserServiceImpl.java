@@ -52,6 +52,13 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setTelefono(request.getTelefono());
 
+        // Mismo criterio que el alta de un solo paso (UserLookupPortImpl):
+        // Alumnos no tienen UI propia todavia, no deben poder loguearse.
+        if (request.getRoles().contains(Rol.ALUMNO) && !request.getRoles().contains(Rol.PROFESOR)
+                && !request.getRoles().contains(Rol.ADMIN) && !request.getRoles().contains(Rol.ADMINISTRATIVO)) {
+            user.setEnabled(false);
+        }
+
         userRepository.save(user);
 
         for (Rol rol : request.getRoles()) {
@@ -73,9 +80,6 @@ public class UserServiceImpl implements UserService {
         }
         if (userRepository.existsByEmail(request.getEmail())) {
             errores.add("El email ya está en uso.");
-        }
-        if (userRepository.existsByTelefono(request.getTelefono())) {
-            errores.add("El teléfono ya está en uso.");
         }
 
         if (!errores.isEmpty()) {

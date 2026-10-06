@@ -3,6 +3,7 @@ package ar.edu.itec1misiones.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.*;
 
 @Entity
@@ -17,14 +18,9 @@ public class HorarioClase {
 
     private DayOfWeek diaSemana;
 
-    @ManyToOne
-    private ComisionMateria comision;
+    private LocalTime horaInicio;
 
-    @ManyToMany
-    @JoinTable(
-        name = "horario_modulos",
-        joinColumns = @JoinColumn(name = "horario_id"),
-        inverseJoinColumns = @JoinColumn(name = "modulo_id")
-    )
-    private List<ModuloHorario> modulos;
+    private LocalTime horaFin;
+    @ManyToOne
+    private Comision comision;
 }

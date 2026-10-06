@@ -5,6 +5,7 @@ import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.model.User;
 import ar.edu.itec1misiones.repository.ProfesorRepository;
 import ar.edu.itec1misiones.security.repository.UserRepository;
+import ar.edu.itec1misiones.util.LegajoGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -57,6 +58,7 @@ public class AdminInitializer {
                 user.setEmail(email);
                 user.setTelefono(telefono);
                 user.setRoles(Set.of(Rol.ADMIN, Rol.PROFESOR));
+                user.setLegajo(LegajoGenerator.generar(dni));
                 userRepository.save(user);
 
                 // Crear entidad Profesor si se requiere el comportamiento de "profesor"

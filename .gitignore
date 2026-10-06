@@ -1,19 +1,15 @@
-# === Archivos de contexto y configuración para Agentes IA ===
-# Al no tener una barra (/) adelante, se ignoran en cualquier subcarpeta del proyecto.
+# Secretos (C4.2): solo se versionan los .env.example
+.env
+.env.*
+!.env.example
 
-# Archivos específicos de instrucciones para IAs
-CLAUDE.md
-GEMINI.md
-CURSOR.md
-AGENT.md
-.cursorrules
+# Claude Code: se versionan commands/, agents/, skills/ y settings.json;
+# se ignora lo propio de cada máquina
+.claude/settings.local.json
+.claude/worktrees/
 
-# Carpetas destinadas a guardar prompts o historiales de agentes
-agentes/
-.agents/
-.ai/
-prompts/
-.gemini/
-backend/skills-lock.json
-backend/AGENT.md
-docs/backend/registro_sesiones.md
+# IDE y sistema operativo
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store

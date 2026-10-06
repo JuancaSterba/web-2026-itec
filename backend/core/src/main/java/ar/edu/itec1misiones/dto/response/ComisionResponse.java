@@ -11,16 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ComisionResponse {
     private Long id;
-    private String nombre;
-    private Integer cupo;
+    private String nombreComision;
+    private Integer cupoMaximo;
     private boolean activa;
-    private Long materiaId;
-    private String materiaNombre;
-    private Long cuatrimestreId;
-    private Integer cuatrimestreAnio;
-    private Integer cuatrimestreNumero;
-    private Long profesorId;
-    private String profesorNombre;
-    private String profesorApellido;
-    private String profesorTitulo;
+    private Long periodoAcademicoId;
+    private Long materiaPlanId;
 }

@@ -7,6 +7,8 @@ import ar.edu.itec1misiones.model.Rol;
 import ar.edu.itec1misiones.security.constants.SecurityConstants;
 import ar.edu.itec1misiones.security.service.UserServiceImpl;
 import ar.edu.itec1misiones.security.util.SecurityUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(SecurityConstants.AUTH_BASE_PATH)
+@Tag(name = "Usuarios", description = "Registro y gestión de usuarios del sistema")
 public class UserController {
 
     private final UserServiceImpl userServiceImpl;
@@ -33,6 +36,7 @@ public class UserController {
 
     @PostMapping(SecurityConstants.REGISTER_PATH)
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Registrar un nuevo usuario (ADMIN / ADMINISTRATIVO)")
     public ResponseEntity<ApiResponse<String>> register(
             @RequestBody @Valid RegisterUserRequest request,
             HttpServletRequest httpRequest) {

@@ -12,7 +12,7 @@ spring:
     converters:
       preferred-json-mapper: jackson
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
   config:
     import:
@@ -30,3 +30,7 @@ logging:
   level:
     root: info
     org.springframework.web: debug
+
+notas:
+  api:
+    url: ${NOTAS_API_URL:http://localhost:8084}

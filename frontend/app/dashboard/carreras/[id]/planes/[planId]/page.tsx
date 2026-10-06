@@ -1,0 +1,134 @@
+import { fetchCore } from "@/lib/api-server"
+import AgregarMateriaDialog from "@/components/planes/agregar-materia-dialog"
+import EditarMateriaPlanDialog from "@/components/planes/editar-materia-plan-dialog"
+import EliminarBoton from "@/components/shared/eliminar-boton"
+import { deleteMateriaPlan } from "@/app/actions/materia-plan-actions"
+import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
+
+interface MateriaPlanResponse {
+  id: number
+  planEstudioId: number
+  materiaId: number
+  materiaNombre: string
+  cuatrimestreDictado: number
+  cargaHoraria: number
+  correlativaIds: number[]
+  correlativaNombres: string[]
+  modalidadEvaluacion: string
+}
+
+interface MateriaResponse {
+  id: number
+  nombre: string
+  codigoInterno: string
+  descripcion: string
+  activa: boolean
+}
+
+interface CarreraResponse {
+  id: number
+  nombre: string
+}
+
+interface PlanEstudioResponse {
+  id: number
+  cohorte: string
+  resolucion: string
+}
+
+export default async function PlanDetallePage({
+  params,
+}: {
+  params: Promise<{ id: string; planId: string }>
+}) {
+  const { id, planId } = await params
+
+  const [materiasPlan, materias, carreras, planes] = await Promise.all([
+    fetchCore<MateriaPlanResponse>("/materias-plan"),
+    fetchCore<MateriaResponse>("/materias"),
+    fetchCore<CarreraResponse>(`/carreras/${id}`),
+    fetchCore<PlanEstudioResponse>(`/planes-estudio/${planId}`),
+  ])
+  const delPlan = materiasPlan?.filter((mp) => String(mp.planEstudioId) === planId) ?? null
+  const carrera = carreras?.[0] ?? null
+  const plan = planes?.[0] ?? null
+
+  const porCuatrimestre = delPlan?.reduce<Record<number, MateriaPlanResponse[]>>((acc, mp) => {
+    acc[mp.cuatrimestreDictado] ??= []
+    acc[mp.cuatrimestreDictado].push(mp)
+    return acc
+  }, {})
+
+  const cuatrimestres = porCuatrimestre ? Object.keys(porCuatrimestre).map(Number).sort((a, b) => a - b) : []
+
+  const materiaIdsUsadas = new Set((delPlan ?? []).map((mp) => mp.materiaId))
+  const materiasParaAgregar = (materias ?? [])
+    .filter((m) => !materiaIdsUsadas.has(m.id))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-foreground">
+            Malla Curricular - Plan {plan?.cohorte ?? planId}
+            {plan?.resolucion ? ` (Res. ${plan.resolucion})` : ""}
+          </h1>
+          <p className="text-sm text-muted-foreground">{carrera?.nombre ?? `Carrera #${id}`}</p>
+        </div>
+        <AgregarMateriaDialog
+          planId={Number(planId)}
+          materiasDisponibles={materiasParaAgregar}
+          correlativasDisponibles={(delPlan ?? [])
+            .map((mp) => ({ id: mp.id, materiaNombre: mp.materiaNombre }))
+            .sort((a, b) => a.materiaNombre.localeCompare(b.materiaNombre, "es"))}
+        />
+      </div>
+
+      {delPlan === null ? (
+        <p className="text-sm text-destructive">No se pudo obtener la malla curricular. Intentá nuevamente más tarde.</p>
+      ) : delPlan.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Este plan de estudio no tiene materias asignadas.</p>
+      ) : (
+        <div className="space-y-4">
+          {cuatrimestres.map((cuatrimestre) => (
+            <div key={cuatrimestre} className="rounded-lg border border-border bg-card p-4">
+              <h2 className="mb-2 text-sm font-semibold text-foreground">{etiquetaCuatrimestre(cuatrimestre)}</h2>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                {porCuatrimestre![cuatrimestre].map((mp) => (
+                  <li key={mp.id} className="flex items-center justify-between">
+                    <span>
+                      {mp.materiaNombre} <span className="text-xs">({mp.cargaHoraria}hs/semana · {mp.modalidadEvaluacion === "PROMOCIONAL" ? "Promocional" : "Final"})</span>
+                      {mp.correlativaNombres.length > 0 && (
+                        <span className="block text-xs text-muted-foreground">
+                          Correlativas: {mp.correlativaNombres.join(", ")}
+                        </span>
+                      )}
+                    </span>
+                    <div className="flex gap-1">
+                      <EditarMateriaPlanDialog
+                        materiaPlan={mp}
+                        planId={Number(planId)}
+                        materiasDisponibles={(materias ?? [])
+                          .filter((m) => m.id === mp.materiaId || !materiaIdsUsadas.has(m.id))
+                          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))}
+                        correlativasDisponibles={(delPlan ?? [])
+                          .filter((otra) => otra.id !== mp.id)
+                          .map((otra) => ({ id: otra.id, materiaNombre: otra.materiaNombre }))
+                          .sort((a, b) => a.materiaNombre.localeCompare(b.materiaNombre, "es"))}
+                      />
+                      <EliminarBoton
+                        accion={deleteMateriaPlan.bind(null, mp.id)}
+                        entidadLabel={mp.materiaNombre}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -14,11 +12,7 @@ import java.util.List;
 public class MateriaResponse {
     private Long id;
     private String nombre;
-    private Integer cargaHoraria;
-    private Integer anio;
-    private Integer cuatrimestre;
+    private String codigoInterno;
+    private String descripcion;
     private boolean activa;
-    private Long planEstudioId;
-    private String planEstudioValidez;
-    private List<Long> correlativasIds;
 }

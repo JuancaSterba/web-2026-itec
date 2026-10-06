@@ -1,6 +1,21 @@
 import "./globals.css"
 import { ReactNode } from "react"
+import { Inter, Space_Grotesk } from "next/font/google"
 import { AuthProvider } from "@/hooks/use-auth"
+import { MyThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
+
+const fontSans = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
+
+const fontDisplay = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+})
 
 export const metadata = {
   title: "Backoffice ITEC",
@@ -9,11 +24,14 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning className={`${fontSans.variable} ${fontDisplay.variable}`}>
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <MyThemeProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+          <Toaster />
+        </MyThemeProvider>
       </body>
     </html>
   )

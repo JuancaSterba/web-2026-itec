@@ -1,0 +1,82 @@
+"use server"
+
+import { cookies } from "next/headers"
+import { revalidatePath } from "next/cache"
+
+function getApiBaseUrl() {
+  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+}
+
+export async function saveCalificacion(
+  cursadaId: number,
+  comisionId: number,
+  instancia: string,
+  nota: number,
+  calificacionId?: number
+) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+
+  const payload = {
+    cursadaId,
+    comisionId,
+    instancia,
+    nota,
+    fecha: new Date().toISOString().split("T")[0],
+  }
+
+  const url = calificacionId
+    ? `${getApiBaseUrl()}/api/v1/calificaciones-parciales/${calificacionId}`
+    : `${getApiBaseUrl()}/api/v1/calificaciones-parciales`
+
+  const response = await fetch(url, {
+    method: calificacionId ? "PUT" : "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(body?.errors?.[0]?.description ?? "No se pudo guardar la calificación")
+  }
+
+  revalidatePath("/dashboard/comisiones/[comisionId]", "page")
+}
+
+export async function saveCalificacionesMasivas(
+  comisionId: number,
+  instancia: string,
+  registros: { cursadaId: number; nota: number }[]
+) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get("auth-token")?.value
+  const fecha = new Date().toISOString().split("T")[0]
+
+  const respuestas = await Promise.all(
+    registros.map((registro) =>
+      fetch(`${getApiBaseUrl()}/api/v1/calificaciones-parciales`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          cursadaId: registro.cursadaId,
+          comisionId,
+          instancia,
+          nota: registro.nota,
+          fecha,
+        }),
+      })
+    )
+  )
+
+  if (respuestas.some((response) => !response.ok)) {
+    throw new Error("No se pudo guardar la instancia de evaluación completa")
+  }
+
+  revalidatePath("/dashboard/comisiones/[comisionId]", "page")
+}

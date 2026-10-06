@@ -1,11 +1,13 @@
 package ar.edu.itec1misiones.controller;
 
 import ar.edu.itec1misiones.dto.ApiResponse;
-import ar.edu.itec1misiones.dto.request.AlumnoRequest;
+import ar.edu.itec1misiones.dto.request.AlumnoRegistroDTO;
 import ar.edu.itec1misiones.dto.request.AlumnoUpdateRequest;
 import ar.edu.itec1misiones.dto.response.AlumnoResponse;
 import ar.edu.itec1misiones.dto.response.MetaBuilderHelper;
 import ar.edu.itec1misiones.service.AlumnoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/alumnos")
+@Tag(name = "Alumnos", description = "Gestión de alumnos y búsqueda por legajo o DNI")
 public class AlumnoController {
 
     private final AlumnoService alumnoService;
@@ -27,11 +30,12 @@ public class AlumnoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Crear un nuevo alumno (alta de un solo paso: crea el Usuario y el Alumno)")
     public ResponseEntity<ApiResponse<AlumnoResponse>> crear(
-            @RequestBody @Valid AlumnoRequest request,
+            @RequestBody @Valid AlumnoRegistroDTO request,
             HttpServletRequest httpRequest) {
 
-        AlumnoResponse alumno = alumnoService.crear(request);
+        AlumnoResponse alumno = alumnoService.crearConUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.<AlumnoResponse>builder()
                         .meta(MetaBuilderHelper.buildMeta(httpRequest))
@@ -41,6 +45,8 @@ public class AlumnoController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Listar todos los alumnos activos")
     public ResponseEntity<ApiResponse<AlumnoResponse>> listar(HttpServletRequest httpRequest) {
         List<AlumnoResponse> alumnos = alumnoService.listarActivos();
         return ResponseEntity.ok(
@@ -52,6 +58,8 @@ public class AlumnoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO') or hasRole('PROFESOR')")
+    @Operation(summary = "Obtener un alumno por ID")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorId(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {
@@ -66,6 +74,8 @@ public class AlumnoController {
     }
 
     @GetMapping("/legajo/{legajo}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Buscar alumno por número de legajo")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorLegajo(
             @PathVariable String legajo,
             HttpServletRequest httpRequest) {
@@ -80,6 +90,8 @@ public class AlumnoController {
     }
 
     @GetMapping("/dni/{dni}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Buscar alumno por DNI")
     public ResponseEntity<ApiResponse<AlumnoResponse>> buscarPorDni(
             @PathVariable String dni,
             HttpServletRequest httpRequest) {
@@ -95,6 +107,7 @@ public class AlumnoController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('ADMINISTRATIVO')")
+    @Operation(summary = "Actualizar datos de un alumno")
     public ResponseEntity<ApiResponse<AlumnoResponse>> actualizar(
             @PathVariable Long id,
             @RequestBody @Valid AlumnoUpdateRequest request,
@@ -111,6 +124,7 @@ public class AlumnoController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Desactivar un alumno (baja lógica)")
     public ResponseEntity<ApiResponse<String>> desactivar(
             @PathVariable Long id,
             HttpServletRequest httpRequest) {

@@ -20,10 +20,13 @@ export function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // (Opcional) Home: decidir según cookie
+  // "/" es publica (hero de bienvenida). Con sesion, directo al dashboard;
+  // sin sesion, se deja pasar para que se renderice el hero.
   if (pathname === "/") {
-    const dest = isAuth ? DASHBOARD_PATH : LOGIN_PATH
-    return NextResponse.redirect(new URL(dest, FRONTEND_BASE || req.url))
+    if (isAuth) {
+      return NextResponse.redirect(new URL(DASHBOARD_PATH, FRONTEND_BASE || req.url))
+    }
+    return NextResponse.next()
   }
 
   // Si no está autenticado y no es /login → a /login

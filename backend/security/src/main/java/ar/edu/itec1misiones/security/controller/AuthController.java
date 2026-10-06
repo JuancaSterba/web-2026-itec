@@ -6,6 +6,8 @@ import ar.edu.itec1misiones.security.constants.SecurityConstants;
 import ar.edu.itec1misiones.security.dto.LoginRequest;
 import ar.edu.itec1misiones.security.dto.LoginResponse;
 import ar.edu.itec1misiones.security.service.AuthServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(SecurityConstants.AUTH_BASE_PATH)
+@Tag(name = "Autenticación", description = "Login y validación de tokens JWT")
 public class AuthController {
 
     private final AuthServiceImpl authServiceImpl;
@@ -26,6 +29,7 @@ public class AuthController {
     }
 
     @PostMapping(SecurityConstants.LOGIN_PATH)
+    @Operation(summary = "Iniciar sesión y obtener token JWT")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @RequestBody LoginRequest request,
             HttpServletRequest servletRequest) {
@@ -42,6 +46,7 @@ public class AuthController {
     }
 
     @GetMapping(SecurityConstants.VALIDATE_PATH)
+    @Operation(summary = "Validar un token JWT")
     public ResponseEntity<ApiResponse<String>> validate(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String tokenHeader,
             HttpServletRequest request) {

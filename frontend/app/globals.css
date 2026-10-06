@@ -1,11 +1,152 @@
-/* globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Animaciones adicionales (opcional) */
+@layer base {
+  :root {
+    /* Parchment: modo claro calido, no blanco puro */
+    --background: 38 30% 97%;
+    --foreground: 174 30% 12%;
+    --card: 40 35% 99%;
+    --card-foreground: 174 30% 12%;
+    --popover: 40 35% 99%;
+    --popover-foreground: 174 30% 12%;
+
+    /* Tierra colorada: rojo-ladrillo, acento primario */
+    --primary: 14 68% 50%;
+    --primary-foreground: 40 40% 98%;
+    /* Selva misionera: verde profundo, acento secundario */
+    --secondary: 152 42% 34%;
+    --secondary-foreground: 40 40% 98%;
+
+    --muted: 38 20% 92%;
+    --muted-foreground: 174 12% 40%;
+    --accent: 14 60% 94%;
+    --accent-foreground: 14 68% 30%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 38 15% 85%;
+    --input: 38 15% 85%;
+    --ring: 14 68% 50%;
+    --radius: 0.75rem;
+
+    --chart-1: 14 68% 50%;
+    --chart-2: 152 42% 38%;
+    --chart-3: 42 75% 55%;
+    --chart-4: 174 30% 30%;
+    --chart-5: 340 55% 55%;
+
+    /* Sidebar: ancla oscura de marca incluso en modo claro */
+    --sidebar-background: 174 28% 10%;
+    --sidebar-foreground: 38 20% 92%;
+    --sidebar-primary: 14 68% 50%;
+    --sidebar-primary-foreground: 40 40% 98%;
+    --sidebar-accent: 174 20% 16%;
+    --sidebar-accent-foreground: 38 20% 92%;
+    --sidebar-border: 174 20% 18%;
+    --sidebar-ring: 14 68% 50%;
+
+    /* Acentos regionales con nombre propio, fuera del contrato semantico */
+    --clay: 14 68% 50%;
+    --selva: 152 42% 38%;
+  }
+
+  .dark {
+    /* Ink: verde-azulado profundo, no negro puro ni slate generico */
+    --background: 174 28% 7%;
+    --foreground: 38 20% 94%;
+    --card: 174 24% 10%;
+    --card-foreground: 38 20% 94%;
+    --popover: 174 26% 9%;
+    --popover-foreground: 38 20% 94%;
+
+    --primary: 14 72% 55%;
+    --primary-foreground: 174 30% 8%;
+    --secondary: 152 38% 42%;
+    --secondary-foreground: 174 30% 8%;
+
+    --muted: 174 18% 16%;
+    --muted-foreground: 38 10% 65%;
+    --accent: 174 20% 18%;
+    --accent-foreground: 38 20% 94%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 38 20% 94%;
+
+    --border: 174 18% 18%;
+    --input: 174 18% 18%;
+    --ring: 14 72% 55%;
+
+    --chart-1: 14 72% 55%;
+    --chart-2: 152 45% 48%;
+    --chart-3: 42 80% 60%;
+    --chart-4: 38 15% 75%;
+    --chart-5: 340 60% 62%;
+
+    --sidebar-background: 174 30% 5%;
+    --sidebar-foreground: 38 20% 88%;
+    --sidebar-primary: 14 72% 55%;
+    --sidebar-primary-foreground: 174 30% 8%;
+    --sidebar-accent: 174 22% 12%;
+    --sidebar-accent-foreground: 38 20% 88%;
+    --sidebar-border: 174 20% 14%;
+    --sidebar-ring: 14 72% 55%;
+
+    --clay: 14 72% 55%;
+    --selva: 152 45% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
 @layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
   .fade-in {
     animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* Superficie de vidrio: usar sobre --card, nunca reemplaza el token */
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-white/10 dark:border-white/5;
+  }
+
+  .text-gradient-brand {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-clay to-selva;
+  }
+
+  .border-gradient-brand {
+    border-image: linear-gradient(135deg, hsl(var(--clay)), hsl(var(--selva))) 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

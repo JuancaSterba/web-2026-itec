@@ -31,10 +31,9 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
                 .orElseThrow(() -> new CarreraNotFoundException(request.getCarreraId()));
 
         PlanEstudio plan = new PlanEstudio();
-        plan.setValidez(request.getValidez());
+        plan.setCohorte(request.getCohorte());
         plan.setResolucion(request.getResolucion());
-        plan.setFechaInicio(request.getFechaInicio());
-        plan.setFechaFin(request.getFechaFin());
+        plan.setFechaImplementacion(request.getFechaImplementacion());
         plan.setCarrera(carrera);
         plan.setActivo(true);
 
@@ -71,10 +70,9 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
         Carrera carrera = carreraRepository.findById(request.getCarreraId())
                 .orElseThrow(() -> new CarreraNotFoundException(request.getCarreraId()));
 
-        plan.setValidez(request.getValidez());
+        plan.setCohorte(request.getCohorte());
         plan.setResolucion(request.getResolucion());
-        plan.setFechaInicio(request.getFechaInicio());
-        plan.setFechaFin(request.getFechaFin());
+        plan.setFechaImplementacion(request.getFechaImplementacion());
         plan.setCarrera(carrera);
 
         return toResponse(planEstudioRepository.save(plan));
@@ -91,10 +89,9 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
     private PlanEstudioResponse toResponse(PlanEstudio plan) {
         return PlanEstudioResponse.builder()
                 .id(plan.getId())
-                .validez(plan.getValidez())
+                .cohorte(plan.getCohorte())
                 .resolucion(plan.getResolucion())
-                .fechaInicio(plan.getFechaInicio())
-                .fechaFin(plan.getFechaFin())
+                .fechaImplementacion(plan.getFechaImplementacion())
                 .activo(plan.isActivo())
                 .carreraId(plan.getCarrera().getId())
                 .carreraNombre(plan.getCarrera().getNombre())

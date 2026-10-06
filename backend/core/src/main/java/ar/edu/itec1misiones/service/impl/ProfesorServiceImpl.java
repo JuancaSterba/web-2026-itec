@@ -1,6 +1,6 @@
 package ar.edu.itec1misiones.service.impl;
 
-import ar.edu.itec1misiones.dto.request.ProfesorRequest;
+import ar.edu.itec1misiones.dto.request.ProfesorRegistroDTO;
 import ar.edu.itec1misiones.dto.request.ProfesorUpdateRequest;
 import ar.edu.itec1misiones.dto.response.ProfesorResponse;
 import ar.edu.itec1misiones.exception.ProfesorNotFoundException;
@@ -38,22 +38,16 @@ public class ProfesorServiceImpl implements ProfesorService {
     }
 
     @Override
-    public ProfesorResponse crear(ProfesorRequest request) {
-        User user = userLookupPort.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Usuario no encontrado con id: " + request.getUserId()));
-
-        if (!user.getRoles().contains(Rol.PROFESOR)) {
-            throw new IllegalArgumentException("El usuario no tiene el rol PROFESOR");
-        }
-        if (profesorRepository.findByUserId(request.getUserId()).isPresent()) {
-            throw new IllegalArgumentException("El usuario ya tiene un perfil de profesor asociado");
-        }
+    public ProfesorResponse crearConUsuario(ProfesorRegistroDTO dto) {
+        // Si esto falla (DNI/email duplicado), la transaccion completa
+        // se revierte -- no queda un Usuario huerfano sin Profesor asociado.
+        User user = userLookupPort.crearConCredencialesPorDni(
+                dto.getNombre(), dto.getApellido(), dto.getDni(), dto.getEmail(),
+                dto.getTelefono(), dto.getTelefonoSecundario(), Rol.PROFESOR);
 
         Profesor profesor = new Profesor();
         profesor.setUser(user);
-        profesor.setTitulo(request.getTitulo());
-        profesor.setTelefonoContacto(request.getTelefonoContacto());
+        profesor.setTitulo(dto.getTitulo());
         profesor.setActivo(true);
 
         return toResponse(profesorRepository.save(profesor));
@@ -86,8 +80,13 @@ public class ProfesorServiceImpl implements ProfesorService {
         Profesor profesor = profesorRepository.findById(id)
                 .orElseThrow(() -> new ProfesorNotFoundException(id));
 
+        User user = profesor.getUser();
+        userLookupPort.actualizarDniSiCambio(user, request.getDni());
+        userLookupPort.actualizarEmailSiCambio(user, request.getEmail());
+        user.setNombre(request.getNombre());
+        user.setApellido(request.getApellido());
+        user.setTelefonoSecundario(request.getTelefonoSecundario());
         profesor.setTitulo(request.getTitulo());
-        profesor.setTelefonoContacto(request.getTelefonoContacto());
         profesor.setActivo(request.isActivo());
 
         return toResponse(profesorRepository.save(profesor));
@@ -99,6 +98,9 @@ public class ProfesorServiceImpl implements ProfesorService {
                 .orElseThrow(() -> new ProfesorNotFoundException(id));
         profesor.setActivo(false);
         profesorRepository.save(profesor);
+        // La baja tambien revoca el acceso, por si esta cuenta llegara a
+        // estar habilitada (ver docs/Reglas_de_Negocio.md).
+        userLookupPort.deshabilitar(profesor.getUser().getId());
     }
 
     private ProfesorResponse toResponse(Profesor profesor) {
@@ -106,10 +108,11 @@ public class ProfesorServiceImpl implements ProfesorService {
         return ProfesorResponse.builder()
                 .id(profesor.getId())
                 .titulo(profesor.getTitulo())
-                .telefonoContacto(profesor.getTelefonoContacto())
+                .telefonoSecundario(user.getTelefonoSecundario())
                 .activo(profesor.isActivo())
                 .userId(user.getId())
                 .username(user.getUsername())
+                .legajo(user.getLegajo())
                 .nombre(user.getNombre())
                 .apellido(user.getApellido())
                 .dni(user.getDni())
