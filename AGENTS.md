@@ -13,7 +13,7 @@ Sistema de gestión académica del ITEC N°1 (carreras, materias, alumnos, profe
 - `ms-asistencias/` (:8083) · `ms-notas/` (:8084) — microservicios aislados
 - `frontend/` — cliente Next.js (:3000)
 - `docs/` — requerimientos, reglas de negocio, diagramas (ver `docs/INDEX.md`); principios innegociables en `docs/constitution.md`
-- `.agents/` — roles (architect, backend, frontend, devops, tester, reviewer) · `.superpowers/` — planes/specs
+- `.agents/` — roles (architect, backend, frontend, devops, tester, reviewer)
 - `docs/pendientes.md` — **única fuente de verdad** de tareas abiertas · `MEMORY.md` — estado, decisiones y aprendizajes
 
 ## Comandos

@@ -10,7 +10,6 @@ Este módulo es el núcleo central (Core) de datos maestros y autenticación. Si
 - 📊 **MS Notas:** `../ms-notas/` (Microservicio independiente para evaluaciones y notas)
 - 📚 **Documentación Central:** `../docs/` (DER, diagramas de clases, secuencias y reglas de negocio)
 - 📌 **Única Fuente de Verdad (Tareas):** `../docs/pendientes.md`
-- ⚡ **Planes / Specs de Desarrollo:** `../.superpowers/`
 
 ## 🎯 Rol y Reglas Específicas del Backend
 1. **Rol de Referencia:** Ver `../.agents/backend.md`.
