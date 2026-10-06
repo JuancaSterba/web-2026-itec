@@ -16,6 +16,7 @@ Principios innegociables. Toda spec, plan y cambio de código debe cumplirlos; e
 - **C2.4** Frontend: datos con Server Components y escrituras con Server Actions (`frontend/app/actions`). Sin fetch al backend desde componentes cliente (excepción heredada: login en `hooks/use-auth.tsx`, ver deuda #36).
 - **C2.5** El frontend solo habla con el API Gateway; ningún servicio se consume directamente por su puerto.
 - **C2.6** Los tipos del frontend (`frontend/types`, `frontend/lib/types.ts`) reflejan los DTOs del backend; si un DTO cambia, se actualizan en el mismo cambio.
+- **C2.7** El contrato público es `/api/v1/<recurso>` (enunciado) y lo expone solo el Gateway, que quita el `/v1` al rutear. Los servicios no conocen el `/v1` y el frontend usa solo rutas `/api/v1`.
 
 ## 3. Política de pruebas
 - **C3.1** Toda regla de negocio nueva o modificada en un `service` tiene un test unitario (JUnit 5 + Mockito).
@@ -33,3 +34,4 @@ Principios innegociables. Toda spec, plan y cambio de código debe cumplirlos; e
 - **C4.6** Las entradas se validan en el borde (`@Valid` + Bean Validation en los request DTOs) y los errores se devuelven sin stack traces.
 - **C4.7** El schema solo cambia por migraciones de Flyway (`ddl-auto: validate`). Las migraciones ya aplicadas no se editan.
 - **C4.8** Los datos personales (DNI, email, teléfono) solo se exponen a los roles que los necesitan.
+- **C4.9** Los errores de autenticación no revelan si un usuario existe: usuario inexistente y contraseña incorrecta devuelven el mismo 401.
