@@ -7,7 +7,7 @@
 
 ## Deuda técnica
 - **#22 [Arquitectura] Acoplamiento sincrónico Core ↔ MS** *(baja prioridad)* — dependencia circular en runtime por HTTP REST: el Core depende de `ms-notas` para cerrar cursadas y los MS dependen del Core para validar horarios. A futuro, evaluar comunicación asincrónica por eventos (RabbitMQ/Kafka). Cambiarlo requiere enmendar C1.4 de `constitution.md`.
-- **#31 [Documentación] Revisar `docs/`** — confirmar que los documentos reflejan el código actual tras los refactors de DDD, Mesas de Examen y horarios/asistencias.
+- **#31 [Documentación] Revisar `docs/`** — confirmar que los documentos reflejan el código actual tras los refactors de DDD, Mesas de Examen y horarios/asistencias. Incluye: `02.00-Modelo_Datos.md` dice que ALUMNO/PROFESOR se crean con `enabled=false`, pero los usuarios creados desde la UI quedan habilitados (ver `MEMORY.md`).
 - **#36 [Seguridad] JWT y datos personales en `localStorage`** — `frontend/hooks/use-auth.tsx` hace el login desde el cliente con `apiClient` y guarda `token` en `localStorage` además de la cookie; `frontend/app/perfil/page.tsx` lee nombre/DNI/roles de `localStorage`. Viola C2.4/C4.5 de `constitution.md`. Migrar el login a una Server Action que setee una cookie `httpOnly` y leer el perfil del lado del servidor.
 
 ## Funcionalidad pendiente
