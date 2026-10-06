@@ -22,7 +22,7 @@ export async function createAdministrador(formData: FormData) {
     roles: roles.length > 0 ? roles : ["ADMINISTRATIVO"],
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/administradores`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/administradores`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export async function updateAdministrador(id: number, formData: FormData, enable
     enabled,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/administradores/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/administradores/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -78,7 +78,7 @@ export async function resetPasswordAdministrador(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/administradores/${id}/reset-password`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/administradores/${id}/reset-password`, {
     method: "POST",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

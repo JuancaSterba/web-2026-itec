@@ -17,7 +17,7 @@ export async function createCiclo(formData: FormData) {
     fechaFin: formData.get("fechaFin"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/ciclos-lectivos`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/ciclos-lectivos`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export async function updateCiclo(id: number, formData: FormData) {
     activo: formData.get("activo") === "on",
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/ciclos-lectivos/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/ciclos-lectivos/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export async function deleteCiclo(id: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/ciclos-lectivos/${id}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/ciclos-lectivos/${id}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

@@ -22,38 +22,43 @@ spring:
       # Access-Control-Allow-Origin repetido. Nos quedamos con el primero.
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+      # Contrato publico unico /api/v1/** (enunciado): el cliente no conoce que
+      # servicio atiende cada recurso. Cada servicio sigue escuchando en /api/**
+      # (o /auth/**), asi que el Gateway solo quita el "/v1".
       routes:
-        # Orden importa: core-auth debe ir antes que core-api, porque
-        # /api/core/auth/** tambien matchea el predicate mas ancho de core-api.
+        # Orden importa: las rutas especificas van antes que core-api, porque
+        # /api/v1/** tambien matchea auth, asistencias y notas.
         - id: core-auth
           uri: ${CORE_API_URL:http://localhost:8081}
           predicates:
-            - Path=/api/core/auth/**
+            - Path=/api/v1/auth/**
           filters:
-            - RewritePath=/api/core/auth/(?<segment>.*), /auth/${segment}
+            - RewritePath=/api/v1/auth/(?<segment>.*), /auth/${segment}
+        - id: asistencias-api
+          uri: ${ASISTENCIAS_API_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/v1/asistencias/**
+          filters:
+            - JwtAuth
+            - RewritePath=/api/v1/(?<segment>.*), /api/${segment}
+        - id: notas-api
+          uri: ${NOTAS_API_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/v1/calificaciones-parciales/**,/api/v1/notas/**
+          filters:
+            - JwtAuth
+            - RewritePath=/api/v1/(?<segment>.*), /api/${segment}
         - id: core-api
           uri: ${CORE_API_URL:http://localhost:8081}
           predicates:
-            - Path=/api/core/**
+            - Path=/api/v1/**
           filters:
             - JwtAuth
-            - RewritePath=/api/core/(?<segment>.*), /api/${segment}
+            - RewritePath=/api/v1/(?<segment>.*), /api/${segment}
         - id: core-docs
           uri: ${CORE_API_URL:http://localhost:8081}
           predicates:
             - Path=/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html
-        - id: asistencias-api
-          uri: ${ASISTENCIAS_API_URL:http://localhost:8083}
-          predicates:
-            - Path=/api/asistencias/**
-          filters:
-            - JwtAuth
-        - id: notas-api
-          uri: ${NOTAS_API_URL:http://localhost:8084}
-          predicates:
-            - Path=/api/calificaciones-parciales/**,/api/notas/**
-          filters:
-            - JwtAuth
 
 # Misma clave y default que backend/security (application-security.yml).
 # En Docker, ambas apps deben recibir el mismo JWT_SECRET (ver docker-compose.yml).

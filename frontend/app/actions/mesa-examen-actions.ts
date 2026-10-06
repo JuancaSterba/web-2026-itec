@@ -60,7 +60,7 @@ export async function createMesaExamen(payload: {
   }
 
   for (const req of requestsToMake) {
-    const response = await fetch(`${getApiBaseUrl()}/api/core/mesas-examen`, {
+    const response = await fetch(`${getApiBaseUrl()}/api/v1/mesas-examen`, {
       method: "POST",
       headers,
       body: JSON.stringify(req),
@@ -83,7 +83,7 @@ export async function inscribirAlumnoEnMesa(
   const token = cookieStore.get("auth-token")?.value
 
   const response = await fetch(
-    `${getApiBaseUrl()}/api/core/mesas-examen/${mesaExamenId}/inscripciones`,
+    `${getApiBaseUrl()}/api/v1/mesas-examen/${mesaExamenId}/inscripciones`,
     {
       method: "POST",
       headers: {
@@ -110,7 +110,7 @@ export async function updateTribunalMesa(
   const token = cookieStore.get("auth-token")?.value
 
   const response = await fetch(
-    `${getApiBaseUrl()}/api/core/mesas-examen/${mesaExamenId}/tribunal`,
+    `${getApiBaseUrl()}/api/v1/mesas-examen/${mesaExamenId}/tribunal`,
     {
       method: "PUT",
       headers: {
@@ -133,7 +133,7 @@ export async function cerrarMesaExamen(mesaId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/mesas-examen/${mesaId}/cerrar`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/mesas-examen/${mesaId}/cerrar`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

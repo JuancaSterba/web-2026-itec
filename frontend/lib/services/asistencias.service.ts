@@ -20,7 +20,7 @@ export interface AsistenciaInput {
   estado: EstadoAsistencia
 }
 
-const BASE_PATH = "/api/asistencias"
+const BASE_PATH = "/api/v1/asistencias"
 
 export async function listarAsistencias(comisionId?: number, fecha?: string): Promise<Asistencia[]> {
   const params = new URLSearchParams()

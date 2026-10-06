@@ -20,7 +20,7 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
     modalidadEvaluacion: formData.get("modalidadEvaluacion"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias-plan`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export async function updateMateriaPlan(formData: FormData, materiaPlanId: numbe
     modalidadEvaluacion: formData.get("modalidadEvaluacion"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan/${materiaPlanId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias-plan/${materiaPlanId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export async function deleteMateriaPlan(materiaPlanId: number) {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth-token")?.value
 
-  const response = await fetch(`${getApiBaseUrl()}/api/core/materias-plan/${materiaPlanId}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias-plan/${materiaPlanId}`, {
     method: "DELETE",
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),

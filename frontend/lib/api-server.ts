@@ -9,9 +9,8 @@ function getApiBaseUrl() {
   return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 }
 
-// Fetch generico contra el gateway: usalo para rutas que NO viven bajo /api/core
-// (ms-notas y ms-asistencias se montan directo en /api/calificaciones-parciales y
-// /api/asistencias, sin RewritePath en el gateway).
+// Fetch generico contra el gateway: recibe la ruta publica completa
+// (ej. /api/v1/asistencias/...). Para recursos del Core, fetchCore antepone /api/v1.
 export async function fetchGateway<T>(path: string): Promise<T[] | null> {
   try {
     const cookieStore = await cookies()
@@ -36,5 +35,5 @@ export async function fetchGateway<T>(path: string): Promise<T[] | null> {
 }
 
 export function fetchCore<T>(path: string): Promise<T[] | null> {
-  return fetchGateway<T>(`/api/core${path}`)
+  return fetchGateway<T>(`/api/v1${path}`)
 }

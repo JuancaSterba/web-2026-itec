@@ -41,8 +41,8 @@ export async function saveAsistenciasMasivas(
   const respuestas = await Promise.all(
     registros.map((registro) => {
       const url = registro.asistenciaId
-        ? `${getApiBaseUrl()}/api/asistencias/${registro.asistenciaId}`
-        : `${getApiBaseUrl()}/api/asistencias`
+        ? `${getApiBaseUrl()}/api/v1/asistencias/${registro.asistenciaId}`
+        : `${getApiBaseUrl()}/api/v1/asistencias`
       return fetch(url, {
         method: registro.asistenciaId ? "PUT" : "POST",
         headers: {

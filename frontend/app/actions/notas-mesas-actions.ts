@@ -23,8 +23,8 @@ export async function saveCalificacionMesa(payload: {
 
   const { calificacionId, ...body } = payload
   const url = calificacionId
-    ? `${getApiBaseUrl()}/api/notas/mesas/${calificacionId}`
-    : `${getApiBaseUrl()}/api/notas/mesas`
+    ? `${getApiBaseUrl()}/api/v1/notas/mesas/${calificacionId}`
+    : `${getApiBaseUrl()}/api/v1/notas/mesas`
 
   const response = await fetch(url, {
     method: calificacionId ? "PUT" : "POST",

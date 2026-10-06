@@ -9,7 +9,6 @@
 - **#22 [Arquitectura] Acoplamiento sincrónico Core ↔ MS** *(baja prioridad)* — dependencia circular en runtime por HTTP REST: el Core depende de `ms-notas` para cerrar cursadas y los MS dependen del Core para validar horarios. A futuro, evaluar comunicación asincrónica por eventos (RabbitMQ/Kafka). Cambiarlo requiere enmendar C1.4 de `constitution.md`.
 - **#31 [Documentación] Revisar `docs/`** — confirmar que los documentos reflejan el código actual tras los refactors de DDD, Mesas de Examen y horarios/asistencias.
 - **#36 [Seguridad] JWT y datos personales en `localStorage`** — `frontend/hooks/use-auth.tsx` hace el login desde el cliente con `apiClient` y guarda `token` en `localStorage` además de la cookie; `frontend/app/perfil/page.tsx` lee nombre/DNI/roles de `localStorage`. Viola C2.4/C4.5 de `constitution.md`. Migrar el login a una Server Action que setee una cookie `httpOnly` y leer el perfil del lado del servidor.
-- **#40 [Documentación] Rutas del Gateway en `AGENTS.md`** — indica `/api/v1/**`, pero las rutas reales son `/api/core/**` (incl. `/api/core/auth/**`), `/api/asistencias/**` y `/api/notas/**` / `/api/calificaciones-parciales/**`.
 
 ## Funcionalidad pendiente
 - **#37 Regularidad por asistencia (70 %)** — el cálculo del 70 % y la notificación MS Asistencias → Core para que el alumno pierda la regularidad no están implementados (ver `02.20-Diagrama_Estados.md` y `03.20-Diagrama_Secuencia_Asistencia.md`).

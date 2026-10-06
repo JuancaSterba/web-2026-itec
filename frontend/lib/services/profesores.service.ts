@@ -17,7 +17,7 @@ export interface Profesor {
   telefono: string
 }
 
-// POST /api/core/profesores es un alta de un solo paso: el Core crea el
+// POST /api/v1/profesores es un alta de un solo paso: el Core crea el
 // Usuario (username=DNI, password=DNI encriptada, rol=PROFESOR, enabled=false)
 // y el Profesor en la misma transaccion (ver docs/Reglas_de_Negocio.md).
 export interface CrearProfesorInput {
