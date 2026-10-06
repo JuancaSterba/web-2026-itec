@@ -1,16 +1,2 @@
-# === Archivos de contexto y configuración para Agentes IA ===
-# Al no tener una barra (/) adelante, se ignoran en cualquier subcarpeta del proyecto.
-
-# Archivos específicos de instrucciones para IAs
-GEMINI.md
-CURSOR.md
-.cursorrules
-
-# Carpetas destinadas a guardar prompts o historiales de agentes
-agentes/
-.ai/
-prompts/
-backend/skills-lock.json
-docs/backend/registro_sesiones.md
-
+# Capturas y logs del MCP de Playwright (Claude Code)
 .playwright-mcp/
