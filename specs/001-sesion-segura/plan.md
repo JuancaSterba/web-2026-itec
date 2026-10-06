@@ -1,7 +1,7 @@
 # 001 — Plan técnico: Sesión segura y perfil desde el servidor
 
 - **Spec:** [`spec.md`](./spec.md)
-- **Estado:** Borrador
+- **Estado:** Aprobado (2026-10-06, incluye el endpoint `GET /api/v1/perfil`)
 
 ## Resumen
 El login pasa a ser una Server Action: el servidor de Next llama al Gateway, guarda el JWT en una cookie `httpOnly` (`itec-sesion`) y redirige según los roles. El rol activo se guarda en otra cookie `httpOnly` (`itec-rol`), que solo escribe una Server Action que valida el rol contra el JWT. El layout raíz (Server Component) lee la sesión y se la pasa a un provider cliente sin tokens ni datos en `localStorage`; `useAuth()` conserva su forma para no tocar sus 5 consumidores. El `proxy` valida presencia y vencimiento de la sesión en cada navegación, y un helper único de fetch para Server Actions convierte un 401 del Gateway en redirect al login con aviso. El perfil se vuelve Server Component y consulta un endpoint nuevo del Core, `GET /api/v1/perfil`.
@@ -78,7 +78,7 @@ Sin cambios de schema. El rol activo vive en una cookie, no en la BD.
 **Cookies** (las escribe solo el servidor de Next)
 | Cookie | Contenido | Atributos |
 |---|---|---|
-| `itec-sesion` | JWT | `httpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age` = segundos hasta el `exp` del JWT, `Secure` si la petición llega por HTTPS |
+| `itec-sesion` | JWT | `httpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age` = segundos hasta el `exp` del JWT |
 | `itec-rol` | Rol activo | Mismos atributos y vencimiento que `itec-sesion` |
 
 ### Lógica (funciones puras y pseudocódigo)
@@ -147,7 +147,7 @@ fetchApi(ruta, init):
 | Vencimiento validado en el `proxy` y, para Server Actions, en el helper `fetchApi` ante un 401. | Solo en el `proxy`. | El `proxy` cubre la navegación. Una Server Action puede enviarse con el token ya vencido; el 401 del Gateway asegura que no se guarde nada (RF-25) y el helper hace el redirect con aviso (RF-17). |
 | Mantener la forma de `useAuth()` (`user`, `logout`, `switchRole`) pero alimentarlo desde el servidor. | Pasar la sesión por props a cada componente. | El header, el sidebar, `RequireRole` y el diálogo de administradores no cambian (C1.5). |
 | Sin test runner en el frontend; la lógica de acceso queda en funciones puras verificadas por E2E. | Agregar Vitest. | Agregar una dependencia requiere aprobación (C1.2) y `MEMORY.md` fija `npm run build` + E2E como verificación del frontend. |
-| `Secure` en las cookies solo si la petición llega por HTTPS. | Variable de entorno nueva. | Docker local corre por HTTP; agregar variables a `.env` requiere aprobación y no es necesario. |
+| Cookies sin `Secure`. | `Secure` condicionado a HTTPS o por variable de entorno. | El proyecto corre solo en local por HTTP (proyecto escolar, sin despliegue). |
 
 ## Estrategia de pruebas
 | RF | Tipo | Test |
@@ -177,6 +177,5 @@ fetchApi(ruta, init):
 
 ## Riesgos
 - **Next.js y redirects en Server Actions:** `redirect()` dentro de `fetchApi` lanza una excepción especial; las actions con `try/catch` (patrón de `MEMORY.md`) deben relanzarla. Mitigación: `fetchApi` usa `redirect` antes del `try` del llamador, o se documenta `unstable_rethrow` en el helper.
-- **Todas las sesiones abiertas se cierran una vez** al desplegar (cambio de nombre de la cookie). Es esperado (RF-19).
 - **Volumen del cambio en `app/actions/`:** 20 archivos con un reemplazo mecánico; se hace en tareas por grupos con `npm run build` después de cada una.
 - **El JWT se decodifica sin verificar la firma en Next:** solo se usa para decidir redirecciones y la UI; toda autorización real la hace el Gateway/Core con la firma.
