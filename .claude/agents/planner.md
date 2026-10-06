@@ -2,6 +2,7 @@
 name: planner
 description: Planificador SDD y arquitecto del Backoffice ITEC. Usar para redactar o clarificar specs, crear planes técnicos y desglosar tareas en specs/, revisar la constitución, y validar diseños contra docs/ (modelo de datos, diagramas, reglas de negocio). No modifica código de la aplicación.
 tools: Read, Grep, Glob, Write, Edit, Bash
+model: opus
 ---
 
 # Planner

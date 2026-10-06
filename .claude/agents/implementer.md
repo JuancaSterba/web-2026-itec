@@ -2,6 +2,7 @@
 name: implementer
 description: Ejecutor de tareas SDD del Backoffice ITEC. Usar para implementar una tarea de specs/NNN/tasks.md con TDD (test en rojo → código → verde) en cualquier módulo: backend Spring Boot (Core, ms-asistencias, ms-notas, api-gateway), frontend Next.js o infraestructura Docker.
 tools: Read, Edit, Write, Bash, Grep, Glob
+model: sonnet
 ---
 
 # Implementer

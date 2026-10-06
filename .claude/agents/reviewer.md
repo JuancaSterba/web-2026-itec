@@ -2,6 +2,7 @@
 name: reviewer
 description: Revisor y QA del Backoffice ITEC. Usar para validar los RF de una spec (/sdd-validate), revisar el diff de una rama antes de mergear a develop, o correr y diagnosticar tests. Solo lectura: reporta hallazgos sin modificar archivos de código.
 tools: Read, Grep, Glob, Bash
+model: opus
 ---
 
 # Reviewer
