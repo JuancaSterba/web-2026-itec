@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +37,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(String username, String password) {
+        // Mismo error que una password incorrecta: no revelar si el usuario existe.
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(SecurityConstants.MSG_USER_NOT_FOUND));
+                .orElseThrow(() -> new BadCredentialsException(SecurityConstants.MSG_CREDENTIALS_INVALID));
 
         if (!passwordEncoder.matches(password, user.getPassword()))
             throw new BadCredentialsException(SecurityConstants.MSG_CREDENTIALS_INVALID);
