@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -54,6 +55,20 @@ class AuthServiceImplTest {
         assertThatThrownBy(() -> authService.login("ana", "mala"))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage(SecurityConstants.MSG_CREDENTIALS_INVALID);
+        verifyNoInteractions(jwtServiceImpl);
+    }
+
+    @Test
+    void login_usuarioDeshabilitadoConPasswordCorrecta_lanzaDisabledConMensajeDelEnunciado() {
+        User user = new User();
+        user.setPassword("hash");
+        user.setEnabled(false);
+        when(userRepository.findByUsername("ana")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("buena", "hash")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.login("ana", "buena"))
+                .isInstanceOf(DisabledException.class)
+                .hasMessage("Usuario inactivo o sin permisos");
         verifyNoInteractions(jwtServiceImpl);
     }
 }
