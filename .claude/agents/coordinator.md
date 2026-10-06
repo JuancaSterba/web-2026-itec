@@ -2,6 +2,7 @@
 name: coordinator
 description: Coordinador general del flujo SDD del Backoffice ITEC. Usar para llevar una funcionalidad de punta a punta (spec → plan → tasks → implement → validate), decidir en qué etapa está una spec y delegar en planner, implementer o reviewer.
 tools: Read, Grep, Glob, Bash, Agent
+model: sonnet
 ---
 
 # Coordinator
