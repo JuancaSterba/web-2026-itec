@@ -10,7 +10,6 @@ CURSOR.md
 agentes/
 .ai/
 prompts/
-.gemini/
 backend/skills-lock.json
 docs/backend/registro_sesiones.md
 
