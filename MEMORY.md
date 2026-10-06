@@ -7,7 +7,7 @@
 - MVP funcional: ABM académicos, inscripciones, comisiones, horarios, asistencias, notas parciales, mesas de examen (turnos/llamados, regla de 48 h) y cierre de actas con PDF.
 - Roles operativos: ADMIN, ADMINISTRATIVO, PROFESOR (vistas `mis-comisiones`, `mis-mesas`). ALUMNO sin portal propio.
 - Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), JWT en `localStorage` (#36).
-- `develop` verificado (tests Java en verde, E2E en Docker) y listo para PR a `main`, que quedó en el PR #3 (2026-06-29). No hay CI.
+- `main` al día con `develop` vía PR #4 (2026-10-06), tras verificar tests Java en verde y E2E en Docker. No hay CI.
 - Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo, diagrama interactivo.
 
 ## Decisiones arquitectónicas
