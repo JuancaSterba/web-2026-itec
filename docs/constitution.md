@@ -6,7 +6,7 @@ Principios innegociables. Toda spec, plan y cambio de código debe cumplirlos; e
 - **C1.1** El stack es cerrado: Java 17 + Spring Boot 3.2.x + Maven; Next.js + React + TypeScript + Tailwind + shadcn/ui; MySQL + Docker Compose. Nada fuera de esta lista sin aprobación.
 - **C1.2** No se agregan dependencias nuevas sin aprobación explícita y sin justificar por qué la librería existente no alcanza.
 - **C1.3** No se crean servicios nuevos: los existentes son Gateway, Core, `ms-asistencias`, `ms-notas` y frontend.
-- **C1.4** Comunicación entre servicios solo por HTTP REST; no se introducen colas ni brokers (ver deuda #22 en `.remember/PENDIENTES.md`).
+- **C1.4** Comunicación entre servicios solo por HTTP REST; no se introducen colas ni brokers (ver deuda #22 en `pendientes.md`).
 - **C1.5** Antes de crear una clase, componente o utilidad, se busca y reutiliza lo existente.
 
 ## 2. Separación de interfaz y lógica

@@ -25,7 +25,7 @@ El **MS Asistencias** es un microservicio transaccional aislado dedicado al regi
 | 🖥️ **Frontend** | [frontend](../frontend/README.md) | Consume las APIs de asistencia a través del Gateway. |
 | 💾 **Base de Datos** | MySQL (`localhost:3306`) | Aislamiento lógico: esquema exclusivo `db_asistencias` (sin JOINs cruzados con otras bases). |
 | 📚 **Docs** | [docs](../docs/INDEX.md) | Diagramas de secuencia y reglas de negocio de regularidad. |
-| 📌 **Tareas / Memoria** | [.remember](../.remember/PENDIENTES.md) | Única fuente de verdad del monorepo. |
+| 📌 **Pendientes** | [docs/pendientes.md](../docs/pendientes.md) | Única fuente de verdad del monorepo. |
 
 ---
 
@@ -70,4 +70,4 @@ docker compose up --build ms-asistencias
 ## 📚 Enlaces a Documentación Relevante
 - 🔄 [Diagrama de Secuencia de Asistencias](../docs/03.20-Diagrama_Secuencia_Asistencia.md)
 - 📜 [Reglas de Negocio (Asistencia y Regularidad)](../docs/01.00-Reglas_de_Negocio.md)
-- 📋 [Única Fuente de Verdad (Tareas)](../.remember/PENDIENTES.md)
+- 📋 [Única Fuente de Verdad (Tareas)](../docs/pendientes.md)

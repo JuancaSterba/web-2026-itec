@@ -29,7 +29,7 @@ Trabaja sobre los servicios backend Java 17 / Spring Boot 3.2.5 del monorepo, re
 6. Validar con tests unitarios (`mvn test` en el módulo correspondiente) antes de dar por terminada una tarea.
 
 ## Convenciones
-- **Única Fuente de Verdad:** Consultar y actualizar `.remember/PENDIENTES.md` al iniciar y completar tareas.
+- **Única Fuente de Verdad:** Consultar `docs/pendientes.md` al iniciar; borrar el ítem al completarlo.
 - **Respuestas concisas:** Directas y sin relleno.
 - **Ediciones granulares:** Modificar solo las líneas estrictamente necesarias.
 - **Flujo de Generación:** Verificar existencia previa de archivos antes de crearlos y autovalidar el código generado antes de concluir.

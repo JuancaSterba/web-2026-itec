@@ -19,7 +19,7 @@ El **Frontend** es el portal web de administración académica para directivos, 
 | 📅 **MS Asistencias** | [ms-asistencias](../ms-asistencias/README.md) | Provee endpoints de registro y consulta de presentismo. |
 | 📊 **MS Notas** | [ms-notas](../ms-notas/README.md) | Provee carga de calificaciones, actas y estado de regularidad. |
 | 📚 **Docs UX/UI** | [docs/05.00-Diseno_UX_UI.md](../docs/05.00-Diseno_UX_UI.md) | Guías de diseño, accesibilidad, paleta institucional y componentes. |
-| 📌 **Tareas / Memoria** | [.remember](../.remember/PENDIENTES.md) | Única fuente de verdad del backlog y deudas técnicas. |
+| 📌 **Pendientes** | [docs/pendientes.md](../docs/pendientes.md) | Única fuente de verdad del backlog y deudas técnicas. |
 
 ---
 
@@ -77,4 +77,4 @@ El cliente maneja autenticación JWT coordinada con el [API Gateway](../api-gate
 ## 📚 Enlaces de Interés
 - 🎨 [Diseño UX / UI](../docs/05.00-Diseno_UX_UI.md)
 - 🧭 [Arquitectura de Navegación](../docs/04.10-Arquitectura_Navegacion.md)
-- 📋 [Única Fuente de Verdad (Tareas)](../.remember/PENDIENTES.md)
+- 📋 [Única Fuente de Verdad (Tareas)](../docs/pendientes.md)

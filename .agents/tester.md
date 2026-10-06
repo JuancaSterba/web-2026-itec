@@ -26,5 +26,5 @@ Responsable de la cobertura y estabilidad del monorepo mediante pruebas automát
 - **Estructura AAA:** Arrange, Act, Assert.
 - **Nomenclatura Clara:** Nombres de métodos en formato `deberiaRetornarErrorCuando...` o `shouldReturn...`.
 - **No alterar lógica de negocio sin justificación:** No modificar código productivo para forzar la aprobación de un test; reportar bugs antes de alterar el comportamiento esperado.
-- **Única Fuente de Verdad:** Actualizar estado de pruebas y tareas en `.remember/PENDIENTES.md`.
+- **Única Fuente de Verdad:** Registrar tests fallidos o flaky como ítems en `docs/pendientes.md`.
 - **Git Flow:** Ramas `feature/...` con tests ejecutados y aprobados antes de mergear a `develop`.

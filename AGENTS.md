@@ -14,7 +14,7 @@ Sistema de gestión académica del ITEC N°1 (carreras, materias, alumnos, profe
 - `frontend/` — cliente Next.js (:3000)
 - `docs/` — requerimientos, reglas de negocio, diagramas (ver `docs/INDEX.md`); principios innegociables en `docs/constitution.md`
 - `.agents/` — roles (architect, backend, frontend, devops, tester, reviewer) · `.superpowers/` — planes/specs
-- `.remember/PENDIENTES.md` — **única fuente de verdad** de tareas · `MEMORY.md` — estado, decisiones y aprendizajes
+- `docs/pendientes.md` — **única fuente de verdad** de tareas abiertas · `MEMORY.md` — estado, decisiones y aprendizajes
 
 ## Comandos
 - Todo el ecosistema: `docker compose up --build -d` (raíz)
@@ -23,7 +23,7 @@ Sistema de gestión académica del ITEC N°1 (carreras, materias, alumnos, profe
 
 ## Guardarraíles
 **Siempre**
-- Leer `MEMORY.md` y `.remember/PENDIENTES.md` al iniciar; al terminar, actualizar PENDIENTES (y `MEMORY.md` si hubo decisión/aprendizaje nuevo).
+- Leer `MEMORY.md` y `docs/pendientes.md` al iniciar; al cerrar un ítem, borrarlo de pendientes (y actualizar `MEMORY.md` si hubo decisión/aprendizaje nuevo).
 - Trabajar en rama `feature/...` desde `develop`, commits pequeños y atómicos.
 - Verificar si el archivo/clase ya existe antes de crearlo; editar solo lo necesario.
 - Correr tests/build del módulo tocado antes de dar la tarea por terminada.
@@ -37,5 +37,5 @@ Sistema de gestión académica del ITEC N°1 (carreras, materias, alumnos, profe
 **Prohibido**
 - Commits directos a `develop` o `main`.
 - Que un microservicio acceda a la BD de otro (comunicación solo vía HTTP/Gateway).
-- Crear backlogs/TODOs fuera de `.remember/PENDIENTES.md`.
+- Crear backlogs/TODOs fuera de `docs/pendientes.md`; registrar lo ya hecho en markdown (va en git).
 - Commitear secretos o credenciales.

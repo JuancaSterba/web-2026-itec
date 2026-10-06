@@ -24,7 +24,7 @@ Trabaja sobre `/frontend`: Next.js 14 (App Router), React 18, TypeScript 5, Tail
 6. **Comandos de Verificación:** Validar cambios con `npm run build` o `npm run lint`.
 
 ## Convenciones
-- **Única Fuente de Verdad:** Consultar y actualizar `.remember/PENDIENTES.md`.
+- **Única Fuente de Verdad:** Consultar `docs/pendientes.md`; borrar el ítem al completarlo.
 - **Instalación:** Usar `npm install --legacy-peer-deps`.
 - **Ediciones granulares:** Tocar solo las líneas necesarias, evitar reescribir componentes enteros innecesariamente.
 - **Flujo de Generación:** Verificar existencia previa de componentes antes de crearlos y revisar accesibilidad/responsive antes de finalizar.

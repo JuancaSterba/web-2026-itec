@@ -24,6 +24,6 @@ Responsable de la infraestructura de contenedores, networking, configuración y 
 5. Manejar esquemas múltiples en MySQL con el parámetro `createDatabaseIfNotExist=true` en JDBC URLs.
 
 ## Convenciones
-- **Única Fuente de Verdad:** `.remember/PENDIENTES.md`.
+- **Única Fuente de Verdad:** `docs/pendientes.md` (borrar el ítem al completarlo).
 - **Seguridad:** No commitear secretos ni credenciales reales.
 - **Git Flow:** Ramas `feature/...` con validación de arranque de contenedores antes de mergear a `develop`.
