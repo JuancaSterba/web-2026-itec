@@ -12,7 +12,7 @@ Sistema de gestión académica del ITEC N°1 (carreras, materias, alumnos, profe
 - `backend/` — core multi-módulo (`api`, `commons`, `core`, `security`): maestros y auth (:8081 docker / :8082 local)
 - `ms-asistencias/` (:8083) · `ms-notas/` (:8084) — microservicios aislados
 - `frontend/` — cliente Next.js (:3000)
-- `docs/` — requerimientos, reglas de negocio, diagramas (ver `docs/INDEX.md`)
+- `docs/` — requerimientos, reglas de negocio, diagramas (ver `docs/INDEX.md`); principios innegociables en `docs/constitution.md`
 - `.agents/` — roles (architect, backend, frontend, devops, tester, reviewer) · `.superpowers/` — planes/specs
 - `.remember/PENDIENTES.md` — **única fuente de verdad** de tareas · `MEMORY.md` — estado, decisiones y aprendizajes
 
