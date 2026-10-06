@@ -18,13 +18,14 @@ Sistema de gestión académica del ITEC N°1 (carreras, materias, alumnos, profe
 
 ## Comandos
 - Todo el ecosistema: `docker compose up --build -d` (raíz)
-- Backend (en cada módulo Maven): `mvn clean verify` · tests: `mvn test`
+- Backend (en cada módulo Maven, con JDK 17): `mvn clean verify` · tests: `mvn test`. Sin CI: antes de un PR a `main`, correr los tests de los 4 módulos.
 - Frontend (`frontend/`): `npm install --legacy-peer-deps` · `npm run dev` · verificación: `npm run build`
 
 ## Guardarraíles
 **Siempre**
-- Leer `MEMORY.md` y `docs/pendientes.md` al iniciar; al cerrar un ítem, borrarlo de pendientes (y actualizar `MEMORY.md` si hubo decisión/aprendizaje nuevo).
-- Trabajar en rama `feature/...` desde `develop`, commits pequeños y atómicos.
+- Leer `MEMORY.md` y `docs/pendientes.md` al iniciar; al cerrar un ítem, borrarlo de pendientes.
+- Al cerrar cada iteración, revisar `MEMORY.md`, `AGENTS.md` y `docs/constitution.md` y actualizarlos si hubo decisión, aprendizaje o dato desactualizado (cambios a la constitución: con aprobación).
+- Trabajar en rama `feature/`, `fix/`, `docs/` o `chore/` desde `develop`, commits pequeños y atómicos.
 - Verificar si el archivo/clase ya existe antes de crearlo; editar solo lo necesario.
 - Correr tests/build del módulo tocado antes de dar la tarea por terminada.
 - Ante una pregunta, solo responder: no modificar código sin orden explícita.
