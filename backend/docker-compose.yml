@@ -29,7 +29,7 @@ services:
       dockerfile: Dockerfile
       args:
         # Le pasamos el puerto al Dockerfile dinámicamente
-        APP_PORT: ${APP_PORT:-8080}
+        APP_PORT: ${APP_PORT:-8082}
     container_name: itec-backend # Nombre amigable para el contenedor
     environment:
       # Inyectamos el perfil activo de Spring (ej. local o prod) desde el .env
@@ -55,7 +55,7 @@ services:
       - NOTAS_API_URL=http://ms-notas:8084
     ports:
       # Mapeamos el puerto de nuestra máquina al puerto del contenedor de forma dinámica
-      - "${APP_PORT:-8080}:${APP_PORT:-8080}"
+      - "${APP_PORT:-8082}:${APP_PORT:-8082}"
     depends_on:
       # Dependencia estricta: El backend NO arrancará hasta que el contenedor mysql-db
       # reporte estar "saludable" (gracias al healthcheck configurado arriba).
