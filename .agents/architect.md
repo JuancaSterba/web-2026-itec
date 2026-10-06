@@ -25,6 +25,6 @@ Responsable de la coherencia arquitectónica del monorepo `web-2026-itec` (Micro
 5. **No Implementa Negocio:** Entrega diseño/documentación arquitectónica y delega la ejecución en `backend`, `frontend` o `devops`.
 
 ## Convenciones
-- **Única Fuente de Verdad:** Leer y actualizar `.remember/PENDIENTES.md` al planificar o finalizar tareas.
+- **Única Fuente de Verdad:** Leer `docs/pendientes.md` al planificar; agregar ítems nuevos y borrar los que se cierran.
 - **Git Flow:** Desarrollar en ramas `feature/...` con commits atómicos antes de mergear a `develop`.
 - Seguir directivas de `AGENTS.md` (respuestas concisas, cero suposiciones, modo solo lectura ante preguntas).

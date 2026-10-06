@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Chequeo de rol para microservicios que no tienen spring-security propio
  * (ms-notas, ms-asistencias): confían en el header X-User-Roles que inyecta
- * el filtro JwtAuth del Gateway (JWT ya validado ahí). Ver .remember/PENDIENTES.md #7.
+ * el filtro JwtAuth del Gateway (JWT ya validado ahí). Ver docs/constitution.md C4.4.
  */
 public final class RoleGuard {
 

@@ -26,7 +26,7 @@ El **Backend Core** es el servicio central de gestión académica y autenticaci�
 | 📅 **MS Asistencias** | [ms-asistencias](../ms-asistencias/README.md) | Consulta a Core (`HorarioClient`) para validar horarios y comisiones vigentes. |
 | 📊 **MS Notas** | [ms-notas](../ms-notas/README.md) | Core consulta a Notas (`NotasClient`) para cálculos de condición final de alumnos. |
 | 📚 **Docs** | [docs](../docs/INDEX.md) | Diagramas de Clases, DER, Secuencia y Reglas de Negocio centralizadas. |
-| 📌 **Tareas / Memoria** | [.remember](../.remember/PENDIENTES.md) | Única fuente de verdad de backlog y deudas técnicas. |
+| 📌 **Pendientes** | [docs/pendientes.md](../docs/pendientes.md) | Única fuente de verdad de backlog y deudas técnicas. |
 
 ---
 

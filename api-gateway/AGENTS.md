@@ -9,8 +9,7 @@ Este módulo es el proxy inverso y enrutador perimetral de la solución ITEC 202
 - 📅 **MS Asistencias:** `../ms-asistencias/` (Enrutado en `/api/v1/asistencias/**`)
 - 📊 **MS Notas:** `../ms-notas/` (Enrutado en `/api/v1/calificaciones/**` y `/api/v1/examenes/**`)
 - 📚 **Documentación Central:** `../docs/` (Specs, DER, diagramas de arquitectura)
-- 📌 **Única Fuente de Verdad (Tareas):** `../.remember/PENDIENTES.md`
-- ⚡ **Planes / Specs de Desarrollo:** `../.superpowers/`
+- 📌 **Única Fuente de Verdad (Tareas):** `../docs/pendientes.md`
 
 ## 🎯 Rol y Reglas Específicas del Gateway
 1. **Rol de Referencia:** Ver `../.agents/backend.md` o `../.agents/architect.md`.

@@ -25,7 +25,7 @@ El **MS Notas** es un microservicio transaccional aislado responsable de la gest
 | 🖥️ **Frontend** | [frontend](../frontend/README.md) | Consume las vistas de carga de notas y actas a través del Gateway. |
 | 💾 **Base de Datos** | MySQL (`localhost:3306`) | Aislamiento lógico: esquema exclusivo `db_calificaciones` (sin JOINs directos con otras bases). |
 | 📚 **Docs** | [docs](../docs/INDEX.md) | Diagramas de secuencia de notas, matriz de correlativas y reglas de evaluación. |
-| 📌 **Tareas / Memoria** | [.remember](../.remember/PENDIENTES.md) | Única fuente de verdad del monorepo. |
+| 📌 **Pendientes** | [docs/pendientes.md](../docs/pendientes.md) | Única fuente de verdad del monorepo. |
 
 ---
 
@@ -71,4 +71,4 @@ docker compose up --build ms-notas
 - 🔄 [Diagrama de Secuencia de Calificaciones](../docs/03.30-Diagrama_Secuencia_Notas.md)
 - 🚥 [Diagrama de Estados Académicos](../docs/02.20-Diagrama_Estados.md)
 - 📜 [Reglas de Negocio (Evaluaciones y Escala de Notas)](../docs/01.00-Reglas_de_Negocio.md)
-- 📋 [Única Fuente de Verdad (Tareas)](../.remember/PENDIENTES.md)
+- 📋 [Única Fuente de Verdad (Tareas)](../docs/pendientes.md)

@@ -9,8 +9,7 @@ Este microservicio administra las calificaciones, evaluaciones y actas de forma 
 - 🖥️ **Frontend:** `../frontend/` (Vistas de carga de notas y actas docentes)
 - 📅 **MS Asistencias:** `../ms-asistencias/` (Microservicio complementario de asistencia)
 - 📚 **Documentación Central:** `../docs/` (Diagramas de secuencia de notas, estados y reglas de evaluación)
-- 📌 **Única Fuente de Verdad (Tareas):** `../.remember/PENDIENTES.md`
-- ⚡ **Planes / Specs de Desarrollo:** `../.superpowers/`
+- 📌 **Única Fuente de Verdad (Tareas):** `../docs/pendientes.md`
 
 ## 🎯 Rol y Reglas Específicas de MS Notas
 1. **Rol de Referencia:** Ver `../.agents/backend.md`.

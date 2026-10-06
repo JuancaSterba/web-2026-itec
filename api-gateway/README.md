@@ -66,4 +66,4 @@ docker compose up --build api-gateway
 ## 📚 Enlaces de Interés
 - 📖 [Documentación Arquitectónica Central](../docs/INDEX.md)
 - 🏛️ [Diagrama de Arquitectura de Contenedores](../docs/04.20-Diagrama_Arquitectura.md)
-- 📋 [Única Fuente de Verdad (Tareas)](../.remember/PENDIENTES.md)
+- 📋 [Única Fuente de Verdad (Tareas)](../docs/pendientes.md)

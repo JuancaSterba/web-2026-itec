@@ -9,8 +9,7 @@ Este módulo es la aplicación cliente Next.js. Si necesitas interactuar o verif
 - 📅 **MS Asistencias:** `../ms-asistencias/` (Contratos de endpoints de asistencia)
 - 📊 **MS Notas:** `../ms-notas/` (Contratos de endpoints de calificaciones y actas)
 - 📚 **Documentación Central:** `../docs/` (Guías de UI/UX, arquitectura de navegación y specs)
-- 📌 **Única Fuente de Verdad (Tareas):** `../.remember/PENDIENTES.md`
-- ⚡ **Planes / Specs de Desarrollo:** `../.superpowers/`
+- 📌 **Única Fuente de Verdad (Tareas):** `../docs/pendientes.md`
 
 ## 🎯 Rol y Reglas Específicas del Frontend
 1. **Rol de Referencia:** Ver `../.agents/frontend.md`.

@@ -9,8 +9,7 @@ Este microservicio maneja de forma transaccional y aislada el presentismo de las
 - 🖥️ **Frontend:** `../frontend/` (Vistas de toma de asistencia)
 - 📊 **MS Notas:** `../ms-notas/` (Microservicio complementario de calificaciones)
 - 📚 **Documentación Central:** `../docs/` (Diagramas de secuencia de asistencias y reglas de regularidad)
-- 📌 **Única Fuente de Verdad (Tareas):** `../.remember/PENDIENTES.md`
-- ⚡ **Planes / Specs de Desarrollo:** `../.superpowers/`
+- 📌 **Única Fuente de Verdad (Tareas):** `../docs/pendientes.md`
 
 ## 🎯 Rol y Reglas Específicas de MS Asistencias
 1. **Rol de Referencia:** Ver `../.agents/backend.md`.

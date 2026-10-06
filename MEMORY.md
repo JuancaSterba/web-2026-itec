@@ -1,7 +1,7 @@
 # MEMORY.md — Memoria de trabajo del proyecto
 
 > Estado, decisiones y aprendizajes entre sesiones. Máx. ~50 líneas: condensar al agregar.
-> Las tareas NO van acá: viven solo en `.remember/PENDIENTES.md`. Última actualización: 2026-10-06.
+> Las tareas NO van acá: viven solo en `docs/pendientes.md`. Última actualización: 2026-10-06.
 
 ## Estado actual
 - MVP funcional: ABM académicos, inscripciones, comisiones, horarios, asistencias, notas parciales, mesas de examen (turnos/llamados, regla de 48 h) y cierre de actas con PDF.
