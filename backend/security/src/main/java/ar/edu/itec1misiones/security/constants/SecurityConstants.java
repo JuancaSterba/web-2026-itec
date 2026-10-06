@@ -19,4 +19,5 @@ public class SecurityConstants {
     public static final String MSG_ACCESS_DENIED = "No tiene permisos para crear un usuario con rol ";
     public static final String MSG_USER_EXISTS = "Usuario ya existe";
     public static final String MSG_USER_NOT_FOUND = "Usuario no encontrado";
+    public static final String MSG_USER_DISABLED = "Usuario inactivo o sin permisos";
 }
