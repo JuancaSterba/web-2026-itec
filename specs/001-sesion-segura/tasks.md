@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 3/31
+- **Progreso:** 4/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -9,7 +9,7 @@
 - [x] T01 [RF-04] Escribir en `AuthServiceImplTest` el caso "usuario deshabilitado con contraseña correcta lanza `DisabledException` con el mensaje 'Usuario inactivo o sin permisos'" — Hecho cuando: el test existe y falla porque el mensaje actual es "La cuenta está deshabilitada".
 - [x] T02 [RF-04] Agregar `MSG_USER_DISABLED` en `SecurityConstants` y usarla en `AuthServiceImpl.login` (después de T01) — Hecho cuando: T01 pasa y `mvn test` de `backend` está en verde.
 - [x] T03 [RF-03, RF-21] Escribir en `AuthServiceImplTest` los casos "usuario deshabilitado con contraseña incorrecta lanza `BadCredentialsException`" y "usuario o contraseña vacíos lanzan `BadCredentialsException` con 'Credenciales inválidas'" — Hecho cuando: los tests pasan (son de regresión: el código actual ya cumple; si alguno falla, se corrige en esta misma tarea).
-- [ ] T04 [RF-11, RF-13, RF-14] Escribir `PerfilServiceImplTest`: devuelve los datos vigentes del usuario autenticado y lanza `PerfilNotFoundException` si el username del token no existe — Hecho cuando: el test existe y falla porque las clases no existen.
+- [x] T04 [RF-11, RF-13, RF-14] Escribir `PerfilServiceImplTest`: devuelve los datos vigentes del usuario autenticado y lanza `PerfilNotFoundException` si el username del token no existe — Hecho cuando: el test existe y falla porque las clases no existen.
 - [ ] T05 [RF-11, RF-13, RF-14] Crear `PerfilResponse`, `PerfilService`, `PerfilServiceImpl` y `PerfilNotFoundException`; el servicio obtiene el username con `SecurityUtils.getUsername()` y busca con `UserRepository` (después de T04) — Hecho cuando: T04 pasa y `mvn test` de `backend` está en verde.
 - [ ] T06 [RF-11, RF-14] Crear `PerfilController` con `GET /api/perfil` (`hasAnyRole` de los 4 roles) y el handler 404 en `SecurityExceptionHandler` (después de T05) [sin test unitario: se verifica por curl en T07] — Hecho cuando: `mvn test` de `backend` está en verde.
 - [ ] T07 [RF-04, RF-11, RF-14, RF-21] Reconstruir el backend en Docker y verificar por el Gateway: `GET /api/v1/perfil` sin token → 401, con token → 200 con los 6 campos; login de usuario deshabilitado → 403 con el mensaje nuevo; login con `{}` → 401 (después de T06) — Hecho cuando: los cuatro curl dan el resultado esperado.
