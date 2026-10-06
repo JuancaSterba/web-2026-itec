@@ -63,6 +63,7 @@ Este archivo consolida todas las tareas pendientes, deudas técnicas y ajustes d
     - [x] Backend ms-notas: Validación cruzada al guardar notas (verifica contra `MesaExamenClient` de Core que el estado no sea `CERRADA`).
     - [x] Frontend: Server actions `cerrarMesaExamen` y route handler `/acta-pdf`. UI para descargar acta (`badge`/botón link) y diálogo de confirmación `CerrarActaButton` (solo ADMIN/ADMINISTRATIVO). Bloqueo de celdas de nota en `/mis-mesas/[id]` si el acta está cerrada.
 35. **[FUTURO, explícitamente diferido] Diagrama de Arquitectura Interactiva & JSON para Agentes IA:** Diferido para el cierre final del proyecto (post-MVP). Los entregables completos (`docs/arquitectura_interactiva.html` y `docs/arquitectura_agentes.json`) han quedado resguardados en la rama `feature/analisis-arquitectura` para ser reincorporados cuando se decida finalizar el proyecto.
+36. **[DEUDA TÉCNICA - Seguridad] JWT y datos personales en `localStorage`** — `hooks/use-auth.tsx` hace el login desde el cliente con `apiClient` y guarda `token` en `localStorage` además de la cookie; `app/perfil/page.tsx` lee nombre/DNI/roles de `localStorage`. Viola C2.4/C4.5 de `docs/constitution.md`. Migrar el login a Server Action que setee cookie `httpOnly` y leer el perfil server-side.
 
 ---
 
