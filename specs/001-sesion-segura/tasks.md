@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 7/31
+- **Progreso:** 8/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -15,7 +15,7 @@
 - [x] T07 [RF-04, RF-11, RF-14, RF-21] Reconstruir el backend en Docker y verificar por el Gateway: `GET /api/v1/perfil` sin token → 401, con token → 200 con los 6 campos; login de usuario deshabilitado → 403 con el mensaje nuevo; login con `{}` → 401 (después de T06) — Hecho cuando: los cuatro curl dan el resultado esperado.
 
 ## Fase 2 — Frontend: base de sesión (`frontend/lib`, `frontend/app/actions`)
-- [ ] T08 [RF-16, RF-17, RF-18, RF-20, RF-24] Crear `lib/sesion.ts` con los nombres de cookie (`itec-sesion`, `itec-rol`), `decodificarJwt`, `sesionVencida(jwt, ahoraSeg)` y `decidirAcceso(ruta, jwt, rolActivo, ahoraSeg)` como funciones puras [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
+- [x] T08 [RF-16, RF-17, RF-18, RF-20, RF-24] Crear `lib/sesion.ts` con los nombres de cookie (`itec-sesion`, `itec-rol`), `decodificarJwt`, `sesionVencida(jwt, ahoraSeg)` y `decidirAcceso(ruta, jwt, rolActivo, ahoraSeg)` como funciones puras [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T09 [RF-10, RF-12] Actualizar `lib/auth-server.ts`: `getUsuarioActual()` lee `itec-sesion` e `itec-rol` y devuelve `rolActivo`, `nombre` y `apellido` (después de T08) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T10 [RF-17, RF-25] Agregar `fetchApi(ruta, init)` en `lib/api-server.ts` (token de `itec-sesion`, redirect a `/login?motivo=expirada` ante 401) y hacer que `fetchGateway` use la cookie nueva y el mismo manejo de 401 (después de T08) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T11 [RF-01, RF-03, RF-04, RF-05, RF-06, RF-07] Crear `app/actions/auth-actions.ts` con `loginAction(estadoPrevio, formData)`: valida campos, llama al Gateway, mapea 401/403 a los mensajes de la spec, setea `itec-sesion` `httpOnly` con `Max-Age` hasta el `exp` y redirige según la cantidad de roles (después de T08) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
