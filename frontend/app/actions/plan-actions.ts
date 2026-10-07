@@ -1,16 +1,9 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function createPlan(formData: FormData, carreraId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     cohorte: formData.get("cohorte"),
     resolucion: formData.get("resolucion"),
@@ -18,12 +11,8 @@ export async function createPlan(formData: FormData, carreraId: number) {
     carreraId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/planes-estudio`, {
+  const response = await fetchApi(`/api/v1/planes-estudio`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -35,9 +24,6 @@ export async function createPlan(formData: FormData, carreraId: number) {
 }
 
 export async function updatePlan(formData: FormData, planId: number, carreraId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     cohorte: formData.get("cohorte"),
     resolucion: formData.get("resolucion"),
@@ -45,12 +31,8 @@ export async function updatePlan(formData: FormData, planId: number, carreraId: 
     carreraId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/planes-estudio/${planId}`, {
+  const response = await fetchApi(`/api/v1/planes-estudio/${planId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -62,14 +44,8 @@ export async function updatePlan(formData: FormData, planId: number, carreraId: 
 }
 
 export async function deletePlan(planId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/planes-estudio/${planId}`, {
+  const response = await fetchApi(`/api/v1/planes-estudio/${planId}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {
