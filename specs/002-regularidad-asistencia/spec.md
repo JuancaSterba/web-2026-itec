@@ -1,6 +1,6 @@
 # 002 — Regularidad por asistencia (70 %)
 
-- **Estado:** Clarificada
+- **Estado:** Implementada (validada 2026-10-07)
 - **Fecha:** 2026-10-06
 - **Rama:** `feature/002-regularidad-asistencia`
 

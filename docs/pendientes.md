@@ -13,7 +13,6 @@
 
 ## Funcionalidad pendiente
 - **#43 Profesor cierra la cursada desde la vista de comisión** — el backend permite al rol PROFESOR previsualizar y cerrar cursadas, y la spec 002 lo nombra como actor (HU-02), pero en `app/dashboard/comisiones/[comisionId]/page.tsx` el botón "Cerrar cursada" solo se muestra a ADMIN/ADMINISTRATIVO. Mostrarlo también al profesor de la comisión.
-- **#37 Regularidad por asistencia (70 %)** — el cálculo del 70 % y la notificación MS Asistencias → Core para que el alumno pierda la regularidad no están implementados (ver `02.20-Diagrama_Estados.md` y `03.20-Diagrama_Secuencia_Asistencia.md`).
 - **#38 Ciclos en correlativas** — `MateriaPlan.correlativas` no detecta ciclos (A requiere B y B requiere A). Ver `03.10-Diagrama_Secuencia_Inscripciones.md`.
 
 ## Diferido por el usuario (no implementar sin pedido explícito)
