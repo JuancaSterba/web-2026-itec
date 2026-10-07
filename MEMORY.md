@@ -8,7 +8,7 @@
 - Roles operativos: ADMIN, ADMINISTRATIVO, PROFESOR (vistas `mis-comisiones`, `mis-mesas`). ALUMNO sin portal propio.
 - Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), revocar sesión al cerrar sesión (#41).
 - Specs SDD implementadas: `001-sesion-segura` (2026-10-06, cierra #36).
-- `main` al día con `develop` vía PR #4 (2026-10-06), tras verificar tests Java en verde y E2E en Docker. No hay CI.
+- `main` al día con `develop` vía PR #5 (2026-10-06, incluye la spec 001). No hay CI: antes de cada PR, tests Java en verde y E2E en Docker.
 - Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo, diagrama interactivo.
 
 ## Decisiones arquitectónicas
