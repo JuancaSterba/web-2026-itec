@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 19/31
+- **Progreso:** 20/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -32,7 +32,7 @@ Reemplazo mecánico de "leer `auth-token` + `fetch` con `Authorization`" por `fe
 ## Fase 4 — Frontend: navegación y pantallas
 - [x] T18 [RF-16, RF-17, RF-18, RF-19, RF-20] Reescribir `proxy.ts` con `decidirAcceso`: borra la cookie legada `auth-token`, borra la sesión vencida y agrega `/perfil` al `matcher` (después de T08) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [x] T19 [RF-16, RF-18] Usar `getUsuarioActual()` en `app/dashboard/layout.tsx` y `app/page.tsx` en lugar de leer `auth-token` (después de T09) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
-- [ ] T20 [RF-02, RF-08, RF-10] Reescribir `hooks/use-auth.tsx`: el provider recibe la sesión por props; `logout` y `switchRole` llaman a `logoutAction` y `seleccionarRolAction`; sin `localStorage` ni token (después de T12, T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa y el archivo no menciona `localStorage`.
+- [x] T20 [RF-02, RF-08, RF-10] Reescribir `hooks/use-auth.tsx`: el provider recibe la sesión por props; `logout` y `switchRole` llaman a `logoutAction` y `seleccionarRolAction`; sin `localStorage` ni token (después de T12, T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa y el archivo no menciona `localStorage`.
 - [ ] T21 [RF-10, RF-19] En `app/layout.tsx`, leer la sesión con `getUsuarioActual()`, pasarla a `AuthProvider` y montar el nuevo `components/auth/limpiar-datos-legados.tsx`, que borra las claves de la versión anterior (después de T20) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T22 [RF-03, RF-04, RF-05, RF-17] Reescribir `app/login/page.tsx` con `useActionState(loginAction)` y el aviso "Tu sesión expiró, volvé a iniciar sesión" cuando llega `?motivo=expirada` (después de T11) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T23 [RF-07, RF-09, RF-22] Convertir `app/seleccionar-rol/page.tsx` en Server Component: roles desde la sesión y botones que llaman a `seleccionarRolAction`, mostrando su error (después de T12) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.

@@ -1,190 +1,71 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useCallback, createContext, useContext, useEffect, useState } from "react"
-import { useLocalStorage } from "react-use"
-import { jwtDecode } from "jwt-decode"
-import { LoginRequest } from "@/types/LoginRequest"
-import { LoginResponse } from "@/types/LoginResponse"
-import apiClient from "@/lib/api-client"
+import { createContext, useCallback, useContext, useMemo } from "react"
+import { toast } from "sonner"
+import type { UsuarioActual } from "@/lib/auth-server"
+import { loginAction, logoutAction, seleccionarRolAction } from "@/app/actions/auth-actions"
 
+// La sesion la lee el servidor (cookies httpOnly) y llega por props desde el
+// layout raiz. En el navegador no se guarda nada: ni token, ni datos
+// personales, ni rol activo (RF-02).
 export type AuthUser = {
   username: string
   role: string
-  roles?: string[]
+  roles: string[]
   nombres?: string
   apellido?: string
-  dni?: string
-  email?: string
-  telefono?: string
 }
 
 type AuthContextType = {
-  token: string | null
   user: AuthUser | null
+  // Puente hasta T22, cuando el formulario de login use loginAction directo.
   login: (username: string, password: string) => Promise<void>
-  logout: () => void
-  setUser: (user: AuthUser | null) => void
-  switchRole: (rol: string) => void
+  logout: () => Promise<void>
+  switchRole: (rol: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  // raw:true evita que el hook guarde el token con JSON.stringify (le agrega
-  // comillas), lo que rompe el Authorization: Bearer que arma api-client.ts.
-  const [token, setToken] = useLocalStorage<string | null>("token", null, true)
-  const [user, setUser] = useState<AuthUser | null>(null)
-  const router = useRouter()
+function aAuthUser(usuario: UsuarioActual | null): AuthUser | null {
+  if (!usuario) return null
+  return {
+    username: usuario.username,
+    role: usuario.rolActivo ?? "",
+    roles: usuario.roles,
+    nombres: usuario.nombre ?? undefined,
+    apellido: usuario.apellido ?? undefined,
+  }
+}
 
-  // Carga inicial desde localStorage (tu lógica)
-  useEffect(() => {
-    const loadUserFromStorage = () => {
-      const storedToken = localStorage.getItem("token")
-      const storedRole = localStorage.getItem("user-role")
-      const storedUsername = localStorage.getItem("username")
+export const AuthProvider = ({
+  usuario = null,
+  children,
+}: {
+  usuario?: UsuarioActual | null
+  children: React.ReactNode
+}) => {
+  const user = useMemo(() => aAuthUser(usuario), [usuario])
 
-      if (storedToken && storedRole && storedUsername) {
-        let storedRoles: string[] | undefined
-        try {
-          const parsed = JSON.parse(localStorage.getItem("roles") || "[]")
-          storedRoles = Array.isArray(parsed) ? parsed : undefined
-        } catch {
-          storedRoles = undefined
-        }
-
-        setUser({
-          username: storedUsername,
-          role: storedRole,
-          roles: storedRoles,
-          nombres: localStorage.getItem("nombres") || undefined,
-          apellido: localStorage.getItem("apellido") || undefined,
-          dni: localStorage.getItem("dni") || undefined,
-          email: localStorage.getItem("email") || undefined,
-          telefono: localStorage.getItem("telefono") || undefined,
-        })
-      } else {
-        setUser(null)
-      }
-    }
-
-    loadUserFromStorage()
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "user-role" || e.key === "token") loadUserFromStorage()
-    }
-    window.addEventListener("storage", handleStorageChange)
-    return () => window.removeEventListener("storage", handleStorageChange)
+  const login = useCallback(async (username: string, password: string) => {
+    const formData = new FormData()
+    formData.set("username", username)
+    formData.set("password", password)
+    const resultado = await loginAction({ error: null }, formData)
+    if (resultado?.error) throw new Error(resultado.error)
   }, [])
 
-  // LOGIN: API -> token -> cookie + storage -> flujo de roles
-  const login = useCallback(
-    async (username: string, password: string) => {
-      const payload: LoginRequest = { username, password }
-      // /api/v1/auth/login: ruta del Gateway (core-auth), nunca /auth/login
-      // directo contra el Core -- ver criterios de aceptacion del plan de frontend.
-      // skipAuthRedirect: credenciales invalidas tambien devuelven 401, y no
-      // es una sesion expirada -- no debe forzar un redirect a /login.
-      const response = await apiClient.post<LoginResponse[]>(
-        "/api/v1/auth/login",
-        payload,
-        { skipAuthRedirect: true }
-      )
+  // Las Server Actions borran o escriben las cookies y redirigen.
+  const logout = useCallback(async () => {
+    await logoutAction() // RF-15, RF-23
+  }, [])
 
-      if (!response.data || response.data.length === 0) {
-        throw new Error("Token no recibido")
-      }
-
-      const receivedToken = response.data[0].token
-      if (!receivedToken) throw new Error("Token vacío")
-
-      // Guardar token
-      setToken(receivedToken)
-      localStorage.setItem("token", receivedToken)
-
-      // 👇 CLAVE: cookie que ve tu middleware/SSR
-      document.cookie = `auth-token=${encodeURIComponent(receivedToken)}; Path=/; SameSite=Lax`
-
-      // Decodificar datos
-      const decoded: any = jwtDecode(receivedToken)
-      const roles: string[] = decoded?.roles || []
-      const datos = decoded?.datos_personales || {}
-
-      localStorage.setItem("username", decoded?.username || "")
-      localStorage.setItem("nombres", datos?.nombre || "")
-      localStorage.setItem("apellido", datos?.apellido || "Desconocido")
-      localStorage.setItem("dni", datos?.dni || "Desconocido")
-      localStorage.setItem("email", datos?.email || "Desconocido")
-      localStorage.setItem("telefono", datos?.telefono || "Desconocido")
-      localStorage.setItem("roles", JSON.stringify(roles))
-
-      if (roles.length > 1) {
-        localStorage.setItem("pending-roles", JSON.stringify(roles))
-        router.replace("/seleccionar-rol")
-      } else {
-        const role = roles[0] || ""
-        localStorage.setItem("user-role", role)
-        setUser({
-          username: decoded?.username || "",
-          role,
-          nombres: datos?.nombre || "",
-          apellido: datos?.apellido || "Desconocido",
-          dni: datos?.dni || "Desconocido",
-          email: datos?.email || "Desconocido",
-          telefono: datos?.telefono || "Desconocido",
-        })
-        router.replace("/dashboard")
-      }
-    },
-    [setToken, router]
-  )
-
-  // LOGOUT: borrar cookie + storage
-  const logout = useCallback(() => {
-    setToken(null)
-    setUser(null)
-
-    // Borrar cookie con los mismos atributos usados al crearla
-    document.cookie = "auth-token=; Path=/; Max-Age=0; SameSite=Lax"
-
-    localStorage.clear()
-    router.replace("/login")
-  }, [setToken, router])
-
-  // Cambia el rol activo de un usuario multi-rol sin volver a loguearse: el
-  // JWT ya trae todos los roles (localStorage "roles"), esto solo cambia
-  // cual es el activo (localStorage "user-role" + contexto).
-  // Si prev es null (primer switch tras un login multi-rol, donde login()
-  // redirige a /seleccionar-rol sin llamar setUser), arma el user desde
-  // localStorage en vez de descartar el cambio.
-  const switchRole = useCallback((rol: string) => {
-    localStorage.setItem("user-role", rol)
-    setUser((prev) => {
-      if (prev) return { ...prev, role: rol }
-
-      let roles: string[] | undefined
-      try {
-        const parsed = JSON.parse(localStorage.getItem("roles") || "[]")
-        roles = Array.isArray(parsed) ? parsed : undefined
-      } catch {
-        roles = undefined
-      }
-
-      return {
-        username: localStorage.getItem("username") || "",
-        role: rol,
-        roles,
-        nombres: localStorage.getItem("nombres") || undefined,
-        apellido: localStorage.getItem("apellido") || undefined,
-        dni: localStorage.getItem("dni") || undefined,
-        email: localStorage.getItem("email") || undefined,
-        telefono: localStorage.getItem("telefono") || undefined,
-      }
-    })
+  const switchRole = useCallback(async (rol: string) => {
+    const resultado = await seleccionarRolAction(rol) // RF-08
+    if (resultado?.error) toast.error(resultado.error) // RF-09, RF-22
   }, [])
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, setUser, switchRole }}>
+    <AuthContext.Provider value={{ user, login, logout, switchRole }}>
       {children}
     </AuthContext.Provider>
   )
