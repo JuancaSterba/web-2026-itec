@@ -182,4 +182,17 @@ class CondicionCursadaServiceTest {
 
         assertEquals(503, ex.getStatusCode().value());
     }
+
+    @Test
+    void cerrar_cursadaYaCerradaDevuelve409() {
+        Cursada cerrada = cursadaCon(ModalidadEvaluacion.FINAL);
+        cerrada.setCondicionFinal(CondicionFinal.REGULAR);
+        when(cursadaRepository.findById(100L)).thenReturn(Optional.of(cerrada));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.cerrar(100L));
+
+        assertEquals(409, ex.getStatusCode().value());
+        assertEquals("La cursada ya está cerrada", ex.getReason());
+        assertEquals(CondicionFinal.REGULAR, cerrada.getCondicionFinal());
+    }
 }

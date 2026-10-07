@@ -1,7 +1,7 @@
 # 002 — Tareas: Regularidad por asistencia (70 %)
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 7/24
+- **Progreso:** 8/24
 
 > El frontend no tiene test runner (C1.2): sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y el E2E de la Fase 4. Maven con JDK 17.
 
@@ -15,7 +15,7 @@
 ## Fase 2 — Core: cierre con asistencia
 - [x] T06 [RF-09, RF-10, RF-11, RF-12, RF-13, RF-23, RF-24] Agregar a `CondicionCursadaServiceTest` el mock de `AsistenciasClient` (REGULAR en los casos existentes) y los casos nuevos: NO_REGULAR queda LIBRE con promedio alto y sin parciales, REGULAR sigue la regla actual, informa porcentaje y `motivoLibre` (ASISTENCIA / PROMEDIO), SIN_REGISTROS da 400, falla del cliente da 503 — Hecho cuando: los tests existen y fallan porque `AsistenciasClient` y los campos nuevos no existen.
 - [x] T07 [RF-09, RF-10, RF-11, RF-12, RF-13, RF-23, RF-24] Crear `ResumenAsistenciaDto` y `AsistenciasClient` (como `NotasClient`, 503 ante error), agregar `porcentajeAsistencia`, `estadoAsistencia` y `motivoLibre` a `CondicionPreviewResponse` y reescribir `CondicionCursadaService.calcular` según el plan (después de T06) — Hecho cuando: T06 pasa y `mvn test` de `backend` está en verde.
-- [ ] T08 [RF-14] Escribir `CondicionCursadaServiceTest.cerrar_cursadaYaCerradaDevuelve409` — Hecho cuando: el test existe y falla porque hoy se puede recerrar.
+- [x] T08 [RF-14] Escribir `CondicionCursadaServiceTest.cerrar_cursadaYaCerradaDevuelve409` — Hecho cuando: el test existe y falla porque hoy se puede recerrar.
 - [ ] T09 [RF-14] Rechazar en `CondicionCursadaService.cerrar` una cursada con `condicionFinal` ya asignada (409 "La cursada ya está cerrada") (después de T07, T08) — Hecho cuando: T08 pasa y `mvn test` de `backend` está en verde.
 - [ ] T10 [RF-09] Agregar `asistencias.api.url: ${ASISTENCIAS_API_URL:http://localhost:8083}` en `backend/api/src/main/resources/application.yml` (después de T07) [sin test: configuración] — Hecho cuando: `mvn test` de `backend` está en verde.
 - [ ] T11 [RF-09] Agregar `ASISTENCIAS_API_URL=http://ms-asistencias:8083` al servicio `backend-app` en `backend/docker-compose.yml` (aprobado en el plan) [sin test: infraestructura] — Hecho cuando: `docker compose config` muestra la variable en `backend-app`.
