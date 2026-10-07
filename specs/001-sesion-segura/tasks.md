@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 15/31
+- **Progreso:** 16/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -26,7 +26,7 @@
 Reemplazo mecánico de "leer `auth-token` + `fetch` con `Authorization`" por `fetchApi`. Donde haya `try/catch`, relanzar el redirect de Next (ver riesgo en el plan). Todas después de T10, todas `[sin test: sin test runner en frontend]`.
 - [x] T14 [RF-17, RF-25] Migrar `administrador`, `alumno`, `asistencia`, `carrera` y `ciclo` — Hecho cuando: esos archivos no mencionan `auth-token` y `npm run build` pasa.
 - [x] T15 [RF-17, RF-25] Migrar `comision`, `comision-profesor`, `cursada`, `horario` e `inscripcion-carrera` — Hecho cuando: esos archivos no mencionan `auth-token` y `npm run build` pasa.
-- [ ] T16 [RF-17, RF-25] Migrar `materia`, `materia-plan`, `mesa-examen`, `nota` y `notas-mesas` — Hecho cuando: esos archivos no mencionan `auth-token` y `npm run build` pasa.
+- [x] T16 [RF-17, RF-25] Migrar `materia`, `materia-plan`, `mesa-examen`, `nota` y `notas-mesas` — Hecho cuando: esos archivos no mencionan `auth-token` y `npm run build` pasa.
 - [ ] T17 [RF-17, RF-25] Migrar `oferta-automatica`, `periodo`, `persona`, `plan`, `profesor` y `app/api/mesas-examen/[id]/acta-pdf/route.ts` — Hecho cuando: esos archivos no mencionan `auth-token` y `npm run build` pasa.
 
 ## Fase 4 — Frontend: navegación y pantallas

@@ -1,16 +1,9 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function createMateriaPlan(formData: FormData, planId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     planEstudioId: planId,
     materiaId: Number(formData.get("materiaId")),
@@ -20,12 +13,8 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
     modalidadEvaluacion: formData.get("modalidadEvaluacion"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias-plan`, {
+  const response = await fetchApi(`/api/v1/materias-plan`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -38,9 +27,6 @@ export async function createMateriaPlan(formData: FormData, planId: number) {
 }
 
 export async function updateMateriaPlan(formData: FormData, materiaPlanId: number, planId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     planEstudioId: planId,
     materiaId: Number(formData.get("materiaId")),
@@ -50,12 +36,8 @@ export async function updateMateriaPlan(formData: FormData, materiaPlanId: numbe
     modalidadEvaluacion: formData.get("modalidadEvaluacion"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias-plan/${materiaPlanId}`, {
+  const response = await fetchApi(`/api/v1/materias-plan/${materiaPlanId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -68,14 +50,8 @@ export async function updateMateriaPlan(formData: FormData, materiaPlanId: numbe
 }
 
 export async function deleteMateriaPlan(materiaPlanId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/materias-plan/${materiaPlanId}`, {
+  const response = await fetchApi(`/api/v1/materias-plan/${materiaPlanId}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {
