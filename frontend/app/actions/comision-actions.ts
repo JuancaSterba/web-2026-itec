@@ -1,28 +1,17 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
 
 export async function createComisionesMasivas(
   periodoId: number,
   seleccion: { materiaPlanId: number; nombreComision: string }[],
   cupoMaximo: number
 ) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const respuestas = await Promise.all(
     seleccion.map((item) =>
-      fetch(`${getApiBaseUrl()}/api/v1/comisiones`, {
+      fetchApi(`/api/v1/comisiones`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
         body: JSON.stringify({
           nombreComision: item.nombreComision,
           cupoMaximo,
@@ -41,9 +30,6 @@ export async function createComisionesMasivas(
 }
 
 export async function updateComision(formData: FormData, comisionId: number, periodoId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     nombreComision: formData.get("nombreComision"),
     cupoMaximo: Number(formData.get("cupoMaximo")),
@@ -51,12 +37,8 @@ export async function updateComision(formData: FormData, comisionId: number, per
     periodoAcademicoId: periodoId,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones/${comisionId}`, {
+  const response = await fetchApi(`/api/v1/comisiones/${comisionId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -68,14 +50,8 @@ export async function updateComision(formData: FormData, comisionId: number, per
 }
 
 export async function deleteComision(comisionId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/comisiones/${comisionId}`, {
+  const response = await fetchApi(`/api/v1/comisiones/${comisionId}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {

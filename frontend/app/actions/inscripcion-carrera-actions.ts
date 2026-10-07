@@ -1,20 +1,13 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
 
 // Resultado tipado en vez de throw: en producción Next enmascara los mensajes
 // de los Error lanzados en server actions (solo llega un digest al cliente).
 export type InscripcionResult = { ok: true } | { ok: false; error: string }
 
 export async function createInscripcionCarrera(formData: FormData): Promise<InscripcionResult> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     alumnoId: Number(formData.get("alumnoId")),
     planEstudioId: Number(formData.get("planEstudioId")),
@@ -22,12 +15,8 @@ export async function createInscripcionCarrera(formData: FormData): Promise<Insc
     estado: "ACTIVA",
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras`, {
+  const response = await fetchApi(`/api/v1/inscripciones-carreras`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -41,13 +30,6 @@ export async function createInscripcionCarrera(formData: FormData): Promise<Insc
 }
 
 export async function crearAlumnoEInscribir(formData: FormData): Promise<InscripcionResult> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-  const authHeaders = {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  }
-
   const payloadAlumno = {
     nombre: formData.get("nombre"),
     apellido: formData.get("apellido"),
@@ -57,9 +39,8 @@ export async function crearAlumnoEInscribir(formData: FormData): Promise<Inscrip
     telefonoSecundario: formData.get("telefonoSecundario") ?? "",
   }
 
-  const respuestaAlumno = await fetch(`${getApiBaseUrl()}/api/v1/alumnos`, {
+  const respuestaAlumno = await fetchApi(`/api/v1/alumnos`, {
     method: "POST",
-    headers: authHeaders,
     body: JSON.stringify(payloadAlumno),
   })
 
@@ -81,9 +62,8 @@ export async function crearAlumnoEInscribir(formData: FormData): Promise<Inscrip
     estado: "ACTIVA",
   }
 
-  const respuestaInscripcion = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras`, {
+  const respuestaInscripcion = await fetchApi(`/api/v1/inscripciones-carreras`, {
     method: "POST",
-    headers: authHeaders,
     body: JSON.stringify(payloadInscripcion),
   })
 
@@ -97,9 +77,6 @@ export async function crearAlumnoEInscribir(formData: FormData): Promise<Inscrip
 }
 
 export async function updateInscripcionCarrera(formData: FormData, inscripcionId: number, alumnoId: number, planEstudioId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     alumnoId,
     planEstudioId,
@@ -107,12 +84,8 @@ export async function updateInscripcionCarrera(formData: FormData, inscripcionId
     estado: formData.get("estado"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras/${inscripcionId}`, {
+  const response = await fetchApi(`/api/v1/inscripciones-carreras/${inscripcionId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -124,14 +97,8 @@ export async function updateInscripcionCarrera(formData: FormData, inscripcionId
 }
 
 export async function deleteInscripcionCarrera(inscripcionId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/inscripciones-carreras/${inscripcionId}`, {
+  const response = await fetchApi(`/api/v1/inscripciones-carreras/${inscripcionId}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {
