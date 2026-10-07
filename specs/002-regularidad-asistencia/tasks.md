@@ -1,7 +1,7 @@
 # 002 — Tareas: Regularidad por asistencia (70 %)
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 4/24
+- **Progreso:** 5/24
 
 > El frontend no tiene test runner (C1.2): sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y el E2E de la Fase 4. Maven con JDK 17.
 
@@ -10,7 +10,7 @@
 - [x] T02 [RF-01, RF-02, RF-04, RF-05, RF-06, RF-08] Crear `ResumenAsistenciaResponse` y `ResumenAsistenciaCalculator.resumir(cursadaId, estados)` con la comparación entera del plan (después de T01) — Hecho cuando: T01 pasa y `mvn test` de `ms-asistencias` está en verde.
 - [x] T03 [RF-03, RF-08] Escribir en `AsistenciaServiceTest` los casos `resumir_cuentaSoloLasFechasConMarcaDelAlumno` y `resumir_cursadaSinFilasDevuelveSinRegistros` (un elemento por cada `cursadaId` pedido) — Hecho cuando: los tests existen y fallan porque `resumir` no existe.
 - [x] T04 [RF-03, RF-08] Agregar `findByCursadaIdIn` en `AsistenciaRepository` y `AsistenciaService.resumir(List<Long>)` (después de T02, T03) — Hecho cuando: T03 pasa y `mvn test` de `ms-asistencias` está en verde.
-- [ ] T05 [RF-07, RF-15, RF-19, RF-25] Agregar `GET /api/asistencias/resumen?cursadaIds=` en `AsistenciaController` con `RoleGuard` (ADMIN, ADMINISTRATIVO, PROFESOR) y 400 si la lista está vacía (después de T04) [sin test unitario: se verifica por curl en T12] — Hecho cuando: `mvn test` de `ms-asistencias` está en verde.
+- [x] T05 [RF-07, RF-15, RF-19, RF-25] Agregar `GET /api/asistencias/resumen?cursadaIds=` en `AsistenciaController` con `RoleGuard` (ADMIN, ADMINISTRATIVO, PROFESOR) y 400 si la lista está vacía (después de T04) [sin test unitario: se verifica por curl en T12] — Hecho cuando: `mvn test` de `ms-asistencias` está en verde.
 
 ## Fase 2 — Core: cierre con asistencia
 - [ ] T06 [RF-09, RF-10, RF-11, RF-12, RF-13, RF-23, RF-24] Agregar a `CondicionCursadaServiceTest` el mock de `AsistenciasClient` (REGULAR en los casos existentes) y los casos nuevos: NO_REGULAR queda LIBRE con promedio alto y sin parciales, REGULAR sigue la regla actual, informa porcentaje y `motivoLibre` (ASISTENCIA / PROMEDIO), SIN_REGISTROS da 400, falla del cliente da 503 — Hecho cuando: los tests existen y fallan porque `AsistenciasClient` y los campos nuevos no existen.

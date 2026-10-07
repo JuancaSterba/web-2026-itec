@@ -1,6 +1,7 @@
 package ar.edu.itec1misiones.asistencias.controller;
 
 import ar.edu.itec1misiones.asistencias.dto.AsistenciaRequest;
+import ar.edu.itec1misiones.asistencias.dto.ResumenAsistenciaResponse;
 import ar.edu.itec1misiones.asistencias.model.Asistencia;
 import ar.edu.itec1misiones.asistencias.service.AsistenciaService;
 import ar.edu.itec1misiones.dto.ApiResponse;
@@ -21,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -63,6 +66,36 @@ public class AsistenciaController {
                         .data(asistencias)
                         .build()
         );
+    }
+
+    // Porcentaje y estado de regularidad (70 %) de una o varias cursadas:
+    // ?cursadaIds=1,2,3. Lo usan la vista de comision, el reporte, el detalle
+    // del alumno y el Core al cerrar una cursada.
+    @GetMapping("/resumen")
+    public ResponseEntity<ApiResponse<ResumenAsistenciaResponse>> resumen(
+            @RequestParam(required = false) String cursadaIds,
+            HttpServletRequest httpRequest) {
+        RoleGuard.exigirRol(httpRequest, Rol.ADMIN, Rol.ADMINISTRATIVO, Rol.PROFESOR);
+        List<ResumenAsistenciaResponse> resumenes = asistenciaService.resumir(parsearIds(cursadaIds));
+        return ResponseEntity.ok(
+                ApiResponse.<ResumenAsistenciaResponse>builder()
+                        .meta(MetaBuilderHelper.buildMeta(httpRequest))
+                        .data(resumenes)
+                        .build()
+        );
+    }
+
+    // Se parsea a mano para responder 400 (y no el 500 del handler generico)
+    // ante una lista vacia o con valores no numericos.
+    private List<Long> parsearIds(String cursadaIds) {
+        if (cursadaIds == null || cursadaIds.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Indicá al menos un cursadaId");
+        }
+        try {
+            return Arrays.stream(cursadaIds.split(",")).map(String::trim).map(Long::valueOf).toList();
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cursadaIds debe ser una lista de números separados por coma");
+        }
     }
 
     @PutMapping("/{id}")
