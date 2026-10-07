@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { getApiBaseUrl } from "@/lib/api-server"
@@ -8,8 +9,11 @@ import {
   COOKIE_SESION,
   RUTA_ELECCION_ROL,
   RUTA_PANEL,
+  RUTA_SESION_EXPIRADA,
   decodificarJwt,
+  rolActivoValido,
   segundosHastaVencer,
+  sesionVencida,
 } from "@/lib/sesion"
 
 export interface EstadoLogin {
@@ -77,4 +81,24 @@ export async function loginAction(_estadoPrevio: EstadoLogin, formData: FormData
 
   cookieStore.delete(COOKIE_ROL) // RF-07: un usuario multi-rol elige antes de entrar
   redirect(RUTA_ELECCION_ROL)
+}
+
+export interface ResultadoRol {
+  error: string | null
+}
+
+// El rol activo lo recuerda el servidor hasta que termina la sesion (RF-08).
+// Se valida contra los roles del JWT: un rol ajeno se rechaza sin tocar el
+// rol activo anterior (RF-09, RF-22).
+export async function seleccionarRolAction(rol: string): Promise<ResultadoRol> {
+  const cookieStore = await cookies()
+  const jwt = cookieStore.get(COOKIE_SESION)?.value
+
+  if (!jwt || sesionVencida(jwt, ahoraEnSegundos())) redirect(RUTA_SESION_EXPIRADA)
+
+  if (!rolActivoValido(jwt, rol)) return { error: "No tenés asignado ese rol" }
+
+  cookieStore.set(COOKIE_ROL, rol, opcionesCookie(jwt))
+  revalidatePath("/", "layout")
+  redirect(RUTA_PANEL)
 }
