@@ -1,16 +1,9 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function createAdministrador(formData: FormData) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const roles = formData.getAll("roles") as string[]
 
   const payload = {
@@ -22,12 +15,8 @@ export async function createAdministrador(formData: FormData) {
     roles: roles.length > 0 ? roles : ["ADMINISTRATIVO"],
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/administradores`, {
+  const response = await fetchApi(`/api/v1/administradores`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -41,9 +30,6 @@ export async function createAdministrador(formData: FormData) {
 }
 
 export async function updateAdministrador(id: number, formData: FormData, enabled: boolean) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const roles = formData.getAll("roles") as string[]
 
   const payload = {
@@ -56,12 +42,8 @@ export async function updateAdministrador(id: number, formData: FormData, enable
     enabled,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/administradores/${id}`, {
+  const response = await fetchApi(`/api/v1/administradores/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -75,14 +57,8 @@ export async function updateAdministrador(id: number, formData: FormData, enable
 }
 
 export async function resetPasswordAdministrador(id: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/administradores/${id}/reset-password`, {
+  const response = await fetchApi(`/api/v1/administradores/${id}/reset-password`, {
     method: "POST",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {

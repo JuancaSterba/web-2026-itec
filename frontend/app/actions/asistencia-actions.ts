@@ -1,12 +1,7 @@
 "use server"
 
-import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
-import { fetchCore } from "@/lib/api-server"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
+import { fetchApi, fetchCore } from "@/lib/api-server"
 
 interface HorarioClaseDeComision {
   diaSemana: string
@@ -35,20 +30,13 @@ export async function saveAsistenciasMasivas(
     return { error: "La fecha no coincide con ningún día de clase de la comisión" }
   }
 
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const respuestas = await Promise.all(
     registros.map((registro) => {
       const url = registro.asistenciaId
-        ? `${getApiBaseUrl()}/api/v1/asistencias/${registro.asistenciaId}`
-        : `${getApiBaseUrl()}/api/v1/asistencias`
-      return fetch(url, {
+        ? `/api/v1/asistencias/${registro.asistenciaId}`
+        : `/api/v1/asistencias`
+      return fetchApi(url, {
         method: registro.asistenciaId ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
         body: JSON.stringify({ cursadaId: registro.cursadaId, comisionId, fecha, estado: registro.estado }),
       })
     })
