@@ -8,6 +8,7 @@ import {
   COOKIE_ROL,
   COOKIE_SESION,
   RUTA_ELECCION_ROL,
+  RUTA_LOGIN,
   RUTA_PANEL,
   RUTA_SESION_EXPIRADA,
   decodificarJwt,
@@ -101,4 +102,14 @@ export async function seleccionarRolAction(rol: string): Promise<ResultadoRol> {
   cookieStore.set(COOKIE_ROL, rol, opcionesCookie(jwt))
   revalidatePath("/", "layout")
   redirect(RUTA_PANEL)
+}
+
+// Solo cierra la sesion en este navegador: el JWT sigue siendo valido hasta
+// vencer (revocarlo en el servidor quedo fuera de alcance).
+export async function logoutAction(): Promise<void> {
+  const cookieStore = await cookies()
+  cookieStore.delete(COOKIE_SESION) // RF-15
+  cookieStore.delete(COOKIE_ROL)
+  revalidatePath("/", "layout")
+  redirect(RUTA_LOGIN) // RF-23
 }
