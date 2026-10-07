@@ -1,7 +1,7 @@
 # 002 — Tareas: Regularidad por asistencia (70 %)
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 11/24
+- **Progreso:** 12/24
 
 > El frontend no tiene test runner (C1.2): sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y el E2E de la Fase 4. Maven con JDK 17.
 
@@ -19,7 +19,7 @@
 - [x] T09 [RF-14] Rechazar en `CondicionCursadaService.cerrar` una cursada con `condicionFinal` ya asignada (409 "La cursada ya está cerrada") (después de T07, T08) — Hecho cuando: T08 pasa y `mvn test` de `backend` está en verde.
 - [x] T10 [RF-09] Agregar `asistencias.api.url: ${ASISTENCIAS_API_URL:http://localhost:8083}` en `backend/api/src/main/resources/application.yml` (después de T07) [sin test: configuración] — Hecho cuando: `mvn test` de `backend` está en verde.
 - [x] T11 [RF-09] Agregar `ASISTENCIAS_API_URL=http://ms-asistencias:8083` al servicio `backend-app` en `backend/docker-compose.yml` (aprobado en el plan) [sin test: infraestructura] — Hecho cuando: `docker compose config` muestra la variable en `backend-app`.
-- [ ] T12 [RF-07, RF-09, RF-11, RF-12, RF-13, RF-23, RF-24, RF-25] Reconstruir `ms-asistencias` y `backend-app` y verificar por el Gateway: resumen con datos y con una cursada sin filas, 403 con un rol sin permiso, preview con `porcentajeAsistencia` y `motivoLibre`, 400 sin registros y 503 con `ms-asistencias` apagado (después de T05, T09, T11) — Hecho cuando: cada caso da el resultado esperado.
+- [x] T12 [RF-07, RF-09, RF-11, RF-12, RF-13, RF-23, RF-24, RF-25] Reconstruir `ms-asistencias` y `backend-app` y verificar por el Gateway: resumen con datos y con una cursada sin filas, 403 con un rol sin permiso, preview con `porcentajeAsistencia` y `motivoLibre`, 400 sin registros y 503 con `ms-asistencias` apagado (después de T05, T09, T11) — Hecho cuando: cada caso da el resultado esperado.
 
 ## Fase 3 — Frontend
 - [ ] T13 [RF-07, RF-08] Crear `types/ResumenAsistencia.ts` y `lib/asistencia.ts` (`fetchResumenAsistencia(cursadaIds)` y la etiqueta "Sin registros") [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
