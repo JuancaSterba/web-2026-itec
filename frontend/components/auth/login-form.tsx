@@ -68,7 +68,7 @@ export function LoginForm({ sesionExpirada }: { sesionExpirada: boolean }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="username">Usuario</Label>
-              <Input id="username" name="username" required disabled={isPending} />
+              <Input id="username" name="username" autoComplete="username" required disabled={isPending} />
             </div>
             <div>
               <Label htmlFor="password">Contraseña</Label>
@@ -77,6 +77,7 @@ export function LoginForm({ sesionExpirada }: { sesionExpirada: boolean }) {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   required
                   disabled={isPending}
                   className="pr-10"
