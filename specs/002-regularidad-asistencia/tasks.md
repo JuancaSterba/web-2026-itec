@@ -1,7 +1,7 @@
 # 002 — Tareas: Regularidad por asistencia (70 %)
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 12/24
+- **Progreso:** 13/24
 
 > El frontend no tiene test runner (C1.2): sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y el E2E de la Fase 4. Maven con JDK 17.
 
@@ -22,7 +22,7 @@
 - [x] T12 [RF-07, RF-09, RF-11, RF-12, RF-13, RF-23, RF-24, RF-25] Reconstruir `ms-asistencias` y `backend-app` y verificar por el Gateway: resumen con datos y con una cursada sin filas, 403 con un rol sin permiso, preview con `porcentajeAsistencia` y `motivoLibre`, 400 sin registros y 503 con `ms-asistencias` apagado (después de T05, T09, T11) — Hecho cuando: cada caso da el resultado esperado.
 
 ## Fase 3 — Frontend
-- [ ] T13 [RF-07, RF-08] Crear `types/ResumenAsistencia.ts` y `lib/asistencia.ts` (`fetchResumenAsistencia(cursadaIds)` y la etiqueta "Sin registros") [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
+- [x] T13 [RF-07, RF-08] Crear `types/ResumenAsistencia.ts` y `lib/asistencia.ts` (`fetchResumenAsistencia(cursadaIds)` y la etiqueta "Sin registros") [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T14 [RF-07, RF-08, RF-22] Agregar la columna "Asistencia" (porcentaje + badge de estado o "Sin registros") en `app/dashboard/comisiones/[comisionId]/page.tsx`, con el control de acceso que ya tiene (después de T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T15 [RF-11, RF-24] Agregar `previsualizarCierre(cursadaId)` en `cursada-actions.ts` y hacer que `cerrarCursada` devuelva el mensaje de error del backend (después de T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T16 [RF-11, RF-12, RF-23, RF-24] En `cerrar-cursada-boton.tsx`, mostrar un diálogo de confirmación con porcentaje, condición y motivo de LIBRE, y los errores del cierre con `toast.error` (después de T15) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
