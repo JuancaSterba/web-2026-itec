@@ -1,63 +1,21 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useAuth } from "@/hooks/use-auth"
+import { SeleccionRol } from "@/components/auth/seleccion-rol"
+import { getUsuarioActual } from "@/lib/auth-server"
+import { RUTA_LOGIN } from "@/lib/sesion"
 
-export default function SeleccionarRolPage() {
-  const [roles, setRoles] = useState<string[]>([])
-  const [error, setError] = useState("")
-  const router = useRouter()
-  const { switchRole } = useAuth()
-
-  useEffect(() => {
-    const storedRoles = localStorage.getItem("pending-roles")
-    if (storedRoles) {
-      try {
-        const parsed = JSON.parse(storedRoles)
-        if (Array.isArray(parsed)) {
-          setRoles(parsed)
-        } else {
-          setError("Los roles no son válidos.")
-        }
-      } catch {
-        setError("No se pudieron leer los roles.")
-      }
-    } else {
-      setError("No hay roles disponibles.")
-    }
-  }, [])
-
-  const handleRoleSelect = (rol: string) => {
-    localStorage.removeItem("pending-roles")
-    switchRole(rol)
-    router.push("/dashboard")
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-md mx-auto mt-20">
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
+// Los roles salen de la sesion (cookie httpOnly), no del navegador (RF-07).
+export default async function SeleccionarRolPage() {
+  const usuario = await getUsuarioActual()
+  if (!usuario) redirect(RUTA_LOGIN)
 
   return (
     <Card className="w-full max-w-md mx-auto mt-20">
       <CardHeader>
         <CardTitle className="text-center">Seleccioná tu rol</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {roles.map((rol) => (
-          <Button key={rol} className="w-full" onClick={() => handleRoleSelect(rol)}>
-            {rol}
-          </Button>
-        ))}
+      <CardContent>
+        <SeleccionRol roles={usuario.roles} />
       </CardContent>
     </Card>
   )

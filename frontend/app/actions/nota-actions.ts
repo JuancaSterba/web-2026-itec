@@ -1,11 +1,7 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
 
 export async function saveCalificacion(
   cursadaId: number,
@@ -14,9 +10,6 @@ export async function saveCalificacion(
   nota: number,
   calificacionId?: number
 ) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     cursadaId,
     comisionId,
@@ -26,15 +19,11 @@ export async function saveCalificacion(
   }
 
   const url = calificacionId
-    ? `${getApiBaseUrl()}/api/v1/calificaciones-parciales/${calificacionId}`
-    : `${getApiBaseUrl()}/api/v1/calificaciones-parciales`
+    ? `/api/v1/calificaciones-parciales/${calificacionId}`
+    : `/api/v1/calificaciones-parciales`
 
-  const response = await fetch(url, {
+  const response = await fetchApi(url, {
     method: calificacionId ? "PUT" : "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -51,18 +40,12 @@ export async function saveCalificacionesMasivas(
   instancia: string,
   registros: { cursadaId: number; nota: number }[]
 ) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
   const fecha = new Date().toISOString().split("T")[0]
 
   const respuestas = await Promise.all(
     registros.map((registro) =>
-      fetch(`${getApiBaseUrl()}/api/v1/calificaciones-parciales`, {
+      fetchApi(`/api/v1/calificaciones-parciales`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
         body: JSON.stringify({
           cursadaId: registro.cursadaId,
           comisionId,

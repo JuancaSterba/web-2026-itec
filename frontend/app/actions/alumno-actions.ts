@@ -1,16 +1,9 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function createAlumno(formData: FormData) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     nombre: formData.get("nombre"),
     apellido: formData.get("apellido"),
@@ -20,12 +13,8 @@ export async function createAlumno(formData: FormData) {
     telefonoSecundario: formData.get("telefonoSecundario"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/alumnos`, {
+  const response = await fetchApi(`/api/v1/alumnos`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -39,9 +28,6 @@ export async function createAlumno(formData: FormData) {
 }
 
 export async function updateAlumno(id: number, formData: FormData, activo: boolean) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     nombre: formData.get("nombre"),
     apellido: formData.get("apellido"),
@@ -51,12 +37,8 @@ export async function updateAlumno(id: number, formData: FormData, activo: boole
     telefonoSecundario: formData.get("telefonoSecundario"),
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/alumnos/${id}`, {
+  const response = await fetchApi(`/api/v1/alumnos/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -71,14 +53,8 @@ export async function updateAlumno(id: number, formData: FormData, activo: boole
 }
 
 export async function deleteAlumno(id: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/alumnos/${id}`, {
+  const response = await fetchApi(`/api/v1/alumnos/${id}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {

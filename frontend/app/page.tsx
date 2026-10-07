@@ -1,16 +1,14 @@
 import { redirect } from "next/navigation"
-import { cookies } from "next/headers"
 import Link from "next/link"
 import { ArrowRight, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { getUsuarioActual } from "@/lib/auth-server"
+import { RUTA_ELECCION_ROL, RUTA_PANEL } from "@/lib/sesion"
 
 export default async function Home() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")
-
-  if (token) {
-    redirect("/dashboard")
-  }
+  // Con sesion, la portada no se muestra (RF-18).
+  const usuario = await getUsuarioActual()
+  if (usuario) redirect(usuario.rolActivo ? RUTA_PANEL : RUTA_ELECCION_ROL)
 
   return (
     <main className="relative flex min-h-screen items-center overflow-hidden bg-background px-6 py-24">

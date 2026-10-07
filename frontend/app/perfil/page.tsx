@@ -1,57 +1,64 @@
-'use client'
+import { redirect } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { fetchCore } from "@/lib/api-server"
+import { getUsuarioActual } from "@/lib/auth-server"
+import { RUTA_LOGIN } from "@/lib/sesion"
+import type { Perfil } from "@/types/Perfil"
 
-import { useEffect, useState } from 'react'
+// Datos personales vigentes del Core (RF-11): el endpoint solo devuelve los
+// del usuario de la sesion (RF-13). Roles y rol activo salen de la sesion (RF-12).
+export default async function PerfilPage() {
+  const usuario = await getUsuarioActual()
+  if (!usuario) redirect(RUTA_LOGIN)
 
-export default function PerfilPage() {
-  const [usuario, setUsuario] = useState({
-    nombres: '',
-    apellido: '',
-    dni: '',
-    username: '',
-    email: '',
-    telefono: '',
-    roles: [] as string[],
-    rolSeleccionado: '',
-  })
+  const perfil = (await fetchCore<Perfil>("/perfil"))?.[0] ?? null
 
-  useEffect(() => {
-    const rolesGuardados = localStorage.getItem('roles')
-    const roles = rolesGuardados ? JSON.parse(rolesGuardados) : []
-
-    setUsuario({
-      nombres: localStorage.getItem('nombres') || 'Desconocido',
-      apellido: localStorage.getItem('apellido') || 'Desconocido',
-      dni: localStorage.getItem('dni') || 'Desconocido',
-      username: localStorage.getItem('username') || 'Desconocido',
-      email: localStorage.getItem('email') || 'Desconocido',
-      telefono: localStorage.getItem('telefono') || 'Desconocido',
-      roles: Array.isArray(roles) ? roles : [],
-      rolSeleccionado: localStorage.getItem('user-role') || 'Sin rol',
-    })
-  }, [])
+  const datos: [string, string | undefined][] = [
+    ["Nombre", perfil?.nombre],
+    ["Apellido", perfil?.apellido],
+    ["DNI", perfil?.dni],
+    ["Usuario", perfil?.username],
+    ["Email", perfil?.email],
+    ["Teléfono", perfil?.telefono],
+  ]
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Perfil del Usuario</h1>
-      <div className="bg-white p-4 rounded-lg shadow max-w-md">
-        <p className="mb-2"><strong>Nombres:</strong> {usuario.nombres}</p>
-        <p className="mb-2"><strong>Apellido:</strong> {usuario.apellido}</p>
-        <p className="mb-2"><strong>DNI:</strong> {usuario.dni}</p>
-        <p className="mb-2"><strong>Usuario:</strong> {usuario.username}</p>
-        <p className="mb-2"><strong>Email:</strong> {usuario.email}</p>
-        <p className="mb-2"><strong>Teléfono:</strong> {usuario.telefono}</p>
-        <p className="mb-2"><strong>Rol seleccionado:</strong> {usuario.rolSeleccionado}</p>
-        <div className="mb-2">
-          <strong>Roles disponibles:</strong>
-          <ul className="list-disc list-inside">
-            {usuario.roles.length > 0 ? (
-              usuario.roles.map((rol, idx) => <li key={idx}>{rol}</li>)
-            ) : (
-              <li>No se encontraron roles</li>
-            )}
-          </ul>
-        </div>
-      </div>
+      <Card className="max-w-md">
+        <CardHeader>
+          <CardTitle>Perfil del Usuario</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {perfil ? (
+            <dl className="space-y-2">
+              {datos.map(([etiqueta, valor]) => (
+                <div key={etiqueta}>
+                  <dt className="text-sm text-muted-foreground">{etiqueta}</dt>
+                  <dd>{valor || "—"}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            // RF-14: el error no cierra la sesion.
+            <Alert variant="destructive">
+              <AlertDescription>No se pudieron obtener tus datos. Intentá de nuevo más tarde.</AlertDescription>
+            </Alert>
+          )}
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">Roles</p>
+            <div className="flex flex-wrap gap-2">
+              {usuario.roles.map((rol) => (
+                <Badge key={rol} variant={rol === usuario.rolActivo ? "default" : "outline"}>
+                  {rol}
+                  {rol === usuario.rolActivo && " (activo)"}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

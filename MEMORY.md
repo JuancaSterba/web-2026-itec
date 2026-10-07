@@ -6,7 +6,8 @@
 ## Estado actual
 - MVP funcional: ABM académicos, inscripciones, comisiones, horarios, asistencias, notas parciales, mesas de examen (turnos/llamados, regla de 48 h) y cierre de actas con PDF.
 - Roles operativos: ADMIN, ADMINISTRATIVO, PROFESOR (vistas `mis-comisiones`, `mis-mesas`). ALUMNO sin portal propio.
-- Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), JWT en `localStorage` (#36).
+- Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), revocar sesión al cerrar sesión (#41).
+- Specs SDD implementadas: `001-sesion-segura` (2026-10-06, cierra #36).
 - `main` al día con `develop` vía PR #4 (2026-10-06), tras verificar tests Java en verde y E2E en Docker. No hay CI.
 - Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo, diagrama interactivo.
 
@@ -18,14 +19,16 @@
 - **BD aislada por servicio** en una sola instancia MySQL: aislamiento lógico sin costo operativo extra.
 - **Flyway + MySQL único** (`ddl-auto: validate`, sin H2): evitar divergencias entre el schema de dev y el de prod.
 - **`User` como entidad única** con legajo `AAAA-DNI` autogenerado y multi-rol (`Set<Rol>`): una persona puede ser alumno/profesor/admin sin duplicar datos.
-- **Frontend con Server Actions + RSC** (sin `apiClient` del lado del cliente): un patrón único y sin el bug 401 de inyección de JWT en CSR.
+- **Frontend con Server Actions + RSC** (sin fetch desde el cliente): un patrón único y sin el bug 401 de inyección de JWT en CSR.
+- **Sesión en cookies `httpOnly`** (spec 001): `itec-sesion` (JWT) e `itec-rol` (rol activo, validado contra el JWT) las escribe solo el servidor de Next. El login es una Server Action; `proxy.ts` y `fetchApi` (`lib/api-server.ts`) mandan a `/login?motivo=expirada` ante sesión vencida o 401. Reglas en `lib/sesion.ts`. Nada de la sesión en `localStorage`: un script malicioso en la página no puede robarla. C2.4 y C4.5 reescritas sin la excepción heredada de #36 (aprobado 2026-10-06).
 - **Mesas desacopladas de la cursada** (ligadas a CicloLectivo + `TurnoExamen`/`TipoMesa`); el cálculo de cursada devuelve solo LIBRE/REGULAR/PROMOCIONADA: los finales tienen su propio ciclo de vida.
 - **Horarios con `horaInicio`/`horaFin` libres** (se eliminó `ModuloHorario`): los módulos fijos no cubrían superposiciones reales.
 - **SDD con Claude Code nativo** (`.claude/` en la raíz: 4 agentes, comandos `/sdd-*`, skill `sdd`; specs en `specs/NNN-nombre/`): una sola herramienta y la IA siempre corre desde la raíz, donde está el versionado; por eso no hay archivos de agentes en subcarpetas.
 - **Acta cerrada = inmutable**: `ms-notas` consulta el estado de la mesa al Core antes de guardar notas.
 
 ## Aprendizajes / errores a evitar
-- Server Actions siempre con `try/catch` + `toast.error`: una excepción no atrapada rompe todo el árbol de React.
+- Server Actions siempre con `try/catch` + `toast.error`: una excepción no atrapada rompe todo el árbol de React. Pero `redirect()` lanza `NEXT_REDIRECT`: todo `catch` que envuelva una Server Action o `fetchApi` (servidor o cliente) llama primero a `unstable_rethrow(error)`, o un login correcto se muestra como error.
+- El frontend usa React 18.2 (sin `useActionState`): formularios con Server Actions vía `useTransition`.
 - Formatear fechas con `timeZone: "America/Argentina/Buenos_Aires"` (o pre-formatear en el server) para evitar hydration mismatch.
 - `revalidatePath` con la ruta específica; el genérico no refresca listados anidados.
 - Botones dentro de `<form>` en dialogs: `type="button"`/`preventDefault`, o envían el form.

@@ -39,8 +39,8 @@ Paquete base Java: `ar.edu.itec1misiones`. Cada servicio Maven es un proyecto in
 - Cambiar un prefijo de ruta implica actualizar `application.yml` y el frontend en el mismo cambio.
 
 **`frontend/` (Next.js 16, React 18, TypeScript; :3000)**
-- Lecturas con Server Components y escrituras con Server Actions en `app/actions/`; solo contra el Gateway. No agregar `fetch` desde componentes cliente ni usos nuevos de `lib/api-client.ts` (deuda #36).
-- Server Actions siempre con `try/catch` + `toast.error` (sonner).
+- Lecturas con Server Components y escrituras con Server Actions en `app/actions/`; solo contra el Gateway, con `fetchApi`/`fetchCore` de `lib/api-server.ts` (ponen el JWT de la cookie y manejan el 401). Sesión del servidor con `getUsuarioActual()`. No agregar `fetch` desde componentes cliente ni guardar nada de la sesión en `localStorage`.
+- Server Actions siempre con `try/catch` + `toast.error` (sonner); en el `catch`, primero `unstable_rethrow(error)` para no tragarse `redirect()`.
 - `revalidatePath` con la ruta específica. Fechas con `timeZone: "America/Argentina/Buenos_Aires"`.
 - Botones dentro de `<form>` en dialogs: `type="button"` o `preventDefault`.
 - UI con componentes de `components/ui/` (shadcn/ui) y patrones de `docs/05.00-Diseno_UX_UI.md`.

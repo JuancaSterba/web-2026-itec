@@ -1,5 +1,3 @@
-import apiClient from "@/lib/api-client"
-
 export type RolAdministrador = "ADMIN" | "ADMINISTRATIVO"
 
 // Coincide con UsuarioAdminResponse del backend (modulo security).

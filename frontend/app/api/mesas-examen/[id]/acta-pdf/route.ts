@@ -1,25 +1,15 @@
-import { cookies } from "next/headers"
+import { unstable_rethrow } from "next/navigation"
 import { NextRequest, NextResponse } from "next/server"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
+import { fetchApi } from "@/lib/api-server"
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   const { id: mesaId } = await context.params
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
 
   try {
-    const response = await fetch(`${getApiBaseUrl()}/api/v1/mesas-examen/${mesaId}/acta-pdf`, {
-      method: "GET",
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    })
+    const response = await fetchApi(`/api/v1/mesas-examen/${mesaId}/acta-pdf`, { method: "GET" })
 
     if (!response.ok) {
       return new NextResponse("Error al generar el acta PDF", { status: response.status })
@@ -36,6 +26,8 @@ export async function GET(
       headers,
     })
   } catch (error) {
+    // Deja pasar el redirect al login con la sesion vencida (fetchApi).
+    unstable_rethrow(error)
     console.error("Error proxying PDF request:", error)
     return new NextResponse("Error interno del servidor", { status: 500 })
   }

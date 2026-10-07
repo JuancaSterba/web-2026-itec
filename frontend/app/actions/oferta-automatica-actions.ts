@@ -1,12 +1,7 @@
 "use server"
 
-import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
-import { fetchCore } from "@/lib/api-server"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
+import { fetchApi, fetchCore } from "@/lib/api-server"
 
 interface PlanEstudioResponse {
   id: number
@@ -35,13 +30,6 @@ interface PeriodoAcademicoResponse {
 const CUPO_DEFAULT = 30
 
 export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: number, carreraIds: number[]) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-  const authHeaders = {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  }
-
   // 1. Crear los 2 períodos institucionales del año (reusando los que ya
   // existan para este ciclo con el mismo nombre, para no duplicarlos).
   const periodosExistentes = (await fetchCore<PeriodoAcademicoResponse>("/periodos-academicos")) ?? []
@@ -58,9 +46,8 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
       if (existente) {
         return { id: existente.id, paridad: periodo.paridad }
       }
-      const response = await fetch(`${getApiBaseUrl()}/api/v1/periodos-academicos`, {
+      const response = await fetchApi(`/api/v1/periodos-academicos`, {
         method: "POST",
-        headers: authHeaders,
         body: JSON.stringify({
           nombre: periodo.nombre,
           fechaInicio: periodo.fechaInicio,
@@ -106,9 +93,8 @@ export async function generarOfertaAcademicaAutomatica(cicloId: number, anio: nu
 
   const respuestas = await Promise.all(
     comisionesACrear.map((item) =>
-      fetch(`${getApiBaseUrl()}/api/v1/comisiones`, {
+      fetchApi(`/api/v1/comisiones`, {
         method: "POST",
-        headers: authHeaders,
         body: JSON.stringify({
           nombreComision: item.nombreComision,
           cupoMaximo: item.cupoMaximo,
