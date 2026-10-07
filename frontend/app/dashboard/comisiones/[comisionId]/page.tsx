@@ -324,11 +324,20 @@ export default async function ComisionDetallePage({
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>{cursada.condicionFinal}</TableCell>
+                      <TableCell>
+                        {/* Con condicion final la cursada esta cerrada (RF-27). */}
+                        {cursada.condicionFinal ? (
+                          <Badge variant={cursada.condicionFinal === "LIBRE" ? "destructive" : "secondary"}>
+                            {cursada.condicionFinal} · cerrada
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">En curso</span>
+                        )}
+                      </TableCell>
                       <TableCell>{cursada.notaCierre ?? "—"}</TableCell>
                       {esAdmin && (
                         <TableCell className="flex justify-end gap-1">
-                          <CerrarCursadaBoton cursadaId={cursada.id} />
+                          {!cursada.condicionFinal && <CerrarCursadaBoton cursadaId={cursada.id} />}
                           <EditarCursadaDialog cursada={cursada} />
                           <EliminarBoton
                             accion={deleteCursada.bind(null, cursada.id)}
