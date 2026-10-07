@@ -44,6 +44,7 @@ Actores: profesor (toma asistencia y cierra la cursada de sus comisiones), admin
 | RF-24 | SI se rechaza un cierre por no poder obtener las asistencias, ENTONCES EL SISTEMA DEBE informar el motivo al usuario. | HU-02 |
 | RF-25 | SI un usuario sin rol admin, administrativo o profesor intenta consultar las asistencias de un alumno, ENTONCES EL SISTEMA DEBE rechazar el acceso. | HU-04 |
 | RF-26 | SI un usuario que solo tiene el rol profesor consulta a un alumno que no cursa en ninguna de sus comisiones, ENTONCES EL SISTEMA DEBE rechazar la consulta. | HU-04 |
+| RF-27 | MIENTRAS una cursada esté cerrada, EL SISTEMA DEBE mostrarla como cerrada y no ofrecer la acción de cerrarla. | HU-02 |
 
 ## Casos límite
 - Tardanzas → cuentan como presente (RF-02).
@@ -53,6 +54,7 @@ Actores: profesor (toma asistencia y cierra la cursada de sus comisiones), admin
 - Alumno con buen promedio y asistencia insuficiente → LIBRE al cerrar (RF-09), indicando el motivo en la vista previa (RF-23).
 - Falla al obtener las asistencias durante el cierre → cierre rechazado con motivo (RF-13, RF-24).
 - Asistencias corregidas después del cierre → la condición no cambia (RF-14).
+- Cursada ya cerrada (por el cierre o con la condición cargada a mano) → se muestra como cerrada y sin la acción de cerrar (RF-27).
 - Reporte o consulta sin datos → "Sin registros" (RF-17, RF-20).
 - Acceso sin permiso al reporte o a la consulta → rechazado (RF-21, RF-25).
 - Profesor que consulta un alumno ajeno a sus comisiones → rechazado (RF-26).
@@ -75,3 +77,6 @@ Actores: profesor (toma asistencia y cierra la cursada de sus comisiones), admin
 - **Q-03:** el reporte es por materia y ciclo lectivo, con todas sus comisiones → RF-15, RF-17.
 - **Q-04:** un usuario que solo es profesor ve sus comisiones; el reporte es solo para admin y administrativo → RF-21, RF-22, RF-26.
 - **Redacción:** RF-11 y RF-13 tenían dos "DEBE" y se partieron (RF-23, RF-24). "Destacar" en RF-16 pasó a "listar primero y marcar con un indicador". Se separó el acceso al reporte (RF-21) del de la consulta (RF-25).
+
+## Cambios
+- **2026-10-06 — RF-27 (nuevo).** En la prueba E2E (T20), una cursada cerrada seguía mostrando el botón "Cerrar cursada" y nada indicaba que estaba cerrada: el usuario se enteraba recién por el error al apretarlo. Se agrega RF-27. Para el sistema, una cursada con condición final está cerrada, también si la condición se cargó a mano al editarla; la edición manual sigue disponible para correcciones.

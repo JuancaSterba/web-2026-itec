@@ -43,6 +43,7 @@ El cálculo vive en `ms-asistencias`, el dueño de los datos: una función pura 
 | frontend | `types/ResumenAsistencia.ts` | **Nuevo** tipo espejo. | RF-07 |
 | frontend | `lib/asistencia.ts` | **Nuevo**: `fetchResumenAsistencia(cursadaIds)` (Gateway) y `etiquetaAsistencia(resumen)` para mostrar "Sin registros". | RF-07, RF-08 |
 | frontend | `app/dashboard/comisiones/[comisionId]/page.tsx` | Columna "Asistencia" con porcentaje y badge de estado por alumno; usa el control de acceso que ya existe. | RF-07, RF-08, RF-22 |
+| frontend | `app/dashboard/comisiones/[comisionId]/page.tsx` | [IMPACTO: RF-27] La columna "Condición Final" muestra un badge "<condición> · cerrada" cuando `condicionFinal` no es null, y `CerrarCursadaBoton` se muestra solo en las cursadas abiertas. Sin cambios en el backend (el 409 de RF-14 queda como segunda capa). | RF-27 |
 | frontend | `components/comisiones/cerrar-cursada-boton.tsx` | Antes de cerrar, muestra la vista previa (porcentaje, condición y motivo de LIBRE) en un diálogo de confirmación; errores del cierre con `toast.error`. | RF-11, RF-12, RF-23, RF-24 |
 | frontend | `app/actions/cursada-actions.ts` | `previsualizarCierre(cursadaId)`; `cerrarCursada` devuelve el mensaje de error del backend. | RF-11, RF-24 |
 | frontend | `app/dashboard/reportes/asistencia/page.tsx` | **Nueva** pantalla: formulario GET (materia, ciclo), tabla con comisión, porcentaje y estado, NO_REGULAR primero y marcados; "Sin registros". | RF-15, RF-16, RF-17, RF-21 |
@@ -126,6 +127,7 @@ preview = calcular(cursadaId); guardar condición y nota
 | RF-12 | Unitario | `calcular_sinRegistrosRechazaCierre` |
 | RF-13, RF-24 | Unitario + E2E | `calcular_siFallaElServicioDeAsistenciasDevuelve503`; E2E con `ms-asistencias` apagado: toast con el mensaje. |
 | RF-14 | Unitario | `cerrar_cursadaYaCerradaDevuelve409` |
+| RF-27 | E2E | [IMPACTO: RF-27] Navegador: cursada cerrada con badge "cerrada" y sin botón; cursada abierta con botón. |
 | RF-15, RF-16, RF-17 | E2E | Reporte con datos (NO_REGULAR primero y marcados) y sin datos ("Sin registros"). |
 | RF-18, RF-19, RF-20 | E2E | Detalle de alumno con cursadas y sin asistencias. |
 | RF-21 | E2E | Profesor sin el ítem del menú; acceso directo a la URL muestra "No tenés permiso". |
