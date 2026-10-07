@@ -1,6 +1,6 @@
 # 001 — Sesión segura y perfil desde el servidor
 
-- **Estado:** Clarificada
+- **Estado:** Implementada (validada 2026-10-06)
 - **Fecha:** 2026-10-06
 - **Rama:** `feature/001-sesion-segura`
 
