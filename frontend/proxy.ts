@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
+import { COOKIE_LEGADA, COOKIE_ROL, COOKIE_SESION, decidirAcceso } from "@/lib/sesion"
 
-const LOGIN_PATH = process.env.NEXT_PUBLIC_LOGIN_PATH || "/login"
-const DASHBOARD_PATH = process.env.NEXT_PUBLIC_DASHBOARD_PATH || "/dashboard"
 const FRONTEND_BASE = process.env.NEXT_PUBLIC_FRONTEND_URL // ej: http://localhost:3000
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
-  const token = req.cookies.get("auth-token")?.value
-  const isAuth = !!token
 
   // No interceptar estáticos ni APIs
   if (
@@ -20,29 +17,33 @@ export function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // "/" es publica (hero de bienvenida). Con sesion, directo al dashboard;
-  // sin sesion, se deja pasar para que se renderice el hero.
-  if (pathname === "/") {
-    if (isAuth) {
-      return NextResponse.redirect(new URL(DASHBOARD_PATH, FRONTEND_BASE || req.url))
-    }
-    return NextResponse.next()
+  // Reglas en lib/sesion.ts: sin sesion → login (RF-16), vencida → login con
+  // aviso (RF-17), con sesion en "/" o "/login" → panel (RF-18), multi-rol
+  // sin rol elegido → eleccion de rol (RF-20).
+  const decision = decidirAcceso(
+    pathname,
+    req.cookies.get(COOKIE_SESION)?.value,
+    req.cookies.get(COOKIE_ROL)?.value,
+    Math.floor(Date.now() / 1000)
+  )
+
+  const response =
+    decision.tipo === "pasar"
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL(decision.destino, FRONTEND_BASE || req.url))
+
+  if (decision.tipo === "redirigir" && decision.borrarSesion) {
+    response.cookies.delete(COOKIE_SESION)
+    response.cookies.delete(COOKIE_ROL)
   }
 
-  // Si no está autenticado y no es /login → a /login
-  if (!isAuth && pathname !== LOGIN_PATH) {
-    return NextResponse.redirect(new URL(LOGIN_PATH, FRONTEND_BASE || req.url))
-  }
+  // La cookie de la version anterior no era httpOnly: se descarta (RF-19).
+  if (req.cookies.has(COOKIE_LEGADA)) response.cookies.delete(COOKIE_LEGADA)
 
-  // Si está autenticado e intenta ir a /login → a /dashboard
-  if (isAuth && pathname === LOGIN_PATH) {
-    return NextResponse.redirect(new URL(DASHBOARD_PATH, FRONTEND_BASE || req.url))
-  }
-
-  return NextResponse.next()
+  return response
 }
 
 export const config = {
-  // Incluimos /login para que aplique la regla de "si ya estás logueado, mandá al dashboard"
-  matcher: ["/", "/login", "/dashboard/:path*", "/materias/:path*", "/alumnos/:path*", "/profesores/:path*", "/seleccionar-rol"],
+  // Incluye "/" y "/login" para mandar al panel a quien ya tiene sesion.
+  matcher: ["/", "/login", "/dashboard/:path*", "/perfil", "/seleccionar-rol", "/materias/:path*", "/alumnos/:path*", "/profesores/:path*"],
 }
