@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 24/31
+- **Progreso:** 25/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -37,7 +37,7 @@ Reemplazo mecánico de "leer `auth-token` + `fetch` con `Authorization`" por `fe
 - [x] T22 [RF-03, RF-04, RF-05, RF-17] Reescribir `app/login/page.tsx` con `useActionState(loginAction)` y el aviso "Tu sesión expiró, volvé a iniciar sesión" cuando llega `?motivo=expirada` (después de T11) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [x] T23 [RF-07, RF-09, RF-22] Convertir `app/seleccionar-rol/page.tsx` en Server Component: roles desde la sesión y botones que llaman a `seleccionarRolAction`, mostrando su error (después de T12) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [x] T24 [RF-11, RF-12, RF-13, RF-14] Crear `types/Perfil.ts` y convertir `app/perfil/page.tsx` en Server Component: datos de `GET /api/v1/perfil`, roles y rol activo de la sesión, y mensaje de error sin cerrar la sesión (después de T09, T10, T06) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
-- [ ] T25 [RF-02] Eliminar `lib/api-client.ts` y las funciones sin uso de `lib/services/*.service.ts` que lo importan, conservando los tipos (después de T20, T22) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa y `localStorage` solo aparece en `limpiar-datos-legados.tsx`.
+- [x] T25 [RF-02] Eliminar `lib/api-client.ts` y las funciones sin uso de `lib/services/*.service.ts` que lo importan, conservando los tipos (después de T20, T22) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa y `localStorage` solo aparece en `limpiar-datos-legados.tsx`.
 
 ## Fase 5 — Verificación E2E (Docker + navegador)
 - [ ] T26 [RF-01, RF-02, RF-03, RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-22, RF-24] Con `docker compose up --build -d`, verificar login, cookies `HttpOnly`, almacenamiento vacío, mensajes de error, elección y cambio de rol (recarga y otra pestaña), rol ajeno rechazado y roles fijos durante la sesión (después de T25) — Hecho cuando: cada RF listado tiene su resultado anotado como OK.
