@@ -3,12 +3,13 @@
 Única fuente de verdad de tareas abiertas, deuda técnica y funcionalidades diferidas.
 
 - Solo ítems **abiertos**. Al cerrar uno, se borra de este archivo: lo realizado queda en el historial de git.
-- Los números son estables (se citan desde otros docs). Un ítem nuevo usa el siguiente número libre: **#42**.
+- Los números son estables (se citan desde otros docs). Un ítem nuevo usa el siguiente número libre: **#43**.
 
 ## Deuda técnica
 - **#22 [Arquitectura] Acoplamiento sincrónico Core ↔ MS** *(baja prioridad)* — dependencia circular en runtime por HTTP REST: el Core depende de `ms-notas` para cerrar cursadas y los MS dependen del Core para validar horarios. A futuro, evaluar comunicación asincrónica por eventos (RabbitMQ/Kafka). Cambiarlo requiere enmendar C1.4 de `constitution.md`.
 - **#31 [Documentación] Revisar `docs/`** — confirmar que los documentos reflejan el código actual tras los refactors de DDD, Mesas de Examen y horarios/asistencias. Incluye: `02.00-Modelo_Datos.md` dice que ALUMNO/PROFESOR se crean con `enabled=false`, pero los usuarios creados desde la UI quedan habilitados (ver `MEMORY.md`).
 - **#41 [Seguridad] Revocar la sesión en el servidor al cerrar sesión** *(baja prioridad)* — el logout borra las cookies del navegador, pero el JWT sigue siendo válido hasta vencer (24 h). Quedó fuera de alcance de `specs/001-sesion-segura`. Requeriría una lista de tokens revocados consultada por el Gateway.
+- **#42 [Seguridad] Profesor solo ve sus comisiones, controlado en el backend** *(baja prioridad)* — en `specs/002-regularidad-asistencia`, que un profesor vea solo sus comisiones y alumnos (RF-22, RF-26) se controla en los Server Components de Next, igual que la vista de comisión. `ms-asistencias` y `ms-notas` solo exigen el rol PROFESOR, así que un profesor que llame directo al Gateway puede leer asistencias o notas de otra comisión. Mitigarlo requiere que los MS sepan qué comisiones dicta cada profesor (consulta al Core o claim en el JWT); ver #22.
 
 ## Funcionalidad pendiente
 - **#37 Regularidad por asistencia (70 %)** — el cálculo del 70 % y la notificación MS Asistencias → Core para que el alumno pierda la regularidad no están implementados (ver `02.20-Diagrama_Estados.md` y `03.20-Diagrama_Secuencia_Asistencia.md`).

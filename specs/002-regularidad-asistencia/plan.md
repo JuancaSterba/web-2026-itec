@@ -1,7 +1,7 @@
 # 002 — Plan técnico: Regularidad por asistencia (70 %)
 
 - **Spec:** [`spec.md`](./spec.md)
-- **Estado:** Borrador
+- **Estado:** Aprobado (2026-10-06, incluye la llamada Core → `ms-asistencias` y `ASISTENCIAS_API_URL` en `backend/docker-compose.yml`)
 
 ## Resumen
 El cálculo vive en `ms-asistencias`, el dueño de los datos: una función pura arma el resumen de una cursada (presentes, tardanzas, ausencias, total, porcentaje y estado REGULAR / NO_REGULAR / SIN_REGISTROS) y un endpoint nuevo, `GET /api/asistencias/resumen?cursadaIds=…`, lo devuelve para una o varias cursadas. El Core lo consulta al previsualizar y al cerrar una cursada (cliente nuevo `AsistenciasClient`, mismo patrón que `NotasClient`): sin registros rechaza el cierre, NO_REGULAR fuerza LIBRE y REGULAR sigue la regla actual de parciales. El frontend usa el mismo endpoint por el Gateway para la columna de la vista de comisión, el reporte por materia y ciclo (pantalla nueva) y la sección de asistencia del detalle del alumno.
@@ -133,6 +133,6 @@ preview = calcular(cursadaId); guardar condición y nota
 | RF-26 | E2E | Profesor que abre un alumno de otra comisión → rechazo. |
 
 ## Riesgos
-- **RF-22 y RF-26 se controlan en el servidor de Next, no en `ms-asistencias`:** un profesor que llame directo al Gateway con su token podría pedir el resumen de cualquier cursada. Es el mismo nivel de control que hoy tienen las asistencias y las notas; alcanza para el escenario (proyecto local). Si se quisiera cerrar, sería una llamada MS → Core más (deuda #22).
+- **RF-22 y RF-26 se controlan en el servidor de Next, no en `ms-asistencias`:** un profesor que llame directo al Gateway con su token podría pedir el resumen de cualquier cursada. Es el mismo nivel de control que hoy tienen las asistencias y las notas; alcanza para el escenario (proyecto local). Registrado como deuda #42.
 - **Cambio de comportamiento en el cierre:** las cursadas sin asistencias ya no se pueden cerrar (RF-12). Con los datos del seeder no debería pasar, pero conviene saberlo al probar.
 - **Valor `TARDE`:** `estado-asistencia-toggle.tsx` y el tipo viejo del frontend usan `TARDE`, mientras que la toma de asistencia guarda `TARDANZA`. El calculador acepta ambos para no perder datos.
