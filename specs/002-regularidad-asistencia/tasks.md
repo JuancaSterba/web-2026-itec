@@ -1,7 +1,7 @@
 # 002 — Tareas: Regularidad por asistencia (70 %)
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 15/24
+- **Progreso:** 16/24
 
 > El frontend no tiene test runner (C1.2): sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y el E2E de la Fase 4. Maven con JDK 17.
 
@@ -25,7 +25,7 @@
 - [x] T13 [RF-07, RF-08] Crear `types/ResumenAsistencia.ts` y `lib/asistencia.ts` (`fetchResumenAsistencia(cursadaIds)` y la etiqueta "Sin registros") [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [x] T14 [RF-07, RF-08, RF-22] Agregar la columna "Asistencia" (porcentaje + badge de estado o "Sin registros") en `app/dashboard/comisiones/[comisionId]/page.tsx`, con el control de acceso que ya tiene (después de T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [x] T15 [RF-11, RF-24] Agregar `previsualizarCierre(cursadaId)` en `cursada-actions.ts` y hacer que `cerrarCursada` devuelva el mensaje de error del backend (después de T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
-- [ ] T16 [RF-11, RF-12, RF-23, RF-24] En `cerrar-cursada-boton.tsx`, mostrar un diálogo de confirmación con porcentaje, condición y motivo de LIBRE, y los errores del cierre con `toast.error` (después de T15) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
+- [x] T16 [RF-11, RF-12, RF-23, RF-24] En `cerrar-cursada-boton.tsx`, mostrar un diálogo de confirmación con porcentaje, condición y motivo de LIBRE, y los errores del cierre con `toast.error` (después de T15) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T17 [RF-15, RF-16, RF-17, RF-21] Crear `app/dashboard/reportes/asistencia/page.tsx`: formulario GET (materia, ciclo), tabla con comisión, porcentaje y estado, NO_REGULAR primero y marcados, "Sin registros", y acceso solo para ADMIN/ADMINISTRATIVO (después de T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T18 [RF-21] Agregar el ítem "Reporte de asistencia" en `components/layout/sidebar.tsx` para ADMIN y ADMINISTRATIVO (después de T17) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
 - [ ] T19 [RF-18, RF-19, RF-20, RF-26] Agregar la sección "Asistencia por cursada" en `app/dashboard/alumnos/[alumnoId]/page.tsx` (presentes, tardanzas, ausencias, porcentaje, estado, "Sin registros") y permitir el acceso de un profesor solo si el alumno cursa en sus comisiones (después de T13) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa.
