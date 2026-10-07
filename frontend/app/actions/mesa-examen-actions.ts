@@ -1,11 +1,7 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
-
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
 
 export async function createMesaExamen(payload: {
   materiaPlanId: number
@@ -17,14 +13,6 @@ export async function createMesaExamen(payload: {
   fechaHoraEspecial?: string
   tribunalIds: number[]
 }) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const headers = {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  }
-
   const baseRequest = {
     materiaPlanId: payload.materiaPlanId,
     cicloLectivoId: payload.cicloLectivoId,
@@ -60,9 +48,8 @@ export async function createMesaExamen(payload: {
   }
 
   for (const req of requestsToMake) {
-    const response = await fetch(`${getApiBaseUrl()}/api/v1/mesas-examen`, {
+    const response = await fetchApi(`/api/v1/mesas-examen`, {
       method: "POST",
-      headers,
       body: JSON.stringify(req),
     })
 
@@ -79,17 +66,10 @@ export async function inscribirAlumnoEnMesa(
   mesaExamenId: number,
   payload: { alumnoId: number; condicionInscripcion: string }
 ) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(
-    `${getApiBaseUrl()}/api/v1/mesas-examen/${mesaExamenId}/inscripciones`,
+  const response = await fetchApi(
+    `/api/v1/mesas-examen/${mesaExamenId}/inscripciones`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: JSON.stringify(payload),
     }
   )
@@ -106,17 +86,10 @@ export async function updateTribunalMesa(
   mesaExamenId: number,
   payload: { tribunalIds: number[] }
 ) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(
-    `${getApiBaseUrl()}/api/v1/mesas-examen/${mesaExamenId}/tribunal`,
+  const response = await fetchApi(
+    `/api/v1/mesas-examen/${mesaExamenId}/tribunal`,
     {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: JSON.stringify(payload),
     }
   )
@@ -130,15 +103,8 @@ export async function updateTribunalMesa(
 }
 
 export async function cerrarMesaExamen(mesaId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/mesas-examen/${mesaId}/cerrar`, {
+  const response = await fetchApi(`/api/v1/mesas-examen/${mesaId}/cerrar`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {

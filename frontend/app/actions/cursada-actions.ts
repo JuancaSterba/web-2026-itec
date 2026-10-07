@@ -1,16 +1,9 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function createCursada(formData: FormData, comisionId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const payload = {
     alumnoId: Number(formData.get("alumnoId")),
     comisionId,
@@ -18,12 +11,8 @@ export async function createCursada(formData: FormData, comisionId: number) {
     condicionFinal: "REGULAR",
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas`, {
+  const response = await fetchApi(`/api/v1/cursadas`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -36,18 +25,12 @@ export async function createCursada(formData: FormData, comisionId: number) {
 }
 
 export async function createCursadasMasivas(alumnoId: number, comisionIds: number[]) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
   const fechaInscripcion = new Date().toISOString().slice(0, 10)
 
   const respuestas = await Promise.all(
     comisionIds.map((comisionId) =>
-      fetch(`${getApiBaseUrl()}/api/v1/cursadas`, {
+      fetchApi(`/api/v1/cursadas`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
         body: JSON.stringify({ alumnoId, comisionId, fechaInscripcion, condicionFinal: "REGULAR" }),
       })
     )
@@ -68,9 +51,6 @@ export async function createCursadasMasivas(alumnoId: number, comisionIds: numbe
 }
 
 export async function updateCursada(formData: FormData, cursadaId: number, alumnoId: number, comisionId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
   const notaCierreRaw = formData.get("notaCierre")
 
   const payload = {
@@ -80,12 +60,8 @@ export async function updateCursada(formData: FormData, cursadaId: number, alumn
     notaCierre: notaCierreRaw ? Number(notaCierreRaw) : null,
   }
 
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas/${cursadaId}`, {
+  const response = await fetchApi(`/api/v1/cursadas/${cursadaId}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify(payload),
   })
 
@@ -97,14 +73,8 @@ export async function updateCursada(formData: FormData, cursadaId: number, alumn
 }
 
 export async function cerrarCursada(cursadaId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas/${cursadaId}/cerrar`, {
+  const response = await fetchApi(`/api/v1/cursadas/${cursadaId}/cerrar`, {
     method: "POST",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {
@@ -116,14 +86,8 @@ export async function cerrarCursada(cursadaId: number) {
 }
 
 export async function deleteCursada(cursadaId: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/cursadas/${cursadaId}`, {
+  const response = await fetchApi(`/api/v1/cursadas/${cursadaId}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {

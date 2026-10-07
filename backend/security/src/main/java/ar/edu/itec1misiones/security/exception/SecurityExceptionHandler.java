@@ -181,6 +181,21 @@ public class SecurityExceptionHandler {
         );
     }
 
+    @ExceptionHandler(PerfilNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handlePerfilNotFound(
+            PerfilNotFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorDto error = new ErrorDto(ExceptionConstants.ERROR_PERFIL_NOT_FOUND, ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.builder()
+                        .meta(MetaBuilderHelper.buildMeta(request))
+                        .errors(List.of(error))
+                        .build()
+        );
+    }
+
     @ExceptionHandler(AdministradorDatosDuplicadosException.class)
     public ResponseEntity<ApiResponse<Object>> handleAdministradorDatosDuplicados(
             AdministradorDatosDuplicadosException ex,

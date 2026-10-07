@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
         // (matchea la password a mano arriba), asi que isEnabled() no se
         // valida solo -- hay que chequearlo explicitamente aca.
         if (!user.isEnabled()) {
-            throw new DisabledException("La cuenta está deshabilitada");
+            throw new DisabledException(SecurityConstants.MSG_USER_DISABLED);
         }
 
         Map<String, Object> extraClaims = usuarioCallback.obtenerDatosUsuario(user);

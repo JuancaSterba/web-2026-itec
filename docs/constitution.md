@@ -13,7 +13,7 @@ Principios innegociables. Toda spec, plan y cambio de código debe cumplirlos; e
 - **C2.1** Backend en capas: `controller` → `service` → `repository`. Los controllers no tienen reglas de negocio ni acceden a repositorios.
 - **C2.2** Las APIs exponen DTOs (`dto/` o `backend/commons`); nunca entidades JPA.
 - **C2.3** Las reglas de negocio viven en el backend. El frontend puede validar para mejorar la UX, pero el servicio siempre revalida.
-- **C2.4** Frontend: datos con Server Components y escrituras con Server Actions (`frontend/app/actions`). Sin fetch al backend desde componentes cliente (excepción heredada: login en `hooks/use-auth.tsx`, ver deuda #36).
+- **C2.4** Frontend: datos con Server Components y escrituras con Server Actions (`frontend/app/actions`), incluido el login. Sin fetch al backend desde componentes cliente.
 - **C2.5** El frontend solo habla con el API Gateway; ningún servicio se consume directamente por su puerto.
 - **C2.6** Los tipos del frontend (`frontend/types`, `frontend/lib/types.ts`) reflejan los DTOs del backend; si un DTO cambia, se actualizan en el mismo cambio.
 - **C2.7** El contrato público es `/api/v1/<recurso>` (enunciado) y lo expone solo el Gateway, que quita el `/v1` al rutear. Los servicios no conocen el `/v1` y el frontend usa solo rutas `/api/v1`.
@@ -30,7 +30,7 @@ Principios innegociables. Toda spec, plan y cambio de código debe cumplirlos; e
 - **C4.2** Ningún secreto se commitea: `.env` y `.env.local` se ignoran y solo se versionan `.env.example` con valores de ejemplo.
 - **C4.3** Las contraseñas se guardan solo con hash (`PasswordEncoder`/BCrypt); nunca se loguean ni se devuelven en una respuesta.
 - **C4.4** Todo endpoint nuevo valida el rol: Spring Security en el Core y `RoleGuard.exigirRol` en los MS. No hay endpoints anónimos fuera del login.
-- **C4.5** El JWT se lee del lado del servidor desde cookie (`frontend/lib/auth-server.ts`). Código nuevo no guarda tokens ni datos personales en `localStorage` (hoy `use-auth.tsx` y `perfil/page.tsx` lo hacen: deuda #36).
+- **C4.5** La sesión vive en cookies `httpOnly` que solo escribe el servidor de Next (`itec-sesion` con el JWT, `itec-rol` con el rol activo) y se lee con `frontend/lib/auth-server.ts`. El navegador no guarda tokens, datos personales, roles ni el rol activo en `localStorage` ni `sessionStorage`.
 - **C4.6** Las entradas se validan en el borde (`@Valid` + Bean Validation en los request DTOs) y los errores se devuelven sin stack traces.
 - **C4.7** El schema solo cambia por migraciones de Flyway (`ddl-auto: validate`). Las migraciones ya aplicadas no se editan.
 - **C4.8** Los datos personales (DNI, email, teléfono) solo se exponen a los roles que los necesitan.

@@ -1,5 +1,3 @@
-import apiClient from "@/lib/api-client"
-
 // Coincide con AlumnoResponse del Core. nombre/apellido/dni/email/telefono
 // vienen denormalizados desde el Usuario asociado -- no son editables aca.
 // telefonoSecundario si es editable (dato opcional de contacto).

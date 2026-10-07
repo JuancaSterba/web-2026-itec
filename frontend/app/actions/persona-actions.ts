@@ -1,6 +1,6 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 
 export interface PersonaResumen {
   nombre: string
@@ -11,18 +11,8 @@ export interface PersonaResumen {
   roles: string[]
 }
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function buscarPersonaPorDniAction(dni: string): Promise<PersonaResumen | null> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/personas/dni/${dni}`, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
+  const response = await fetchApi(`/api/v1/personas/dni/${dni}`, {
   })
 
   if (!response.ok) {

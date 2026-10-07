@@ -8,6 +8,7 @@ public class ExceptionConstants {
     public static final String ERROR_INTERNAL = "INTERNAL_ERROR";
     public static final String ERROR_AUTH = "AUTH";
     public static final String ERROR_ADMIN_NOT_FOUND = "ADMIN_NOT_FOUND";
+    public static final String ERROR_PERFIL_NOT_FOUND = "PERFIL_NOT_FOUND";
     public static final String ERROR_SELF_ACTION_FORBIDDEN = "SELF_ACTION_FORBIDDEN";
     public static final String ERROR_ROL_INVALIDO = "ROL_INVALIDO";
 }

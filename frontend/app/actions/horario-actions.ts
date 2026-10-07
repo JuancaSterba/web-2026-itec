@@ -1,22 +1,11 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { fetchApi } from "@/lib/api-server"
 import { revalidatePath } from "next/cache"
 
-function getApiBaseUrl() {
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
-}
-
 export async function createHorarioClase(comisionId: number, diaSemana: string, horaInicio: string, horaFin: string) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/horarios`, {
+  const response = await fetchApi(`/api/v1/horarios`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
     body: JSON.stringify({ comisionId, diaSemana, horaInicio, horaFin }),
   })
 
@@ -29,14 +18,8 @@ export async function createHorarioClase(comisionId: number, diaSemana: string, 
 }
 
 export async function deleteHorarioClase(id: number) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/horarios/${id}`, {
+  const response = await fetchApi(`/api/v1/horarios/${id}`, {
     method: "DELETE",
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
   })
 
   if (!response.ok) {
