@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 27/31
+- **Progreso:** 28/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -44,7 +44,7 @@ Reemplazo mecánico de "leer `auth-token` + `fetch` con `Authorization`" por `fe
 - [x] T27 [RF-11, RF-12, RF-13, RF-14, RF-15, RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-25] Verificar perfil (dato vigente, roles, error con el Core caído), logout, redirecciones sin sesión y con sesión, sesión vencida al navegar y al enviar un formulario, datos legados borrados y usuario multi-rol sin elegir rol (después de T26) — Hecho cuando: cada RF listado tiene su resultado anotado como OK.
 
 ## Fase 6 — Docs y cierre
-- [ ] T28 Actualizar `docs/04.20-Diagrama_Arquitectura.md` y `docs/03.00-Diagrama_Secuencia.md`: login vía Server Action con cookie `httpOnly` y `GET /api/v1/perfil` [sin test: docs] — Hecho cuando: los diagramas muestran el flujo nuevo.
+- [x] T28 Actualizar `docs/04.20-Diagrama_Arquitectura.md` y `docs/03.00-Diagrama_Secuencia.md`: login vía Server Action con cookie `httpOnly` y `GET /api/v1/perfil` [sin test: docs] — Hecho cuando: los diagramas muestran el flujo nuevo.
 - [ ] T29 Validar todos los RF con `/sdd-validate` (después de T27) — Hecho cuando: los 25 RF están en ✅.
 - [ ] T30 Borrar #36 de `docs/pendientes.md`, agregar el pendiente "Revocar la sesión en el servidor al cerrar sesión" y registrar en `MEMORY.md` la decisión de sesión con cookies `httpOnly` [sin test: docs] — Hecho cuando: pendientes y `MEMORY.md` reflejan el estado final y `AGENTS.md` fue revisado.
 - [ ] T31 Proponer quitar de `docs/constitution.md` las excepciones heredadas de C2.4 y C4.5 y aplicarlo con aprobación del usuario [sin test: docs] — Hecho cuando: el usuario aprobó y la constitución ya no menciona `use-auth.tsx` ni la deuda #36.
