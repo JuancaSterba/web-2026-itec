@@ -95,10 +95,17 @@ public class CondicionCursadaService {
 
     @Transactional
     public CondicionPreviewResponse cerrar(Long cursadaId) {
-        CondicionPreviewResponse preview = calcular(cursadaId);
-
         Cursada cursada = cursadaRepository.findById(cursadaId)
                 .orElseThrow(() -> new CursadaNotFoundException(cursadaId));
+
+        // Una cursada cerrada no se recalcula: corregir una asistencia despues
+        // no debe cambiar su condicion (RF-14). Para corregirla a mano esta
+        // la edicion de la cursada.
+        if (cursada.getCondicionFinal() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cursada ya está cerrada");
+        }
+
+        CondicionPreviewResponse preview = calcular(cursadaId);
         cursada.setCondicionFinal(preview.getCondicionFinal());
         cursada.setNotaCierre(preview.getNotaCierre());
         cursadaRepository.save(cursada);
