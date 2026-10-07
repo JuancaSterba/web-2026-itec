@@ -4,6 +4,8 @@ import { Inter, Space_Grotesk } from "next/font/google"
 import { AuthProvider } from "@/hooks/use-auth"
 import { MyThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
+import { LimpiarDatosLegados } from "@/components/auth/limpiar-datos-legados"
+import { getUsuarioActual } from "@/lib/auth-server"
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -22,12 +24,16 @@ export const metadata = {
   description: "Sistema académico",
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // La sesion se lee en el servidor desde las cookies httpOnly (RF-10).
+  const usuario = await getUsuarioActual()
+
   return (
     <html lang="es" suppressHydrationWarning className={`${fontSans.variable} ${fontDisplay.variable}`}>
       <body>
         <MyThemeProvider>
-          <AuthProvider>
+          <LimpiarDatosLegados />
+          <AuthProvider usuario={usuario}>
             {children}
           </AuthProvider>
           <Toaster />
