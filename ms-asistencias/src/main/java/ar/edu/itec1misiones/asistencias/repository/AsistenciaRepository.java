@@ -12,4 +12,6 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
 
     @Query("SELECT a FROM Asistencia a WHERE (:cursadaId IS NULL OR a.cursadaId = :cursadaId) AND (CAST(:fecha AS date) IS NULL OR a.fecha = :fecha)")
     List<Asistencia> buscarPorFiltros(@Param("cursadaId") Long cursadaId, @Param("fecha") LocalDate fecha);
+
+    List<Asistencia> findByCursadaIdIn(List<Long> cursadaIds);
 }
