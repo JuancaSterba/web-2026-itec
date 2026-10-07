@@ -1,7 +1,7 @@
 # 002 — Tareas: Regularidad por asistencia (70 %)
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 24/25
+- **Progreso:** 25/25
 
 > El frontend no tiene test runner (C1.2): sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y el E2E de la Fase 4. Maven con JDK 17.
 
@@ -38,4 +38,4 @@
 ## Fase 5 — Docs y cierre
 - [x] T22 Actualizar `docs/03.20-Diagrama_Secuencia_Asistencia.md`, `docs/02.20-Diagrama_Estados.md` y `docs/04.20-Diagrama_Arquitectura.md` con el flujo real (resumen en el MS, consulta del Core al cerrar, LIBRE por asistencia) [sin test: docs] — Hecho cuando: los tres documentos reflejan el flujo implementado.
 - [x] T23 Validar todos los RF con `/sdd-validate` (después de T21) — Hecho cuando: los 26 RF están en ✅.
-- [ ] T24 Borrar #37 de `docs/pendientes.md`, agregar el pendiente "Inasistencias justificadas (US-ASIS-04)", registrar en `MEMORY.md` dónde vive el cálculo y revisar `AGENTS.md` y `docs/constitution.md` [sin test: docs] — Hecho cuando: pendientes y `MEMORY.md` reflejan el estado final y los otros dos fueron revisados.
+- [x] T24 Borrar #37 de `docs/pendientes.md`, agregar el pendiente "Inasistencias justificadas (US-ASIS-04)", registrar en `MEMORY.md` dónde vive el cálculo y revisar `AGENTS.md` y `docs/constitution.md` [sin test: docs] — Hecho cuando: pendientes y `MEMORY.md` reflejan el estado final y los otros dos fueron revisados.
