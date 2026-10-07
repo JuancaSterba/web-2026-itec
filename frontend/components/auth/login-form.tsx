@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import Link from "next/link"
+import { unstable_rethrow } from "next/navigation"
 import { LogIn, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -32,6 +33,8 @@ export function LoginForm({ sesionExpirada }: { sesionExpirada: boolean }) {
           toast.error(resultado.error)
         }
       } catch (err) {
+        // El login correcto termina en redirect (NEXT_REDIRECT): no es un error.
+        unstable_rethrow(err)
         console.error("Error login:", err)
         setError("No se pudo iniciar sesión. Intentá de nuevo.")
       }
