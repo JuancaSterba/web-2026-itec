@@ -1,7 +1,7 @@
 # 001 — Tareas: Sesión segura y perfil desde el servidor
 
 - **Plan:** [`plan.md`](./plan.md)
-- **Progreso:** 25/31
+- **Progreso:** 26/31
 
 > El frontend no tiene test runner (agregar uno requiere aprobación, C1.2). Sus tareas se marcan `[sin test: sin test runner en frontend]` y se verifican con `npm run build` y con el E2E de la Fase 5. Los comandos Maven se corren con JDK 17.
 
@@ -40,7 +40,7 @@ Reemplazo mecánico de "leer `auth-token` + `fetch` con `Authorization`" por `fe
 - [x] T25 [RF-02] Eliminar `lib/api-client.ts` y las funciones sin uso de `lib/services/*.service.ts` que lo importan, conservando los tipos (después de T20, T22) [sin test: sin test runner en frontend] — Hecho cuando: `npm run build` pasa y `localStorage` solo aparece en `limpiar-datos-legados.tsx`.
 
 ## Fase 5 — Verificación E2E (Docker + navegador)
-- [ ] T26 [RF-01, RF-02, RF-03, RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-22, RF-24] Con `docker compose up --build -d`, verificar login, cookies `HttpOnly`, almacenamiento vacío, mensajes de error, elección y cambio de rol (recarga y otra pestaña), rol ajeno rechazado y roles fijos durante la sesión (después de T25) — Hecho cuando: cada RF listado tiene su resultado anotado como OK.
+- [x] T26 [RF-01, RF-02, RF-03, RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-22, RF-24] Con `docker compose up --build -d`, verificar login, cookies `HttpOnly`, almacenamiento vacío, mensajes de error, elección y cambio de rol (recarga y otra pestaña), rol ajeno rechazado y roles fijos durante la sesión (después de T25) — Hecho cuando: cada RF listado tiene su resultado anotado como OK.
 - [ ] T27 [RF-11, RF-12, RF-13, RF-14, RF-15, RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-25] Verificar perfil (dato vigente, roles, error con el Core caído), logout, redirecciones sin sesión y con sesión, sesión vencida al navegar y al enviar un formulario, datos legados borrados y usuario multi-rol sin elegir rol (después de T26) — Hecho cuando: cada RF listado tiene su resultado anotado como OK.
 
 ## Fase 6 — Docs y cierre
