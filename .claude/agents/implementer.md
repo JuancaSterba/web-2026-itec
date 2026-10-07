@@ -30,7 +30,7 @@ Paquete base Java: `ar.edu.itec1misiones`. Cada servicio Maven es un proyecto in
 **`ms-asistencias/` (:8083, `db_asistencias`) y `ms-notas/` (:8084, `db_calificaciones`)**
 - Solo su BD. Datos del Core vía cliente REST (`CORE_API_URL`) con token interno.
 - Sin Spring Security propio: autorizar con `RoleGuard.exigirRol` en cada endpoint.
-- Respuestas con `ApiResponse<T>` + `ErrorDto`. Regularidad (70 %) y escalas de nota según `docs/01.00` y `docs/02.20`.
+- Respuestas con `ApiResponse<T>` + `ErrorDto`. Regularidad (70 %): `ResumenAsistenciaCalculator` en `ms-asistencias` (ver `docs/03.20`); escalas de nota según `docs/01.00` y `docs/02.20`.
 - Tests: `cd ms-notas && mvn test` / `cd ms-asistencias && mvn test`.
 
 **`api-gateway/` (:8080)**
@@ -40,7 +40,7 @@ Paquete base Java: `ar.edu.itec1misiones`. Cada servicio Maven es un proyecto in
 
 **`frontend/` (Next.js 16, React 18, TypeScript; :3000)**
 - Lecturas con Server Components y escrituras con Server Actions en `app/actions/`; solo contra el Gateway, con `fetchApi`/`fetchCore` de `lib/api-server.ts` (ponen el JWT de la cookie y manejan el 401). Sesión del servidor con `getUsuarioActual()`. No agregar `fetch` desde componentes cliente ni guardar nada de la sesión en `localStorage`.
-- Server Actions siempre con `try/catch` + `toast.error` (sonner); en el `catch`, primero `unstable_rethrow(error)` para no tragarse `redirect()`.
+- Server Actions siempre con `try/catch` + `toast.error` (sonner); en el `catch`, primero `unstable_rethrow(error)` para no tragarse `redirect()`. Los errores que el usuario debe ver se devuelven como `{ error }` (Next oculta el mensaje de los lanzados en producción).
 - `revalidatePath` con la ruta específica. Fechas con `timeZone: "America/Argentina/Buenos_Aires"`.
 - Botones dentro de `<form>` en dialogs: `type="button"` o `preventDefault`.
 - UI con componentes de `components/ui/` (shadcn/ui) y patrones de `docs/05.00-Diseno_UX_UI.md`.

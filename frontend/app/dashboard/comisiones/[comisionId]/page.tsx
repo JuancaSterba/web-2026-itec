@@ -1,6 +1,7 @@
 import { fetchCore, fetchGateway } from "@/lib/api-server"
 import { getUsuarioActual } from "@/lib/auth-server"
 import { getProfesorActual } from "@/lib/profesor-actual"
+import { etiquetaEstado, fetchResumenAsistencia, formatearPorcentaje, varianteEstado } from "@/lib/asistencia"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -193,6 +194,10 @@ export default async function ComisionDetallePage({
     })
   }
 
+  // Porcentaje y estado de regularidad (70 %) de cada alumno (spec 002, RF-07).
+  // null si ms-asistencias no respondio: la columna muestra "No disponible".
+  const resumenAsistencia = await fetchResumenAsistencia((cursadasDeLaComision ?? []).map((c) => c.id))
+
   const calificacionesParciales = Array.from(calificacionesPorCursada?.values() ?? []).flat()
 
   const instancias = Array.from(new Set(calificacionesParciales.map((c) => c.instancia))).sort()
@@ -291,6 +296,7 @@ export default async function ComisionDetallePage({
               <TableHeader>
                 <TableRow>
                   <TableHead>Alumno</TableHead>
+                  <TableHead>Asistencia</TableHead>
                   <TableHead>Condición Final</TableHead>
                   <TableHead>Nota de Cierre</TableHead>
                   {esAdmin && <TableHead className="text-right">Acciones</TableHead>}
@@ -304,11 +310,34 @@ export default async function ComisionDetallePage({
                       <TableCell>
                         {alumno ? `${alumno.nombre} ${alumno.apellido}` : `Alumno #${cursada.alumnoId}`}
                       </TableCell>
-                      <TableCell>{cursada.condicionFinal}</TableCell>
+                      <TableCell>
+                        {resumenAsistencia === null ? (
+                          <span className="text-muted-foreground">No disponible</span>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span>{formatearPorcentaje(resumenAsistencia.get(cursada.id))}</span>
+                            {resumenAsistencia.get(cursada.id)?.estado !== "SIN_REGISTROS" && (
+                              <Badge variant={varianteEstado(resumenAsistencia.get(cursada.id)?.estado)}>
+                                {etiquetaEstado(resumenAsistencia.get(cursada.id)?.estado)}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {/* Con condicion final la cursada esta cerrada (RF-27). */}
+                        {cursada.condicionFinal ? (
+                          <Badge variant={cursada.condicionFinal === "LIBRE" ? "destructive" : "secondary"}>
+                            {cursada.condicionFinal} · cerrada
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">En curso</span>
+                        )}
+                      </TableCell>
                       <TableCell>{cursada.notaCierre ?? "—"}</TableCell>
                       {esAdmin && (
                         <TableCell className="flex justify-end gap-1">
-                          <CerrarCursadaBoton cursadaId={cursada.id} />
+                          {!cursada.condicionFinal && <CerrarCursadaBoton cursadaId={cursada.id} />}
                           <EditarCursadaDialog cursada={cursada} />
                           <EliminarBoton
                             accion={deleteCursada.bind(null, cursada.id)}

@@ -2,6 +2,10 @@ import { fetchCore } from "@/lib/api-server"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { etiquetaCuatrimestre } from "@/lib/cuatrimestre-carrera"
+import { getUsuarioActual } from "@/lib/auth-server"
+import { getProfesorActual } from "@/lib/profesor-actual"
+import { etiquetaEstado, fetchResumenAsistencia, formatearPorcentaje, SIN_REGISTROS, varianteEstado } from "@/lib/asistencia"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface AlumnoResponse {
   id: number
@@ -54,6 +58,11 @@ interface PeriodoAcademicoResponse {
   cicloLectivoId: number
 }
 
+interface ComisionProfesorResponse {
+  comisionId: number
+  profesorId: number
+}
+
 interface CursadaResponse {
   id: number
   alumnoId: number
@@ -103,15 +112,50 @@ export default async function FichaAlumnoPage({
 }) {
   const { alumnoId } = await params
 
-  const [alumnos, inscripciones, planes, materiasPlan, comisiones, periodos, cursadas] = await Promise.all([
-    fetchCore<AlumnoResponse>(`/alumnos/${alumnoId}`),
-    fetchCore<InscripcionCarreraResponse>("/inscripciones-carreras"),
-    fetchCore<PlanEstudioResponse>("/planes-estudio"),
-    fetchCore<MateriaPlanResponse>("/materias-plan"),
-    fetchCore<ComisionResponse>("/comisiones"),
-    fetchCore<PeriodoAcademicoResponse>("/periodos-academicos"),
-    fetchCore<CursadaResponse>("/cursadas"),
-  ])
+  const [alumnos, inscripciones, planes, materiasPlan, comisiones, periodos, cursadas, comisionesProfesores] =
+    await Promise.all([
+      fetchCore<AlumnoResponse>(`/alumnos/${alumnoId}`),
+      fetchCore<InscripcionCarreraResponse>("/inscripciones-carreras"),
+      fetchCore<PlanEstudioResponse>("/planes-estudio"),
+      fetchCore<MateriaPlanResponse>("/materias-plan"),
+      fetchCore<ComisionResponse>("/comisiones"),
+      fetchCore<PeriodoAcademicoResponse>("/periodos-academicos"),
+      fetchCore<CursadaResponse>("/cursadas"),
+      fetchCore<ComisionProfesorResponse>("/comisiones-profesores"),
+    ])
+
+  // Acceso (spec 002): admin y administrativo ven a cualquier alumno; quien
+  // solo es profesor, solo a alumnos de las comisiones que dicta (RF-25, RF-26).
+  const usuario = await getUsuarioActual()
+  const esAdmin = !!usuario?.roles.some((rol) => rol === "ADMIN" || rol === "ADMINISTRATIVO")
+  const cursadasDelAlumno = (cursadas ?? []).filter((cu) => String(cu.alumnoId) === alumnoId)
+  let comisionesVisibles: Set<number> | null = null // null = todas
+  if (!esAdmin) {
+    const profesor = usuario?.roles.includes("PROFESOR") ? await getProfesorActual() : null
+    comisionesVisibles = new Set(
+      (comisionesProfesores ?? []).filter((cp) => profesor && cp.profesorId === profesor.id).map((cp) => cp.comisionId)
+    )
+    if (!cursadasDelAlumno.some((cu) => comisionesVisibles!.has(cu.comisionId))) {
+      return <p className="text-sm text-destructive">No tenés acceso a este alumno.</p>
+    }
+  }
+
+  const cursadasParaAsistencia = cursadasDelAlumno.filter(
+    (cu) => comisionesVisibles === null || comisionesVisibles.has(cu.comisionId)
+  )
+  const resumenAsistencia = await fetchResumenAsistencia(cursadasParaAsistencia.map((cu) => cu.id))
+  const hayAsistencias =
+    !!resumenAsistencia && Array.from(resumenAsistencia.values()).some((r) => r.estado !== "SIN_REGISTROS")
+  const filasAsistencia = cursadasParaAsistencia.map((cu) => {
+    const comision = (comisiones ?? []).find((c) => c.id === cu.comisionId)
+    const materia = (materiasPlan ?? []).find((mp) => mp.id === comision?.materiaPlanId)
+    return {
+      cursadaId: cu.id,
+      materia: materia?.materiaNombre ?? "—",
+      comision: comision?.nombreComision ?? `#${cu.comisionId}`,
+      resumen: resumenAsistencia?.get(cu.id),
+    }
+  })
 
   const alumno = alumnos?.[0] ?? null
   const hoy = new Date().toISOString().slice(0, 10)
@@ -222,6 +266,50 @@ export default async function FichaAlumnoPage({
           })}
         </div>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Asistencia por cursada</CardTitle>
+          <CardDescription>Regular con 70 % de asistencia o más; la tardanza cuenta como presente.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {resumenAsistencia === null ? (
+            <p className="text-sm text-destructive">No se pudo obtener la asistencia. Intentá nuevamente más tarde.</p>
+          ) : !hayAsistencias ? (
+            // RF-20
+            <p className="text-sm text-muted-foreground">{SIN_REGISTROS}</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Materia</TableHead>
+                  <TableHead>Comisión</TableHead>
+                  <TableHead className="text-right">Presentes</TableHead>
+                  <TableHead className="text-right">Tardanzas</TableHead>
+                  <TableHead className="text-right">Ausencias</TableHead>
+                  <TableHead>Asistencia</TableHead>
+                  <TableHead>Estado</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filasAsistencia.map((fila) => (
+                  <TableRow key={fila.cursadaId}>
+                    <TableCell>{fila.materia}</TableCell>
+                    <TableCell>{fila.comision}</TableCell>
+                    <TableCell className="text-right">{fila.resumen?.presentes ?? 0}</TableCell>
+                    <TableCell className="text-right">{fila.resumen?.tardanzas ?? 0}</TableCell>
+                    <TableCell className="text-right">{fila.resumen?.ausentes ?? 0}</TableCell>
+                    <TableCell>{formatearPorcentaje(fila.resumen)}</TableCell>
+                    <TableCell>
+                      <Badge variant={varianteEstado(fila.resumen?.estado)}>{etiquetaEstado(fila.resumen?.estado)}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

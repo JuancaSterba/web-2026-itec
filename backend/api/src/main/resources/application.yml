@@ -34,3 +34,8 @@ logging:
 notas:
   api:
     url: ${NOTAS_API_URL:http://localhost:8084}
+
+# Resumen de regularidad (70 %) al cerrar cursadas (spec 002, AsistenciasClient).
+asistencias:
+  api:
+    url: ${ASISTENCIAS_API_URL:http://localhost:8083}

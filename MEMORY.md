@@ -6,9 +6,9 @@
 ## Estado actual
 - MVP funcional: ABM académicos, inscripciones, comisiones, horarios, asistencias, notas parciales, mesas de examen (turnos/llamados, regla de 48 h) y cierre de actas con PDF.
 - Roles operativos: ADMIN, ADMINISTRATIVO, PROFESOR (vistas `mis-comisiones`, `mis-mesas`). ALUMNO sin portal propio.
-- Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), revocar sesión al cerrar sesión (#41).
-- Specs SDD implementadas: `001-sesion-segura` (2026-10-06, cierra #36).
-- `main` al día con `develop` vía PR #4 (2026-10-06), tras verificar tests Java en verde y E2E en Docker. No hay CI.
+- Deuda abierta principal: acoplamiento HTTP circular Core↔MS (#22), docs desactualizados (#31), revocar sesión al cerrar sesión (#41), "profesor solo sus comisiones" sin control en los MS (#42).
+- Specs SDD implementadas: `001-sesion-segura` (2026-10-06, cierra #36) y `002-regularidad-asistencia` (2026-10-07, cierra #37).
+- `main` al día con `develop` vía PR #5 (2026-10-06, incluye la spec 001). No hay CI: antes de cada PR, tests Java en verde y E2E en Docker.
 - Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo, diagrama interactivo.
 
 ## Decisiones arquitectónicas
@@ -24,10 +24,13 @@
 - **Mesas desacopladas de la cursada** (ligadas a CicloLectivo + `TurnoExamen`/`TipoMesa`); el cálculo de cursada devuelve solo LIBRE/REGULAR/PROMOCIONADA: los finales tienen su propio ciclo de vida.
 - **Horarios con `horaInicio`/`horaFin` libres** (se eliminó `ModuloHorario`): los módulos fijos no cubrían superposiciones reales.
 - **SDD con Claude Code nativo** (`.claude/` en la raíz: 4 agentes, comandos `/sdd-*`, skill `sdd`; specs en `specs/NNN-nombre/`): una sola herramienta y la IA siempre corre desde la raíz, donde está el versionado; por eso no hay archivos de agentes en subcarpetas.
+- **Regularidad por asistencia en `ms-asistencias`** (spec 002): `ResumenAsistenciaCalculator` (tardanza = presente, solo fechas con marca, comparación entera contra 70 %) y `GET /api/asistencias/resumen?cursadaIds=`. El Core la consulta solo al previsualizar/cerrar: NO_REGULAR deja LIBRE antes de mirar parciales, sin registros → 400, servicio caído → 503, cursada cerrada no se recalcula (409). El dueño de los datos calcula; el resto consume.
 - **Acta cerrada = inmutable**: `ms-notas` consulta el estado de la mesa al Core antes de guardar notas.
 
 ## Aprendizajes / errores a evitar
 - Server Actions siempre con `try/catch` + `toast.error`: una excepción no atrapada rompe todo el árbol de React. Pero `redirect()` lanza `NEXT_REDIRECT`: todo `catch` que envuelva una Server Action o `fetchApi` (servidor o cliente) llama primero a `unstable_rethrow(error)`, o un login correcto se muestra como error.
+- Errores para el usuario en Server Actions: devolver `{ error }`, no lanzarlos (en producción Next oculta el mensaje de los errores lanzados).
+- En los MS, el handler genérico convierte en 500 los errores de conversión de `@RequestParam`: para responder 400, recibir texto y parsear a mano.
 - El frontend usa React 18.2 (sin `useActionState`): formularios con Server Actions vía `useTransition`.
 - Formatear fechas con `timeZone: "America/Argentina/Buenos_Aires"` (o pre-formatear en el server) para evitar hydration mismatch.
 - `revalidatePath` con la ruta específica; el genérico no refresca listados anidados.
