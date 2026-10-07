@@ -1,6 +1,7 @@
 "use server"
 
 import { fetchApi } from "@/lib/api-server"
+import type { CondicionPreview } from "@/types/CondicionPreview"
 import { revalidatePath } from "next/cache"
 
 export async function createCursada(formData: FormData, comisionId: number) {
@@ -72,17 +73,40 @@ export async function updateCursada(formData: FormData, cursadaId: number, alumn
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
 }
 
-export async function cerrarCursada(cursadaId: number) {
+async function mensajeDeError(response: Response, porDefecto: string): Promise<string> {
+  const body = await response.json().catch(() => null)
+  return body?.errors?.[0]?.description ?? porDefecto
+}
+
+// Vista previa del cierre: condicion, porcentaje de asistencia y motivo de
+// LIBRE (spec 002, RF-11, RF-23). Devuelve el error del backend en vez de
+// lanzarlo: en produccion Next oculta el mensaje de los errores lanzados.
+export async function previsualizarCierre(
+  cursadaId: number
+): Promise<{ preview: CondicionPreview | null; error: string | null }> {
+  const response = await fetchApi(`/api/v1/cursadas/${cursadaId}/condicion-preview`)
+
+  if (!response.ok) {
+    return { preview: null, error: await mensajeDeError(response, "No se pudo calcular la condición") }
+  }
+
+  const json = await response.json()
+  return { preview: (json?.data?.[0] as CondicionPreview) ?? null, error: null }
+}
+
+// Errores del cierre (sin asistencias, ya cerrada, servicio caido) vuelven
+// como texto para mostrarlos con toast.error (RF-12, RF-24).
+export async function cerrarCursada(cursadaId: number): Promise<{ error: string | null }> {
   const response = await fetchApi(`/api/v1/cursadas/${cursadaId}/cerrar`, {
     method: "POST",
   })
 
   if (!response.ok) {
-    const body = await response.json().catch(() => null)
-    throw new Error(body?.errors?.[0]?.description ?? "No se pudo cerrar la cursada")
+    return { error: await mensajeDeError(response, "No se pudo cerrar la cursada") }
   }
 
   revalidatePath("/dashboard/comisiones/[comisionId]", "page")
+  return { error: null }
 }
 
 export async function deleteCursada(cursadaId: number) {
