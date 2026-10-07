@@ -15,6 +15,7 @@ import {
   ChevronRight,
   BookOpen,
   ShieldCheck,
+  BarChart3,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
@@ -42,6 +43,7 @@ export const navigation = [
     items: [
       { name: "Ciclos Lectivos", href: "/dashboard/ciclos", icon: Calendar, roles: ["ADMIN", "ADMINISTRATIVO"] },
       { name: "Mesas de Examen", href: "/dashboard/mesas-examen", icon: ClipboardCheck, roles: ["ADMIN", "ADMINISTRATIVO"] },
+      { name: "Reporte de asistencia", href: "/dashboard/reportes/asistencia", icon: BarChart3, roles: ["ADMIN", "ADMINISTRATIVO"] },
       { name: "Mis Clases", href: "/dashboard/mis-comisiones", icon: ClipboardList, roles: ["PROFESOR"] },
       { name: "Mis Mesas de Examen", href: "/dashboard/mis-mesas", icon: ClipboardCheck, roles: ["PROFESOR"] },
     ],

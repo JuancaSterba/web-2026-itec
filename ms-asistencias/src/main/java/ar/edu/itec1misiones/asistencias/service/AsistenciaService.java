@@ -2,6 +2,7 @@ package ar.edu.itec1misiones.asistencias.service;
 
 import ar.edu.itec1misiones.asistencias.client.HorarioClient;
 import ar.edu.itec1misiones.asistencias.dto.AsistenciaRequest;
+import ar.edu.itec1misiones.asistencias.dto.ResumenAsistenciaResponse;
 import ar.edu.itec1misiones.asistencias.model.Asistencia;
 import ar.edu.itec1misiones.asistencias.repository.AsistenciaRepository;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AsistenciaService {
@@ -37,6 +40,19 @@ public class AsistenciaService {
 
     public List<Asistencia> listar(Long cursadaId, LocalDate fecha) {
         return asistenciaRepository.buscarPorFiltros(cursadaId, fecha);
+    }
+
+    // Un resumen por cada cursada pedida, en el mismo orden; una cursada sin
+    // filas queda como SIN_REGISTROS (RF-08). Cada fila es una clase con marca
+    // del alumno, asi que las fechas sin marca no cuentan (RF-03).
+    public List<ResumenAsistenciaResponse> resumir(List<Long> cursadaIds) {
+        Map<Long, List<String>> estadosPorCursada = asistenciaRepository.findByCursadaIdIn(cursadaIds).stream()
+                .collect(Collectors.groupingBy(Asistencia::getCursadaId,
+                        Collectors.mapping(Asistencia::getEstado, Collectors.toList())));
+
+        return cursadaIds.stream()
+                .map(id -> ResumenAsistenciaCalculator.resumir(id, estadosPorCursada.getOrDefault(id, List.of())))
+                .toList();
     }
 
     public Asistencia actualizar(Long id, AsistenciaRequest request) {
