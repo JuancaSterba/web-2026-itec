@@ -3,7 +3,7 @@
 Única fuente de verdad de tareas abiertas, deuda técnica y funcionalidades diferidas.
 
 - Solo ítems **abiertos**. Al cerrar uno, se borra de este archivo: lo realizado queda en el historial de git.
-- Los números son estables (se citan desde otros docs). Un ítem nuevo usa el siguiente número libre: **#46**.
+- Los números son estables (se citan desde otros docs). Un ítem nuevo usa el siguiente número libre: **#47**.
 
 ## Deuda técnica
 - **#22 [Arquitectura] Acoplamiento sincrónico Core ↔ MS** — dependencia circular en runtime por HTTP REST: el Core depende de `ms-notas` y, desde `specs/002-regularidad-asistencia`, de `ms-asistencias` (resumen de asistencia) para previsualizar y cerrar cursadas; los MS dependen del Core para validar horarios y el estado de las mesas. Si un MS está caído, el cierre de cursada falla (503). **Próximo paso: analizar opciones de desacople** (por ejemplo, eventos asincrónicos con RabbitMQ/Kafka, réplica local de los datos que cada servicio necesita, o mover el cierre a un orquestador) y su costo para un proyecto que corre en local; ver también #42. Cambiar a mensajería requiere enmendar C1.4 de `constitution.md`.
@@ -11,6 +11,7 @@
 - **#42 [Seguridad] Profesor solo ve sus comisiones, controlado en el backend** *(baja prioridad)* — en `specs/002-regularidad-asistencia`, que un profesor vea solo sus comisiones y alumnos (RF-22, RF-26) se controla en los Server Components de Next, igual que la vista de comisión. `ms-asistencias` y `ms-notas` solo exigen el rol PROFESOR, así que un profesor que llame directo al Gateway puede leer asistencias o notas de otra comisión. Mitigarlo requiere que los MS sepan qué comisiones dicta cada profesor (consulta al Core o claim en el JWT); ver #22.
 
 - **#45 [Datos] Flyway desalineado con las entidades del Core** — `V1__init.sql` conserva el schema anterior al refactor DDD (`cuatrimestre`, `alumno_inscripto`, `modulo_horario`, `examen`, `nota`…) y el perfil `local`, que usa Docker, corre con `flyway.enabled: false` y `ddl-auto: update`: no se cumple C4.7 y el perfil `prod` (`validate`) probablemente no arranque. Próximo paso: generar una migración nueva desde el schema real (sin editar `V1`), activar Flyway + `validate` en `local` y verificar E2E; requiere aprobación (perfiles y `.env`). Incluye limpiar código muerto: el enum `EstadoCursada` (solo existe en el schema viejo) y `HorarioClient` de `ms-notas` (no se usa: los parciales no validan la fecha contra el horario).
+- **#46 [Robustez] El Core no traduce la caída de `ms-notas` a 503** — `AsistenciasClient` responde 503 si `ms-asistencias` no está disponible, pero `NotasClient` (`obtenerPorCursada`, `obtenerPorMesa`) no atrapa el error: si `ms-notas` está caído, previsualizar o cerrar una cursada, cerrar una mesa o generar el acta PDF devuelven un error genérico. Aplicar el mismo criterio que `AsistenciasClient`, con su test (C3.2). Ver #22.
 
 ## Funcionalidad pendiente
 - **#44 Inasistencias justificadas (US-ASIS-04)** — estado JUSTIFICADA con motivo obligatorio (certificado opcional) que no cuente como ausencia en la regularidad del 70 %. Quedó fuera de alcance de `specs/002-regularidad-asistencia`; el cálculo vive en `ResumenAsistenciaCalculator` (`ms-asistencias`).
