@@ -1,6 +1,7 @@
 # Índice de Documentación
 
 > **Antes que nada:** [`constitution.md`](./constitution.md) — principios innegociables que toda spec y código deben cumplir.
+> **Para estudiar el proyecto:** [`GUIA-DE-ESTUDIO.md`](./GUIA-DE-ESTUDIO.md) — resumen de arquitectura, dominio, reglas de negocio y seguridad, con preguntas de autoevaluación.
 > **Tareas abiertas:** [`pendientes.md`](./pendientes.md) — única fuente de verdad del backlog y la deuda técnica.
 
 Orden de lectura recomendado. Código decimal `categoría.orden` — el paso de 10 en el segundo número deja huecos para insertar documentos nuevos sin renombrar los existentes (ej: un doc entre `01.00` y `01.10` se numera `01.05`). Categorías nuevas se agregan al final (`06`, `07`...).
