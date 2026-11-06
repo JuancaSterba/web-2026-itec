@@ -10,7 +10,7 @@
 - `docs/` revisado contra el código el 2026-11-06 (cierra #31); `docs/GUIA-DE-ESTUDIO.md` resume el proyecto para estudiarlo.
 - Specs SDD implementadas: `001-sesion-segura` (2026-10-06, cierra #36) y `002-regularidad-asistencia` (2026-10-07, cierra #37).
 - `main` al día con `develop` vía PR #5 (2026-10-06, incluye la spec 001). No hay CI: antes de cada PR, tests Java en verde y E2E en Docker.
-- Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo, diagrama interactivo.
+- Diferidos por el usuario: cursos cortos, habilitación de carga de notas por ADMIN, seeder masivo. Desestimado: diagrama interactivo (#35).
 
 ## Decisiones arquitectónicas
 - **Dominio DDD** (Carrera → PlanEstudio → MateriaPlan → Comisión → Cursada; CicloLectivo → PeriodoAcademico independiente): el modelo viejo atado a carrera no soportaba planes ni ciclos compartidos. Fuente: `docs/02.00-Modelo_Datos.md`.

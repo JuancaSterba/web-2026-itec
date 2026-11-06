@@ -22,4 +22,3 @@
 - **#3 Cursos cortos** — ofertas de duración menor a un cuatrimestre (ej. 4 sábados); no encajan en el modelo centrado en carrera/plan.
 - **#13 Habilitación de carga de notas por ADMIN** — pedido textual (2026-07-08): "para futuras versiones, las notas deberán ser habilitadas por el admin para poder cargar". Un profesor no podría cargar notas de una instancia hasta que un ADMIN/ADMINISTRATIVO la habilite.
 - **#30 Carga masiva de datos de prueba** — seeder con muchas carreras, materias, profesores, alumnos y comisiones con horarios, para pruebas de rendimiento y estrés.
-- **#35 Diagrama de arquitectura interactiva + JSON para agentes** — post-MVP. Los entregables (`docs/arquitectura_interactiva.html`, `docs/arquitectura_agentes.json`) están en la rama `feature/analisis-arquitectura`.
